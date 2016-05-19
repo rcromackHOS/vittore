@@ -23,44 +23,58 @@ engineStruct engineSetup(int engHrs)
 
 //--------------------------------------------------------------------
 //
+/*
 void set_Engine_State(engineStruct Engine, int mode)
 {
-	switch(mode)
+	switch (mode)
 	{
-	   case ENGINE_STOP:
+	   case 0:
+	   {
 		   if (Engine.mode == ENGINE_RUNNING)
-			   set_Engine_State(Engine, ENGINE_STOPPING);
-
-
+		   {
+			  set_Engine_State(Engine, ENGINE_STOPPING);
+		   }
+		   P8OUT ^= BIT1;
 	       break;
+	   }
 
-	   case ENGINE_PRE:
-
-
-		   break;
-
-	   case ENGINE_CRANK:
-
+	   case 1:
+       {
 
 		   break;
-
-	   case ENGINE_POST:
-
-
-		   break;
-
-	   case ENGINE_RUNNING:
-
+	   }
+	   case 2:
+	   {
 
 		   break;
-
-	   case ENGINE_STOPPING:
-
+	   }
+	   case 3:
+	   {
 
 		   break;
+	   }
+	   case 4:
+	   {
+
+		   break;
+       }
+	   case 5:
+	   {
+		   if (Engine.mode != ENGINE_STOP && Engine.mode != ENGINE_STOPPING)
+		   {
+			   P2OUT &= ~ACCESSORY_PIN;
+			   P9OUT &= ~CRANK_PIN;
+			   P9OUT &= ~GLOWPLUG_PIN;
+		   }
+		   else
+			   Engine.mode = ENGINE_STOP;
+
+		   break;
+	   }
+
 	}
 }
-
+*/
 
 
 

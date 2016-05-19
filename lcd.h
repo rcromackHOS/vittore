@@ -21,9 +21,14 @@
 
 //--------------------------------------------------------------------
 
+void OLED_setup();
 void OLED_clockCycle();
-//void clearDisplay();
-//void setup_display();
+void OLED_command(int c);
+void OLED_sendByte(int tx_b);
+void OLED_data(int d);
+void OLED_clearDisplay();
+
+//--------------------------------------------------------------------
 
 #endif /* LCD_H_ */
 

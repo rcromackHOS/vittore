@@ -15,18 +15,21 @@
 
 //--------------------------------------------------------------------
 
-volatile unsigned int tmrCnt = 0;
-volatile unsigned int secondCount = 0;
+static volatile unsigned int tmrCnt = 0;
+static volatile unsigned int secondCount = 0;
 volatile unsigned int checkMask = 0x0;
 
 //--------------------------------------------------------------------
 
 void setupPorts()
 {
+	P2DIR |= 0x01;
 	P3DIR |= 0x80;
+
 	P5DIR |= 0x3f;// P5REN |= BIT5;
 
 	P8DIR |= 0x21;
+	P3DIR |= 0x60;
 
 	P5OUT |= OLED_RST;
 }
@@ -38,7 +41,7 @@ int handle_secondEvents()
     // pulse heatbeat
 	P5OUT ^= BIT1;
 
-
+	OLED_setup();
 
 	//if (secondCount % 60 == 0)
 	//	  handle_minuteEvents();
@@ -65,13 +68,16 @@ int main()
 
 	setupPorts();
 
-	engineSetup(0);
+	//engineSetup(0, 0);
+
+	OLED_setup();
 
 	_BIS_SR(GIE); // interrupts enabled
 
+	volatile int countseconds = 0;
+
 	while(1)
     {
-
 	   // ten millis events
 	   //if (checkMask && 0x1 == 0x1)
        //
@@ -79,17 +85,22 @@ int main()
 	   // half-second based events
 	   if (checkMask && 0x2 == 0x2)
 	   {
-		  checkMask ^= 0x2;
-		  P8OUT ^= BIT0;
+		  //checkMask ^= 0x2;
+		   checkMask &= ~0x2;
+		   P8OUT ^= BIT0;
+
+		   countseconds++;
 	   }
 
 	   // second based events
-       if (checkMask && 0x4 == 0x4)
-	   //if ((BIT2 >> checkMask) & 1 == 1)
+       //if (checkMask && 0x4 == 0x4)
+	   //{
+       // checkMask &= ~0x4;
+	   if (countseconds == 2)
 	   {
-    	 checkMask ^= 0x4;
-    	 secondCount++;
-    	 handle_secondEvents();
+		   countseconds = 0;
+		   secondCount++;
+		   handle_secondEvents();
        }
     }
 }
@@ -109,9 +120,11 @@ __interrupt void Timer_A (void)
 	 checkMask |= 0x2;
 
    // second based events
-   if (tmrCnt % 100 == 0)
-	 checkMask |= 0x4;
-
+   //if (tmrCnt % 100 == 0)
+   //{
+	 //if (checkMask && 0x4 != 0x4)
+   //	   checkMask |= 0x4;
+   //}
 }
 
 
