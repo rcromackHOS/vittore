@@ -4,11 +4,14 @@
 //***************************************************************************************
 
 
-#include <msp430.h>
 //#include <msp430f47197.h>
 //#include <msp430_math.h>
+#include <msp430.h>
+#include "config.h"
+
 #include "timeDate.h"
 #include "lcd.h"
+
 
 //--------------------------------------------------------------------
 
@@ -35,7 +38,7 @@ int handle_secondEvents()
     // pulse heatbeat
 	P5OUT ^= BIT1;
 
-	OLED_clockCycle();
+
 
 	//if (secondCount % 60 == 0)
 	//	  handle_minuteEvents();
@@ -61,6 +64,8 @@ int main()
 	CCR0 = 374;
 
 	setupPorts();
+
+	engineSetup(0);
 
 	_BIS_SR(GIE); // interrupts enabled
 

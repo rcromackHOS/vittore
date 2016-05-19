@@ -8,6 +8,10 @@
 #ifndef LCD_H_
 #define LCD_H_
 
+#include <msp430.h>
+
+//--------------------------------------------------------------------
+
 #define ROW_N  	 	4;                 // Number of display rows
 #define COLUMN_N  	20;             // Number of display columns
 
@@ -22,3 +26,4 @@ void OLED_clockCycle();
 //void setup_display();
 
 #endif /* LCD_H_ */
+

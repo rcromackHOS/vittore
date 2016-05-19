@@ -1,0 +1,1 @@
+"./engineController.obj" "./lcd.obj" "./main.obj" "./timeDate.obj" "../MSPMATHLIB_CCS_msp430_4xx_small_code_small_data.lib" "../lnk_msp430f47197.cmd" -llibmath.a -llibc.a 
