@@ -36,6 +36,19 @@ void setupPorts()
 
 //--------------------------------------------------------------------
 //
+void delayms(int m)
+{
+  int i;
+  //int j;
+  for (i = m; i > 0; i--)
+  {
+	//  for (j = m; j > 0; j--) { }
+  }
+
+}
+
+//--------------------------------------------------------------------
+//
 int handle_secondEvents()
 {
     // pulse heatbeat
@@ -43,7 +56,9 @@ int handle_secondEvents()
 
 	//OLED_command(0xA0); //on second line
 	//OLED_data(0x1F); //write solid blocks
-
+	P3OUT |= OLED_MOSI;
+	delayms(1000);
+	P3OUT &= ~OLED_MOSI;
 	//if (secondCount % 60 == 0)
 	//	  handle_minuteEvents();
     return 1;
@@ -96,7 +111,10 @@ int main()
 	    	   countseconds = 0;
 	    	   secondCount++;
 	    	   handle_secondEvents();
-       }
+           }
+
+	   }
+
     }
 }
 

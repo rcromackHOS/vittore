@@ -174,11 +174,8 @@ void OLED_setup()
    OLED_command(0x40);        //  VCOMH deselect level=1 x Vcc (default: 0x20=0,77 x Vcc)
    OLED_command(0x78);        // OLED characterization: OLED command set disabled (SD=0) (exit from OLED command set)
    OLED_command(0x28); // Function set: fundamental command set (RE=0) (exit from extended command set), lines #
-   OLED_command(0x01);        // Clear display
 
-   // After a clear display, a minimum pause of 1-2 ms is required
-   for(i=200; i>0; i--)
-   {}
+   OLED_clearDisplay();
 
    OLED_command(0x80);        // Set DDRAM addOLED_Resets 0x00 in addOLED_Resets counter (cursor home) (default value)
    OLED_command(0x0C);        // Display ON/OFF control: display ON, cursor off, blink off
