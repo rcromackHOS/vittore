@@ -38,7 +38,7 @@ typedef struct
 //--------------------------------------------------------------------
 
 engineStruct engineSetup(int engHrs);
-//void set_Engine_State(engineStruct Engine, int mode);
+void set_Engine_State(engineStruct Engine, int mode);
 
 //--------------------------------------------------------------------
 

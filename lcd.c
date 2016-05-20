@@ -9,7 +9,7 @@
 
 //--------------------------------------------------------------------
 
-int OLED_new_line[4] = {0x80, 0xA0, 0xC0, 0xE0};               // DDRAM addOLED_Resets for each line of the display
+int OLED_new_line[4] = {0x80, 0xA0, 0xC0, 0xE0};
 int OLED_rows = 0x08;
 
 //--------------------------------------------------------------------

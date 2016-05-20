@@ -41,7 +41,8 @@ int handle_secondEvents()
     // pulse heatbeat
 	P5OUT ^= BIT1;
 
-	OLED_setup();
+	//OLED_command(0xA0); //on second line
+	//OLED_data(0x1F); //write solid blocks
 
 	//if (secondCount % 60 == 0)
 	//	  handle_minuteEvents();
@@ -90,17 +91,11 @@ int main()
 		   P8OUT ^= BIT0;
 
 		   countseconds++;
-	   }
-
-	   // second based events
-       //if (checkMask && 0x4 == 0x4)
-	   //{
-       // checkMask &= ~0x4;
-	   if (countseconds == 2)
-	   {
-		   countseconds = 0;
-		   secondCount++;
-		   handle_secondEvents();
+	       if (countseconds == 2)
+	       {
+	    	   countseconds = 0;
+	    	   secondCount++;
+	    	   handle_secondEvents();
        }
     }
 }
