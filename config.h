@@ -7,40 +7,48 @@
 
 #ifndef CONFIG_H_
 #define CONFIG_H_
-//--------------------------------------------------------------------
-
-volatile int _HIGH_SP_24V = 	2810;
-volatile int _LOW_SP_24V = 	 	2560;
-
-volatile int _HIGH_SP_BMS = 	2850;
-volatile int _LOW_SP_BMS = 	 	2300;
-
-volatile int _LOW_SP_12V = 	 	1100;
-
-volatile int _HIGH_SP_TEMP = 	4000;
-volatile int _NOMINAL_SP_TEMP = 2000;
-volatile int _LOW_SP_TEMP =	 	500;
-
-volatile int _UNIT_MODE =		0;
-
-volatile int _STATE_CODE =		0;
 
 //--------------------------------------------------------------------
 
-volatile int _PREHEAT_SP =		15;
-volatile int PREHEAT_D =		0;
+extern volatile int _HIGH_SP_24V;
+extern volatile int _LOW_SP_24V;
+extern volatile int VALUE_24V;
 
-volatile int _CRANK_SP =		10;
-volatile int CRANK_D =			0;
+extern volatile int _HIGH_SP_BMS;
+extern volatile int _LOW_SP_BMS;
 
-volatile int _POST_SP =			10;
-volatile int POST_D =			0;
+extern volatile int _LOW_SP_12V;
+extern volatile int VALUE_12V;
 
-volatile int _ATTEMPT_SP =		10;
-volatile int ATTEMPT_D =		0;
+extern volatile int _HIGH_SP_TEMP;
+extern volatile int _NOMINAL_SP_TEMP;
+extern volatile int _LOW_SP_TEMP;
+extern volatile int VALUE_BAT_TEMP;
 
-volatile int _REATTEMPTS_SP =   3;
-volatile int REATTEMPTS_D =		0;
+extern volatile int _HIGH_SP_RPM;
+extern volatile int _LOW_SP_RPM;
+extern volatile int VALUE_RPM;
+
+extern volatile int _UNIT_MODE;
+
+extern volatile int _STATE_CODE;
+
+//--------------------------------------------------------------------
+
+extern volatile int _PREHEAT_SP;
+extern volatile int PREHEAT_D;
+
+extern volatile int _CRANK_SP;
+extern volatile int CRANK_D;
+
+extern volatile int _POST_SP;
+extern volatile int POST_D;
+
+extern volatile int _ATTEMPT_SP;
+extern volatile int ATTEMPT_D;
+
+extern volatile int _REATTEMPTS_SP;
+extern volatile int REATTEMPTS_D;
 
 //--------------------------------------------------------------------
 

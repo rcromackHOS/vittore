@@ -10,8 +10,9 @@
 #include "config.h"
 
 #include "timeDate.h"
+#include "engineController.h"
 #include "lcd.h"
-
+#include "bms.h"
 
 //--------------------------------------------------------------------
 
@@ -29,7 +30,7 @@ void setupPorts()
 	P5DIR |= 0x3f;// P5REN |= BIT5;
 
 	P8DIR |= 0x21;
-	P3DIR |= 0x60;
+	P10DIR |= 0x30;
 
 	P5OUT |= OLED_RST;
 }
@@ -56,9 +57,9 @@ int handle_secondEvents()
 
 	//OLED_command(0xA0); //on second line
 	//OLED_data(0x1F); //write solid blocks
-	P3OUT |= OLED_MOSI;
-	delayms(1000);
-	P3OUT &= ~OLED_MOSI;
+
+
+
 	//if (secondCount % 60 == 0)
 	//	  handle_minuteEvents();
     return 1;
@@ -84,7 +85,7 @@ int main()
 
 	setupPorts();
 
-	//engineSetup(0, 0);
+	engineSetup(0);
 
 	OLED_setup();
 

@@ -6,48 +6,90 @@
  */
 
 #include "engineController.h"
+#include "config.h"
 
 //--------------------------------------------------------------------
 
-
-
+engineStruct engine = {0, 0, 0};
 
 //--------------------------------------------------------------------
 // C imitation of a Constructor for the engine
-engineStruct engineSetup(int engHrs)
+int engineSetup(int engHrs)
 {
-	engineStruct ts = {0, 0, engHrs};
-
-    return ts;
+	engine.engineHours = engHrs;
+	return 1;
 }
 
 //--------------------------------------------------------------------
 //
-void incrementEngineState(engineStruct engine)
+void engineStatus()
 {
-	set_Engine_State(engine, engine.mode);
+	static int count_run;
+	static int count_RPM_fail;
+
+	if (engine.mode != ENGINE_RUNNING &&
+		engine.mode != ENGINE_POST &&
+		engine.mode != ENGINE_STOP &&
+		checkOilPressure())
+	{
+		count_run++;
+		if (count_run > 2)
+		{
+			set_Engine_State(ENGINE_POST);
+			count_run = 0;
+		}
+	}
+
+	else if (engine.mode == ENGINE_RUNNING)
+	{
+		if (checkEngineRPMs() == 1)
+		{
+			if (count_RPM_fail > 0)
+				count_RPM_fail--;
+		}
+		else
+		{
+			count_RPM_fail++;
+			if (count_RPM_fail > 3)
+			{
+				if (checkEngineRPMs() == 0)
+				{
+					set_Engine_State(ENGINE_STOPPING);
+				//  fail slow condition
+				}
+
+				if (checkEngineRPMs() == 2)
+				{
+					set_Engine_State(ENGINE_STOPPING);
+				//  fail slow condition
+				}
+			}
+		}
+	}
+
+	else
+		set_Engine_State(engine.mode);
 }
 
 //--------------------------------------------------------------------
 //
-void set_Engine_State(engineStruct engine, int mode)
+void set_Engine_State(int mode)
 {
-   if (mode == ENGINE_STOP )
-	 P8OUT ^= BIT1;
-	/*
 	   if (mode == ENGINE_STOP)
 	   {
 		   if (engine.mode == ENGINE_RUNNING)
-		     set_Engine_State(engine, ENGINE_STOPPING);
+		     set_Engine_State(ENGINE_STOPPING);
 
 	   }
 
 	   else if (mode == ENGINE_PRE)
 	   {
+
 		 if (engine.mode != ENGINE_PRE)
 		 {
 		   P2OUT |= ACCESSORY_PIN;
 		   P9OUT |= GLOWPLUG_PIN;
+		   P8OUT |= ASSET_IGN_PIN;
 
 		   engine.mode = ENGINE_PRE;
 
@@ -60,7 +102,7 @@ void set_Engine_State(engineStruct engine, int mode)
 		   PREHEAT_D--;
 
 		   if (PREHEAT_D == 0)
-		     set_Engine_State(engine, ENGINE_CRANK);
+		     set_Engine_State(ENGINE_CRANK);
 		 }
 
 	   }
@@ -78,13 +120,11 @@ void set_Engine_State(engineStruct engine, int mode)
 
 		 if (CRANK_D > 0)
 		 {
-		   CRANK_D--;
+		    CRANK_D--;
 
-		   if (CRANK_D == 0)
-		   {
-			 P9OUT &= ~CRANK_PIN;
-		     set_Engine_State(engine, ENGINE_REATTEMPT);
-		   }
+		    if (CRANK_D == 0)
+		        set_Engine_State(ENGINE_REATTEMPT);
+
 		 }
 
 	   }
@@ -106,15 +146,15 @@ void set_Engine_State(engineStruct engine, int mode)
 		 	if (ATTEMPT_D > 0)
 		 	   ATTEMPT_D--;
 
-		   	if (ATTEMPT_D == 0)
-			   set_Engine_State(engine, ENGINE_CRANK);
+		 	else if (ATTEMPT_D == 0)
+			   set_Engine_State(ENGINE_CRANK);
 		 }
 
- 	 	 if (REATTEMPTS_D == 0)
+ 	 	 if (REATTEMPTS_D <= 0)
 		 {
 		    // fail mode
 
-		    set_Engine_State(engine, ENGINE_STOPPING);
+		    set_Engine_State(ENGINE_STOPPING);
 		 }
 
 	   }
@@ -125,6 +165,8 @@ void set_Engine_State(engineStruct engine, int mode)
 		 {
 		   engine.mode = ENGINE_POST;
 
+		   P9OUT &= ~CRANK_PIN;
+
 		   POST_D = _POST_SP;
 		 }
 
@@ -134,8 +176,13 @@ void set_Engine_State(engineStruct engine, int mode)
 
 		   if (POST_D == 0)
 		   {
-			 P9OUT &= ~GLOWPLUG_PIN;
-		     set_Engine_State(engine, ENGINE_RUNNING);
+			 if (checkEngineRPMs())
+			 {
+			   P9OUT &= ~GLOWPLUG_PIN;
+		       set_Engine_State(ENGINE_RUNNING);
+			 }
+			 else
+			   set_Engine_State(ENGINE_REATTEMPT);
 		   }
 		 }
 
@@ -145,6 +192,11 @@ void set_Engine_State(engineStruct engine, int mode)
 	   {
 			if (engine.mode != ENGINE_RUNNING)
 		   	   engine.mode = ENGINE_RUNNING;
+
+			P2OUT |= ACCESSORY_PIN;
+			P9OUT &= ~CRANK_PIN;
+		    P9OUT &= ~GLOWPLUG_PIN;
+
 	   }
 
 	   else if (mode == ENGINE_STOPPING)
@@ -155,6 +207,7 @@ void set_Engine_State(engineStruct engine, int mode)
 			   P2OUT &= ~ACCESSORY_PIN;
 			   P9OUT &= ~CRANK_PIN;
 			   P9OUT &= ~GLOWPLUG_PIN;
+			   P8OUT &= ~ASSET_IGN_PIN;
 
 		   	   engine.mode = ENGINE_STOP;
 		   }
@@ -163,7 +216,6 @@ void set_Engine_State(engineStruct engine, int mode)
 
 	   }
 
-	   */
 }
 
 

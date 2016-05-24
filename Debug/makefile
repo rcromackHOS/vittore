@@ -10,6 +10,8 @@ GEN_OPTS__FLAG :=
 GEN_CMDS__FLAG := 
 
 ORDERED_OBJS += \
+"./bms.obj" \
+"./config.obj" \
 "./engineController.obj" \
 "./lcd.obj" \
 "./main.obj" \
@@ -157,8 +159,8 @@ vittore.hex: $(EXE_OUTPUTS)
 # Other Targets
 clean:
 	-$(RM) $(EXE_OUTPUTS__QUOTED)$(BIN_OUTPUTS__QUOTED)
-	-$(RM) "engineController.d" "lcd.d" "main.d" "timeDate.d" 
-	-$(RM) "engineController.obj" "lcd.obj" "main.obj" "timeDate.obj" 
+	-$(RM) "bms.d" "config.d" "engineController.d" "lcd.d" "main.d" "timeDate.d" 
+	-$(RM) "bms.obj" "config.obj" "engineController.obj" "lcd.obj" "main.obj" "timeDate.obj" 
 	-@echo 'Finished clean'
 	-@echo ' '
 

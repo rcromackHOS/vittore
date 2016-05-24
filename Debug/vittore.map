@@ -1,7 +1,7 @@
 ******************************************************************************
                   MSP430 Linker PC v15.12.1                    
 ******************************************************************************
->> Linked Fri May 20 13:46:11 2016
+>> Linked Tue May 24 15:05:50 2016
 
 OUTPUT FILE NAME:   <vittore.out>
 ENTRY POINT SYMBOL: "_c_int00_noargs_noexit"  address: 0000211e
@@ -18,8 +18,8 @@ MEMORY CONFIGURATION
   INFOC                 00001040   00000040  00000000  00000040  RWIX
   INFOB                 00001080   00000040  00000000  00000040  RWIX
   INFOA                 000010c0   00000040  00000000  00000040  RWIX
-  RAM                   00001100   00001000  0000007e  00000f82  RWIX
-  FLASH                 00002100   0000debe  0000007e  0000de40  RWIX
+  RAM                   00001100   00001000  0000005c  00000fa4  RWIX
+  FLASH                 00002100   0000debe  0000005a  0000de64  RWIX
   BSLSIGNATURE          0000ffbe   00000002  00000002  00000000  RWIX  ffff 
   INT00                 0000ffc0   00000002  00000000  00000002  RWIX
   INT01                 0000ffc2   00000002  00000000  00000002  RWIX
@@ -53,7 +53,7 @@ MEMORY CONFIGURATION
   INT29                 0000fffa   00000002  00000002  00000000  RWIX
   INT30                 0000fffc   00000002  00000002  00000000  RWIX
   RESET                 0000fffe   00000002  00000002  00000000  RWIX
-  FLASH2                00010000   00010000  00000486  0000fb7a  RWIX
+  FLASH2                00010000   00010000  00000488  0000fb78  RWIX
 
 
 SECTION ALLOCATION MAP
@@ -61,8 +61,9 @@ SECTION ALLOCATION MAP
  output                                  attributes/
 section   page    origin      length       input sections
 --------  ----  ----------  ----------   ----------------
-.data      0    00001100    0000002e     UNINITIALIZED
-                  00001100    0000002e     main.obj (.data)
+.data      0    00001100    0000000c     UNINITIALIZED
+                  00001100    00000006     engineController.obj (.data:engine)
+                  00001106    00000006     main.obj (.data)
 
 .stack     0    000020b0    00000050     UNINITIALIZED
                   000020b0    00000004     rts430x_lc_rd_eabi.lib : boot.obj (.stack)
@@ -74,11 +75,11 @@ section   page    origin      length       input sections
                   0000211e    0000001a     rts430x_lc_rd_eabi.lib : boot_special.obj (.text:_isr:_c_int00_noargs_noexit)
                   00002138    00000008                            : isr_trap.obj (.text:_isr:__TI_ISR_TRAP)
 
-.cinit     0    00002140    0000003e     
-                  00002140    0000002d     (.cinit..data.load) [load image, compression = rle]
-                  0000216d    00000001     --HOLE-- [fill = 0]
-                  0000216e    00000008     (__TI_handler_table)
-                  00002176    00000008     (__TI_cinit_table)
+.cinit     0    00002140    0000001a     
+                  00002140    00000009     (.cinit..data.load) [load image, compression = rle]
+                  00002149    00000001     --HOLE-- [fill = 0]
+                  0000214a    00000008     (__TI_handler_table)
+                  00002152    00000008     (__TI_cinit_table)
 
 .init_array 
 *          0    00002100    00000000     UNINITIALIZED
@@ -143,27 +144,28 @@ NMI        0    0000fffc    00000002
 .reset     0    0000fffe    00000002     
                   0000fffe    00000002     rts430x_lc_rd_eabi.lib : boot.obj (.reset)
 
-.text      0    00010000    00000486     
+.text      0    00010000    00000488     
                   00010000    0000011a     lcd.obj (.text:OLED_setup)
                   0001011a    00000082     rts430x_lc_rd_eabi.lib : autoinit_wdt.obj (.text:_auto_init_hold_wdt)
                   0001019c    00000076     lcd.obj (.text:OLED_sendByte)
                   00010212    00000068     rts430x_lc_rd_eabi.lib : copy_decompress_rle.obj (.text:__TI_decompress_rle_core)
                   0001027a    00000066                            : cpy_tbl.obj (.text:copy_in)
-                  000102e0    00000052     main.obj (.text:main)
-                  00010332    00000040     lcd.obj (.text:OLED_data)
-                  00010372    00000038     lcd.obj (.text:OLED_command)
-                  000103aa    00000028     lcd.obj (.text:OLED_clockCycle)
-                  000103d2    00000024     main.obj (.text:setupPorts)
-                  000103f6    00000018     rts430x_lc_rd_eabi.lib : mult16_hw.obj (.text)
-                  0001040e    00000016     lcd.obj (.text:OLED_clearDisplay)
-                  00010424    00000016     rts430x_lc_rd_eabi.lib : div16u.obj (.text)
-                  0001043a    00000014     main.obj (.text:handle_secondEvents)
-                  0001044e    00000014     rts430x_lc_rd_eabi.lib : memcpy.obj (.text:memcpy)
-                  00010462    00000012                            : copy_decompress_none.obj (.text:decompress:none:__TI_decompress_none)
-                  00010474    00000006                            : exit.obj (.text:abort)
-                  0001047a    00000006                            : copy_decompress_rle.obj (.text:decompress:rle24:__TI_decompress_rle24)
-                  00010480    00000004                            : pre_init.obj (.text:_system_pre_init)
-                  00010484    00000002                            : startup.obj (.text:_system_post_cinit)
+                  000102e0    00000058     main.obj (.text:main)
+                  00010338    00000040     lcd.obj (.text:OLED_data)
+                  00010378    00000038     lcd.obj (.text:OLED_command)
+                  000103b0    00000028     lcd.obj (.text:OLED_clockCycle)
+                  000103d8    00000024     main.obj (.text:setupPorts)
+                  000103fc    00000018     rts430x_lc_rd_eabi.lib : mult16_hw.obj (.text)
+                  00010414    00000016     lcd.obj (.text:OLED_clearDisplay)
+                  0001042a    00000016     rts430x_lc_rd_eabi.lib : div16u.obj (.text)
+                  00010440    00000014                            : memcpy.obj (.text:memcpy)
+                  00010454    00000012                            : copy_decompress_none.obj (.text:decompress:none:__TI_decompress_none)
+                  00010466    00000008     engineController.obj (.text:engineSetup)
+                  0001046e    00000008     main.obj (.text:handle_secondEvents)
+                  00010476    00000006     rts430x_lc_rd_eabi.lib : exit.obj (.text:abort)
+                  0001047c    00000006                            : copy_decompress_rle.obj (.text:decompress:rle24:__TI_decompress_rle24)
+                  00010482    00000004                            : pre_init.obj (.text:_system_pre_init)
+                  00010486    00000002                            : startup.obj (.text:_system_post_cinit)
 
 MODULE SUMMARY
 
@@ -171,9 +173,10 @@ MODULE SUMMARY
        ------                     ----   -------   -------
     .\
        lcd.obj                    582    0         0      
-       main.obj                   168    2         46     
+       main.obj                   162    2         6      
+       engineController.obj       8      0         6      
     +--+--------------------------+------+---------+---------+
-       Total:                     750    2         46     
+       Total:                     752    2         12     
                                                           
     C:\ti\ccsv6\tools\compiler\ti-cgt-msp430_15.12.1.LTS\lib\rts430x_lc_rd_eabi.lib
        autoinit_wdt.obj           130    0         0      
@@ -208,20 +211,20 @@ MODULE SUMMARY
        Total:                     472    32        0      
                                                           
        Stack:                     0      0         80     
-       Linker Generated:          0      61        0      
+       Linker Generated:          0      25        0      
     +--+--------------------------+------+---------+---------+
-       Grand Total:               1222   95        126    
+       Grand Total:               1224   59        92     
 
 
 LINKER GENERATED COPY TABLES
 
-__TI_cinit_table @ 00002176 records: 1, size/record: 8, table size: 8
-	.data: load addr=00002140, load size=0000002d bytes, run addr=00001100, run size=0000002e bytes, compression=rle
+__TI_cinit_table @ 00002152 records: 1, size/record: 8, table size: 8
+	.data: load addr=00002140, load size=00000009 bytes, run addr=00001100, run size=0000000c bytes, compression=rle
 
 
 LINKER GENERATED HANDLER TABLE
 
-__TI_handler_table @ 0000216e records: 2, size/record: 4, table size: 8
+__TI_handler_table @ 0000214a records: 2, size/record: 4, table size: 8
 	index: 0, handler: __TI_decompress_rle24
 	index: 1, handler: __TI_decompress_none
 
@@ -230,16 +233,14 @@ GLOBAL SYMBOLS: SORTED ALPHABETICALLY BY Name
 
 address   name                    
 -------   ----                    
-00001122  ATTEMPT_D               
 00000046  BTCNT1                  
 00000046  BTCNT12                 
 00000047  BTCNT2                  
 00000040  BTCTL                   
-00010474  C$$EXIT                 
+00010476  C$$EXIT                 
 00000059  CACTL1                  
 0000005a  CACTL2                  
 0000005b  CAPD                    
-0000111a  CRANK_D                 
 000001d0  DMA0CTL                 
 000001d6  DMA0DA                  
 000001d6  DMA0DAL                 
@@ -322,10 +323,10 @@ address   name
 00000144  MPYS32L_B               
 00000132  MPYS_B                  
 00000130  MPY_B                   
-0001040e  OLED_clearDisplay       
-000103aa  OLED_clockCycle         
-00010372  OLED_command            
-00010332  OLED_data               
+00010414  OLED_clearDisplay       
+000103b0  OLED_clockCycle         
+00010378  OLED_command            
+00010338  OLED_data               
 0001019c  OLED_sendByte           
 00010000  OLED_setup              
 00000138  OP2                     
@@ -395,9 +396,6 @@ address   name
 0000000a  PBOUT                   
 00000016  PBREN                   
 0000000e  PBSEL                   
-0000111e  POST_D                  
-00001116  PREHEAT_D               
-00001126  REATTEMPTS_D            
 00000154  RES0                    
 00000156  RES1                    
 00000158  RES2                    
@@ -518,34 +516,19 @@ address   name
 000000dd  UCB1STAT                
 000000df  UCB1TXBUF               
 00000120  WDTCTL                  
-00001120  _ATTEMPT_SP             
-00001118  _CRANK_SP               
-00001100  _HIGH_SP_24V            
-00001104  _HIGH_SP_BMS            
-0000110a  _HIGH_SP_TEMP           
-00001108  _LOW_SP_12V             
-00001102  _LOW_SP_24V             
-00001106  _LOW_SP_BMS             
-0000110e  _LOW_SP_TEMP            
-0000110c  _NOMINAL_SP_TEMP        
-0000111c  _POST_SP                
-00001114  _PREHEAT_SP             
-00001124  _REATTEMPTS_SP          
-00001112  _STATE_CODE             
-00001110  _UNIT_MODE              
 00002100  __STACK_END             
 00000050  __STACK_SIZE            
 UNDEFED   __TI_BINIT_Base         
 UNDEFED   __TI_BINIT_Limit        
-00002176  __TI_CINIT_Base         
-0000217e  __TI_CINIT_Limit        
-0000216e  __TI_Handler_Table_Base 
-00002176  __TI_Handler_Table_Limit
+00002152  __TI_CINIT_Base         
+0000215a  __TI_CINIT_Limit        
+0000214a  __TI_Handler_Table_Base 
+00002152  __TI_Handler_Table_Limit
 UNDEFED   __TI_INITARRAY_Base     
 UNDEFED   __TI_INITARRAY_Limit    
 00002138  __TI_ISR_TRAP           
-00010462  __TI_decompress_none    
-0001047a  __TI_decompress_rle24   
+00010454  __TI_decompress_none    
+0001047c  __TI_decompress_rle24   
 0000ffde  __TI_int15              
 0000ffe0  __TI_int16              
 0000ffe2  __TI_int17              
@@ -566,22 +549,24 @@ ffffffff  __TI_pprof_out_hndl
 ffffffff  __TI_prof_data_size     
 ffffffff  __TI_prof_data_start    
 ffffffff  __c_args__              
-00010424  __mspabi_divu           
-000103f6  __mspabi_mpyi_hw        
-00010424  __mspabi_remu           
+0001042a  __mspabi_divu           
+000103fc  __mspabi_mpyi_hw        
+0001042a  __mspabi_remu           
 0001011a  _auto_init_hold_wdt     
 0000211e  _c_int00_noargs_noexit  
 0000fffe  _reset_vector           
 000020b0  _stack                  
-00010484  _system_post_cinit      
-00010480  _system_pre_init        
-00010474  abort                   
-0000112c  checkMask               
+00010486  _system_post_cinit      
+00010482  _system_pre_init        
+00010476  abort                   
+0000110a  checkMask               
 0001027a  copy_in                 
-0001043a  handle_secondEvents     
+00001100  engine                  
+00010466  engineSetup             
+0001046e  handle_secondEvents     
 000102e0  main                    
-0001044e  memcpy                  
-000103d2  setupPorts              
+00010440  memcpy                  
+000103d8  setupPorts              
 
 
 GLOBAL SYMBOLS: SORTED BY Symbol Address 
@@ -864,36 +849,17 @@ address   name
 000001ee  DMA2DA                  
 000001ee  DMA2DAL                 
 000001f2  DMA2SZ                  
-00001100  _HIGH_SP_24V            
-00001102  _LOW_SP_24V             
-00001104  _HIGH_SP_BMS            
-00001106  _LOW_SP_BMS             
-00001108  _LOW_SP_12V             
-0000110a  _HIGH_SP_TEMP           
-0000110c  _NOMINAL_SP_TEMP        
-0000110e  _LOW_SP_TEMP            
-00001110  _UNIT_MODE              
-00001112  _STATE_CODE             
-00001114  _PREHEAT_SP             
-00001116  PREHEAT_D               
-00001118  _CRANK_SP               
-0000111a  CRANK_D                 
-0000111c  _POST_SP                
-0000111e  POST_D                  
-00001120  _ATTEMPT_SP             
-00001122  ATTEMPT_D               
-00001124  _REATTEMPTS_SP          
-00001126  REATTEMPTS_D            
-0000112c  checkMask               
+00001100  engine                  
+0000110a  checkMask               
 000020b0  _stack                  
 00002100  Timer_A                 
 00002100  __STACK_END             
 0000211e  _c_int00_noargs_noexit  
 00002138  __TI_ISR_TRAP           
-0000216e  __TI_Handler_Table_Base 
-00002176  __TI_CINIT_Base         
-00002176  __TI_Handler_Table_Limit
-0000217e  __TI_CINIT_Limit        
+0000214a  __TI_Handler_Table_Base 
+00002152  __TI_CINIT_Base         
+00002152  __TI_Handler_Table_Limit
+0000215a  __TI_CINIT_Limit        
 0000ffde  __TI_int15              
 0000ffe0  __TI_int16              
 0000ffe2  __TI_int17              
@@ -916,22 +882,23 @@ address   name
 0001019c  OLED_sendByte           
 0001027a  copy_in                 
 000102e0  main                    
-00010332  OLED_data               
-00010372  OLED_command            
-000103aa  OLED_clockCycle         
-000103d2  setupPorts              
-000103f6  __mspabi_mpyi_hw        
-0001040e  OLED_clearDisplay       
-00010424  __mspabi_divu           
-00010424  __mspabi_remu           
-0001043a  handle_secondEvents     
-0001044e  memcpy                  
-00010462  __TI_decompress_none    
-00010474  C$$EXIT                 
-00010474  abort                   
-0001047a  __TI_decompress_rle24   
-00010480  _system_pre_init        
-00010484  _system_post_cinit      
+00010338  OLED_data               
+00010378  OLED_command            
+000103b0  OLED_clockCycle         
+000103d8  setupPorts              
+000103fc  __mspabi_mpyi_hw        
+00010414  OLED_clearDisplay       
+0001042a  __mspabi_divu           
+0001042a  __mspabi_remu           
+00010440  memcpy                  
+00010454  __TI_decompress_none    
+00010466  engineSetup             
+0001046e  handle_secondEvents     
+00010476  C$$EXIT                 
+00010476  abort                   
+0001047c  __TI_decompress_rle24   
+00010482  _system_pre_init        
+00010486  _system_post_cinit      
 ffffffff  __TI_pprof_out_hndl     
 ffffffff  __TI_prof_data_size     
 ffffffff  __TI_prof_data_start    
@@ -941,4 +908,4 @@ UNDEFED   __TI_BINIT_Limit
 UNDEFED   __TI_INITARRAY_Base     
 UNDEFED   __TI_INITARRAY_Limit    
 
-[352 symbols]
+[334 symbols]
