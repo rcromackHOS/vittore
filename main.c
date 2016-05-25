@@ -13,6 +13,23 @@
 #include "engineController.h"
 #include "lcd.h"
 #include "bms.h"
+#include "button.h"
+
+//--------------------------------------------------------------------
+
+// outputs
+#define HEARTBEAT 		BIT1
+#define FAIL_LED   		BIT4
+
+#define ASSET_IN1_PIN   BIT0
+#define ASSET_IN2_PIN   BIT1
+#define ASSET_IN3_PIN   BIT2
+#define ASSET_IN4_PIN  	BIT3
+
+
+// Inputs
+#define LOWFUEL   		BIT5
+
 
 //--------------------------------------------------------------------
 
@@ -24,15 +41,17 @@ volatile unsigned int checkMask = 0x0;
 
 void setupPorts()
 {
-	P2DIR |= 0x01;
+	P1DIR |= 0xdf;
+	P2DIR |= 0x21;
 	P3DIR |= 0x80;
+	P4DIR |= 0x3f;
+	P5DIR |= 0x3f;
 
-	P5DIR |= 0x3f;// P5REN |= BIT5;
-
+	P7DIR |= 0x00;
 	P8DIR |= 0x21;
-	P10DIR |= 0x30;
+	P9DIR |= 0x7f;
+	P10DIR |= 0xff;
 
-	P5OUT |= OLED_RST;
 }
 
 //--------------------------------------------------------------------
@@ -53,22 +72,48 @@ void delayms(int m)
 int handle_secondEvents()
 {
     // pulse heatbeat
-	P5OUT ^= BIT1;
+	P5OUT ^= HEARTBEAT;
 
 	//OLED_command(0xA0); //on second line
 	//OLED_data(0x1F); //write solid blocks
 
+	// System failure
+	if (failure == 1)
+	{
+		P9OUT |= FAIL_LED;
+		P10OUT |= ASSET_IN4_PIN;
+	}
+	else
+	{
+		P9OUT &= ~FAIL_LED;
+		P10OUT &= ~ASSET_IN4_PIN;
+	}
+
+	// Low fuel
+	if (P2IN & LOWFUEL == 1)
+		P10OUT |= ASSET_IN3_PIN;
+	else
+		P10OUT &= ~ASSET_IN3_PIN;
 
 
-	//if (secondCount % 60 == 0)
-	//	  handle_minuteEvents();
-    return 1;
+	if (secondCount % 60 == 0)
+		handle_minuteEvents();
+
+	return 1;
 }
 
 //--------------------------------------------------------------------
 //
-//void handle_minuteEvents()
-//{}
+void handle_minuteEvents()
+{}
+
+//--------------------------------------------------------------------
+//
+void setStateCode(int code)
+{
+	if (code > _STATE_CODE)
+		_STATE_CODE = code;
+}
 
 //--------------------------------------------------------------------
 //
@@ -88,6 +133,8 @@ int main()
 	engineSetup(0);
 
 	OLED_setup();
+
+	_UNIT_MODE = 0;
 
 	_BIS_SR(GIE); // interrupts enabled
 

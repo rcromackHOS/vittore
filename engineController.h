@@ -39,6 +39,8 @@ typedef struct
 
 // asset tracker outputs
 #define ASSET_IGN_PIN    BIT5
+#define OIL_PIN		     BIT7
+#define ENGINE_TEMP_PIN  BIT6
 
 //--------------------------------------------------------------------
 
@@ -49,6 +51,7 @@ void set_Engine_State(int mode);
 
 int checkOilPressure();
 int checkEngineRPMs();
+int checkEngineTemp();
 
 //--------------------------------------------------------------------
 

@@ -15,6 +15,7 @@ volatile int VALUE_24V = 	    0;
 
 volatile int _HIGH_SP_BMS = 	2850;
 volatile int _LOW_SP_BMS = 	2300;
+volatile int _CELLMONITOR_SP = 30;
 
 volatile int _LOW_SP_12V = 	1100;
 volatile int VALUE_12V = 	    0;
@@ -31,6 +32,9 @@ volatile int VALUE_RPM = 	    0;
 volatile int _UNIT_MODE =		0;
 
 volatile int _STATE_CODE =		0;
+volatile int _MAST_STATUS =     0;
+
+volatile int _RESETTING_ =      0;
 
 //--------------------------------------------------------------------
 
@@ -48,3 +52,9 @@ volatile int ATTEMPT_D =		0;
 
 volatile int _REATTEMPTS_SP =   3;
 volatile int REATTEMPTS_D =		0;
+
+//--------------------------------------------------------------------
+
+extern int failure = 0;
+
+//--------------------------------------------------------------------

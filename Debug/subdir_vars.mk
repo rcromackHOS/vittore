@@ -11,6 +11,7 @@ LIB_SRCS += \
 
 C_SRCS += \
 ../bms.c \
+../button.c \
 ../config.c \
 ../engineController.c \
 ../lcd.c \
@@ -19,6 +20,7 @@ C_SRCS += \
 
 OBJS += \
 ./bms.obj \
+./button.obj \
 ./config.obj \
 ./engineController.obj \
 ./lcd.obj \
@@ -27,6 +29,7 @@ OBJS += \
 
 C_DEPS += \
 ./bms.d \
+./button.d \
 ./config.d \
 ./engineController.d \
 ./lcd.d \
@@ -35,6 +38,7 @@ C_DEPS += \
 
 C_DEPS__QUOTED += \
 "bms.d" \
+"button.d" \
 "config.d" \
 "engineController.d" \
 "lcd.d" \
@@ -43,6 +47,7 @@ C_DEPS__QUOTED += \
 
 OBJS__QUOTED += \
 "bms.obj" \
+"button.obj" \
 "config.obj" \
 "engineController.obj" \
 "lcd.obj" \
@@ -51,6 +56,7 @@ OBJS__QUOTED += \
 
 C_SRCS__QUOTED += \
 "../bms.c" \
+"../button.c" \
 "../config.c" \
 "../engineController.c" \
 "../lcd.c" \
