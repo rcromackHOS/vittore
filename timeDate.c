@@ -32,6 +32,15 @@ dateStruct date(int d, int m, int y)
 }
 
 //--------------------------------------------------------------------
+// C imitation of a Constructor for the dateTime typedef.
+dateTimeStruct datetime(int s, int mm, int h, int d, int m, int y)
+{
+	dateTimeStruct dt = {s, mm, h, d, m, y};
+
+    return dt;
+}
+
+//--------------------------------------------------------------------
 //
 int validateDate(dateStruct ds)
 {

@@ -58,8 +58,8 @@
 #define DOWN_EXTENT_PIN   BIT6
 #define UP_EXTENT_PIN     BIT7
 
-
 //--------------------------------------------------------------------
+
 typedef struct
 {
 	int pin;
@@ -71,23 +71,15 @@ typedef struct
 
 } button;
 
+button buttonList[6];
 
-struct button buttonList[6]
-						 {
-{AUTO_PB_PIN, AUTO_LED_PIN, MODE_AUTO, STATE_NOMINAL, 0};
-{STANDBY_PB_PIN, STANDBY_LED_PIN, MODE_LIGHT1H, STATE_NOMINAL, 0};
-{LIGHT1H_PB_PIN, LIGHT1H_LED_PIN, MODE_STANDBY, STATE_NOMINAL, 0};
-{RESET_PB_PIN, RESET_LED_PIN, MODE_RESET, STATE_NOMINAL, 0};
-{DOWN_PB_PIN, DOWN_LED_PIN, MODE_UP, STATE_NOMINAL, 0};
-{UP_PB_PIN, UP_LED_PIN, MODE_DOWN, STATE_NOMINAL, 0};
-/*
-buttonList[0] = {AUTO_PB_PIN, AUTO_LED_PIN, MODE_AUTO, STATE_NOMINAL, 0};
-buttonList[1] = {STANDBY_PB_PIN, STANDBY_LED_PIN, MODE_LIGHT1H, STATE_NOMINAL, 0};
-buttonList[2] = {LIGHT1H_PB_PIN, LIGHT1H_LED_PIN, MODE_STANDBY, STATE_NOMINAL, 0};
-buttonList[3] = {RESET_PB_PIN, RESET_LED_PIN, MODE_RESET, STATE_NOMINAL, 0};
-buttonList[4] = {DOWN_PB_PIN, DOWN_LED_PIN, MODE_UP, STATE_NOMINAL, 0};
-buttonList[5] = {UP_PB_PIN, UP_LED_PIN, MODE_DOWN, STATE_NOMINAL, 0};
-*/						 };
+//--------------------------------------------------------------------
+
+void buildButtonStateMachine();
+void button_stateMachine();
+
+void mastUpDown();
+void mast_stateMachine(int deltastate);
 
 //--------------------------------------------------------------------
 

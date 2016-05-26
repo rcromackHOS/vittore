@@ -11,18 +11,6 @@
 #include <msp430.h>
 
 //--------------------------------------------------------------------
-
-typedef struct
-{
-  int mode;
-
-  int runTime;
-
-  int engineHours;
-
-} engineStruct;
-
-//--------------------------------------------------------------------
 // state codes
 #define ENGINE_STOP  	 0x0
 #define ENGINE_PRE       0x1

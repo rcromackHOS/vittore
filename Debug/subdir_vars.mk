@@ -10,6 +10,7 @@ LIB_SRCS += \
 ../MSPMATHLIB_CCS_msp430_4xx_small_code_small_data.lib 
 
 C_SRCS += \
+../MCP7940N.c \
 ../bms.c \
 ../button.c \
 ../config.c \
@@ -19,6 +20,7 @@ C_SRCS += \
 ../timeDate.c 
 
 OBJS += \
+./MCP7940N.obj \
 ./bms.obj \
 ./button.obj \
 ./config.obj \
@@ -28,6 +30,7 @@ OBJS += \
 ./timeDate.obj 
 
 C_DEPS += \
+./MCP7940N.d \
 ./bms.d \
 ./button.d \
 ./config.d \
@@ -37,6 +40,7 @@ C_DEPS += \
 ./timeDate.d 
 
 C_DEPS__QUOTED += \
+"MCP7940N.d" \
 "bms.d" \
 "button.d" \
 "config.d" \
@@ -46,6 +50,7 @@ C_DEPS__QUOTED += \
 "timeDate.d" 
 
 OBJS__QUOTED += \
+"MCP7940N.obj" \
 "bms.obj" \
 "button.obj" \
 "config.obj" \
@@ -55,6 +60,7 @@ OBJS__QUOTED += \
 "timeDate.obj" 
 
 C_SRCS__QUOTED += \
+"../MCP7940N.c" \
 "../bms.c" \
 "../button.c" \
 "../config.c" \

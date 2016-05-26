@@ -12,18 +12,43 @@
 
 void buildButtonStateMachine()
 {
-	// PIN, LEDPIN, MODE, STATE, COUNT
-
+	button buttonList[6] =
+	{
+			{AUTO_PB_PIN, AUTO_LED_PIN, MODE_AUTO, STATE_NOMINAL, 0},
+			{STANDBY_PB_PIN, STANDBY_LED_PIN, MODE_STANDBY, STATE_NOMINAL, 0},
+			{LIGHT1H_PB_PIN, LIGHT1H_LED_PIN, MODE_LIGHT1H, STATE_NOMINAL, 0},
+			{RESET_PB_PIN, RESET_LED_PIN, MODE_RESET, STATE_NOMINAL, 0},
+			{DOWN_PB_PIN, DOWN_LED_PIN, MODE_UP, STATE_NOMINAL, 0},
+			{UP_PB_PIN, UP_LED_PIN, MODE_DOWN, STATE_NOMINAL, 0}
+	};
 }
+
+
 
 //--------------------------------------------------------------------
 //
-void button_stateMachine(int state)
+void button_stateMachine()
 {
 	int high;
 	int i;
 
-	for (i = 0; i < 6; i++)
+	int nom_buts;
+	for (i = 3; i >= 0; i--)
+	{
+		if (buttonList[i].state == STATE_PRESSED)
+			nom_buts++;
+	}
+
+	if (nom_buts == 3)
+	{
+		_DIAGNOSTIC_MODE = 1;
+		_DIAGNOSTIC_MODE_TMR = 60;
+
+		nom_buts = 0;
+	}
+
+	// if it seems we're not getting a 3 finger salute, dont enter diagnostic mode
+	for (i = 5; i >= 0; i--)
 	{
 		high = P1IN & buttonList[i].pin;
 
@@ -44,14 +69,18 @@ void button_stateMachine(int state)
 
 			case STATE_PRESSED:
 
-				if (buttonList[i].mode < MODE_RESET)
+				if (buttonList[i].mode < MODE_RESET && _DIAGNOSTIC_MODE == 0)
+				{
 					_UNIT_MODE = buttonList[i].mode;
+					P4OUT |= buttonList[i].LEDpin;
+				}
 
 				else if (buttonList[i].mode == MODE_RESET)
 					_RESETTING_ = 1;
 
 				else if (buttonList[i].mode > MODE_RESET)
 					mastUpDown();
+
 
 				if (high == 0)
 				{
@@ -65,20 +94,28 @@ void button_stateMachine(int state)
 
 		}
 	}
-
 }
 
 //--------------------------------------------------------------------
 //
 void mastUpDown()
 {
+	if (_DIAGNOSTIC_MODE == 1)
+	{
+		if (buttonList[5].state == STATE_PRESSED && buttonList[4].state != STATE_PRESSED)
+			diagnostic_PageUp();
 
-	if (buttonList[5].state == STATE_PRESSED && buttonList[4].state != STATE_PRESSED)
-		mast_stateMachine( MAST_RISING );
+		else if (buttonList[5].state != STATE_PRESSED && buttonList[4].state == STATE_PRESSED)
+			diagnostic_PageDown();
+	}
+	else
+	{
+		if (buttonList[5].state == STATE_PRESSED && buttonList[4].state != STATE_PRESSED)
+			mast_stateMachine( MAST_RISING );
 
-	else if (buttonList[5].state != STATE_PRESSED && buttonList[4].state == STATE_PRESSED)
-		mast_stateMachine( MAST_LOWERING );
-
+		else if (buttonList[5].state != STATE_PRESSED && buttonList[4].state == STATE_PRESSED)
+			mast_stateMachine( MAST_LOWERING );
+	}
 }
 
 //--------------------------------------------------------------------

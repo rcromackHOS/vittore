@@ -32,9 +32,18 @@ volatile int VALUE_RPM = 	    0;
 volatile int _UNIT_MODE =		0;
 
 volatile int _STATE_CODE =		0;
+
+int BMS_EVENT =					0;
+
 volatile int _MAST_STATUS =     0;
 
 volatile int _RESETTING_ =      0;
+
+int _FORCE_LIGHTS_ON =   		0;
+int _FORCE_ENGINE_RUN =   		0;
+
+int _DIAGNOSTIC_MODE =   		0;
+int _DIAGNOSTIC_MODE_TMR =   	0;
 
 //--------------------------------------------------------------------
 

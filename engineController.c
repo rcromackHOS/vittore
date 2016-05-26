@@ -10,7 +10,7 @@
 
 //--------------------------------------------------------------------
 
-engineStruct engine = {0, 0, 0};
+
 
 //--------------------------------------------------------------------
 // C imitation of a Constructor for the engine
@@ -257,7 +257,18 @@ void set_Engine_State(int mode)
 	   else if (mode == ENGINE_RUNNING)
 	   {
 			if (engine.mode != ENGINE_RUNNING)
-		   	   engine.mode = ENGINE_RUNNING;
+		   	    engine.mode = ENGINE_RUNNING;
+			else
+			{
+				engine.runTime++;					// increment seconds of running
+				if (engine.runTime % 60)			// every 60 seconds, increment minutes
+				{
+					engine.engineMins++;
+					if (engine.engineMins % 60)
+						engine.engineHours++;
+ 				}
+
+			}
 
 			P2OUT |= ACCESSORY_PIN;
 			P9OUT &= ~CRANK_PIN;
@@ -270,6 +281,9 @@ void set_Engine_State(int mode)
 
 		   if (engine.mode != ENGINE_STOP && engine.mode != ENGINE_STOPPING)
 		   {
+			   if (mode == ENGINE_RUNNING)
+				 engine.lastRun = now;
+
 			   P2OUT &= ~ACCESSORY_PIN;
 			   P9OUT &= ~CRANK_PIN;
 			   P9OUT &= ~GLOWPLUG_PIN;

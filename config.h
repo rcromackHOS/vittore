@@ -8,6 +8,8 @@
 #ifndef CONFIG_H_
 #define CONFIG_H_
 
+#include "timeDate.h"
+
 //--------------------------------------------------------------------
 
 extern volatile int _HIGH_SP_24V;
@@ -35,7 +37,15 @@ extern volatile int _STATE_CODE;
 
 extern volatile int _MAST_STATUS;
 
+extern int BMS_EVENT;
+
 extern volatile int _RESETTING_;
+
+extern int _FORCE_LIGHTS_ON;
+extern int _FORCE_ENGINE_RUN;
+
+extern int _DIAGNOSTIC_MODE;
+extern int _DIAGNOSTIC_MODE_TMR;
 
 //--------------------------------------------------------------------
 
@@ -57,6 +67,27 @@ extern volatile int REATTEMPTS_D;
 //--------------------------------------------------------------------
 
 extern int failure;
+
+//--------------------------------------------------------------------
+
+typedef struct
+{
+  int mode;
+
+  int runTime;
+
+  int engineMins;
+  int engineHours;
+
+  dateTimeStruct lastRun;
+
+
+
+} engineStruct;
+
+engineStruct engine;
+
+dateTimeStruct now;
 
 //--------------------------------------------------------------------
 

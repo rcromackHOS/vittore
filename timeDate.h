@@ -31,10 +31,24 @@ typedef struct
 
 } dateStruct;
 
+typedef struct
+{
+	  int second;
+	  int minute;
+	  int hour;
+	  int day;
+	  int month;
+	  int year;
+
+} dateTimeStruct;
+
+
 //--------------------------------------------------------------------
 
 timeStruct time(int s, int m, int h);
 dateStruct date(int d, int m, int y);
+dateTimeStruct datetime(int s, int mm, int h, int d, int m, int y);
+
 int validateDate(dateStruct ds);
 int validateTime(timeStruct ts);
 
