@@ -33,6 +33,9 @@ int setLightsState(int s);
 #define FAIL_LED_PIN   	BIT4
 #define LIGHTS_PIN   	BIT4
 
+// port 2
+#define OIL_RST_PIN   	BIT1
+
 // port 10
 #define ASSET_IN1_PIN   BIT0
 #define ASSET_IN3_PIN   BIT2
@@ -94,6 +97,8 @@ int handle_secondEvents()
 {
     static int resetCount;
     static int lights1hCount;
+    static int clearOilChangeCount;
+    static int oldMinute;
 
 	// pulse heatbeat
 	P5OUT ^= HEARTBEAT_PIN;
@@ -162,12 +167,19 @@ int handle_secondEvents()
 		_DIAGNOSTIC_MODE_TMR--;
 		if (_DIAGNOSTIC_MODE_TMR == 0)
 			_DIAGNOSTIC_MODE = 0;
+
+	    // update screen diagnostic page
 	}
+	//else
+	//{
+
+		// update screen
+	//}
 
 
 	// Implimentation of reset functionality
 	// hold reset button 5 seconds, apply the reset
-	// then reset, reset a second after
+	// then clear, reset flag a second after
 	if (_RESETTING_ == 1)
 	{
 		resetCount++;
@@ -199,10 +211,36 @@ int handle_secondEvents()
 		}
 	}
 
+	// Oil Change alert functionality
+	// 25 hours before an oil change is due, report to the asset tracker
+	// hold OCC button for 5 seconds to reset the oil change to 500 hours in the future
+	if (_OILCHANGE_DUE - engine.engineHours <= 25)
+	{
+		P10OUT |= ASSET_IN1_PIN;
+		setStateCode( 4 );
+
+		// pull up and still input?
+		if (P2IN & OIL_RST_PIN == 0)
+		{
+			clearOilChangeCount++;
+			if (clearOilChangeCount == 5)
+			{
+				clearOilChangeCount = 0;
+				_OILCHANGE_DUE += engine.engineHours;
+
+				// write oil change hours to EEPROM
+			}
+		}
+		else if (clearOilChangeCount > 0)
+			clearOilChangeCount = 0;
+	}
 
 	// Jump to minute events
-	if (secondCount == 60)
+	if (oldMinute != now.minute())
+	{
 		handle_minuteEvents();
+		oldMinute = now.minute();
+	}
 
 	return 1;
 }
@@ -231,9 +269,22 @@ int main()
 
 	setupPorts();
 	buildButtonStateMachine();
-	engineSetup(0);
 	OLED_setup();
+
+
+	// pull stored oil change due hours
+	_OILCHANGE_DUE = 500;
+
+	// pull stored engine hours
+    int EngineHours = 0;
+	// pull store engine minutes
+    int EngineMinutes = 0;
+
+	engineSetup(EngineMinutes, EngineHours);
+
 	RTC_begin();
+
+	now = RTC_now();
 
 	// -------------------------- default values
 
@@ -262,6 +313,27 @@ int main()
 
 	   // ---------------------------------------
 
+		enum state_stystem;
+		{
+
+		}
+
+		Switch(state_system) {
+
+			case Intit: //are we done
+					if(done)
+						state_system++;
+					else
+						break;
+
+			case A_Ds_updated:
+
+			case engine_analysis:
+			case engine_control:
+			case
+
+		}
+
 	   // half-second based events
 	   if (checkMask && 0x2 == 0x2)
 	   {
@@ -289,9 +361,13 @@ __interrupt void Timer_A (void)
 {
    tmrCnt++;
 
+   //tom
+   if(engine_countdown != 0)
+	   engine_countdown--;
+
    // ten millis events
-   if (tmrCnt % 2 == 0)
-	   button_stateMachine();
+   //if (tmrCnt % 2 == 0)
+	//   button_stateMachine();
 
    // half-second based events
    if (tmrCnt % 50 == 0)

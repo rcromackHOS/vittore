@@ -103,11 +103,18 @@ void mastUpDown()
 	if (_DIAGNOSTIC_MODE == 1)
 	{
 		if (buttonList[5].state == STATE_PRESSED && buttonList[4].state != STATE_PRESSED)
-			diagnostic_PageUp();
-
+		{
+			_DIAGNOSTIC_PAGE++;
+		    if (_DIAGNOSTIC_PAGE > _DIAGNOSTIC_PAGES)
+		    	_DIAGNOSTIC_PAGE = 0;
+		}
 		else if (buttonList[5].state != STATE_PRESSED && buttonList[4].state == STATE_PRESSED)
-			diagnostic_PageDown();
-	}
+		{
+			_DIAGNOSTIC_PAGE--;
+		    if (_DIAGNOSTIC_PAGE < 0)
+		    	_DIAGNOSTIC_PAGE = _DIAGNOSTIC_PAGES;
+		}
+    }
 	else
 	{
 		if (buttonList[5].state == STATE_PRESSED && buttonList[4].state != STATE_PRESSED)

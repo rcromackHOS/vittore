@@ -44,6 +44,14 @@ int _FORCE_ENGINE_RUN =   		0;
 
 int _DIAGNOSTIC_MODE =   		0;
 int _DIAGNOSTIC_MODE_TMR =   	0;
+int _DIAGNOSTIC_PAGE = 			0;
+int _DIAGNOSTIC_PAGES = 		1;
+
+int _OILCHANGE_DUE =     		0;
+
+int failure = 					0;
+
+int idleCount = 				0;
 
 //--------------------------------------------------------------------
 
@@ -64,6 +72,5 @@ volatile int REATTEMPTS_D =		0;
 
 //--------------------------------------------------------------------
 
-extern int failure = 0;
 
 //--------------------------------------------------------------------

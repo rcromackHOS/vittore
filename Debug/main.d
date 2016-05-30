@@ -12,6 +12,7 @@ main.obj: ../engineController.h
 main.obj: ../lcd.h
 main.obj: ../bms.h
 main.obj: ../button.h
+main.obj: ../MCP7940N.h
 
 ../main.c: 
 C:/ti/ccsv6/ccs_base/msp430/include/msp430.h: 
@@ -25,3 +26,4 @@ C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include/intrinsics_legacy_u
 ../lcd.h: 
 ../bms.h: 
 ../button.h: 
+../MCP7940N.h: 

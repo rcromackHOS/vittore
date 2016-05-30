@@ -46,6 +46,10 @@ extern int _FORCE_ENGINE_RUN;
 
 extern int _DIAGNOSTIC_MODE;
 extern int _DIAGNOSTIC_MODE_TMR;
+extern int _DIAGNOSTIC_PAGE;
+extern int _DIAGNOSTIC_PAGES;
+
+extern int _OILCHANGE_DUE;
 
 //--------------------------------------------------------------------
 
@@ -79,15 +83,31 @@ typedef struct
   int engineMins;
   int engineHours;
 
+  dateTimeStruct lastRunEnd;
   dateTimeStruct lastRun;
-
-
 
 } engineStruct;
 
 engineStruct engine;
 
 dateTimeStruct now;
+
+typedef struct
+{
+  int hours;
+  int minutes;
+
+} idleTime;
+
+idleTime idles[4] =
+		{
+				{0, 0},
+				{0, 0},
+				{0, 0},
+				{0, 0}
+		};
+
+extern int idleCount;
 
 //--------------------------------------------------------------------
 

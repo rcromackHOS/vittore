@@ -14,9 +14,14 @@
 
 //--------------------------------------------------------------------
 // C imitation of a Constructor for the engine
-int engineSetup(int engHrs)
+int engineSetup(int engMins, int engHrs)
 {
 	engine.engineHours = engHrs;
+	engine.engineMins = engMins;
+
+	engine.lastRun = datetime( 0, 0, 0, 0, 0, 0 );
+	engine.lastRunEnd = datetime( 0, 0, 0, 0, 0, 0 );
+
 	return 1;
 }
 
@@ -143,8 +148,7 @@ void set_Engine_State(int mode)
 
 	   if (mode == ENGINE_STOP)
 	   {
-		   if (engine.mode == ENGINE_RUNNING)
-			 engine.mode = ENGINE_STOPPING;
+		   engine.mode = ENGINE_STOPPING;
 	   }
 
 	   if (mode == ENGINE_PRE)
@@ -257,17 +261,30 @@ void set_Engine_State(int mode)
 	   else if (mode == ENGINE_RUNNING)
 	   {
 			if (engine.mode != ENGINE_RUNNING)
-		   	    engine.mode = ENGINE_RUNNING;
-			else
 			{
-				engine.runTime++;					// increment seconds of running
-				if (engine.runTime % 60)			// every 60 seconds, increment minutes
+		   	    engine.mode = ENGINE_RUNNING;
+
+		   	    engine.lastRun = now;
+				store_idleTime( );
+
+				engine.lastRunEnd = datetime( 0, 0, 0, 0, 0, 0 );
+			}
+		   	else
+			{
+				engine.runTime++;					    // increment seconds of running
+				if (engine.runTime % 60 == 0)			// every 60 seconds, increment minutes
 				{
 					engine.engineMins++;
-					if (engine.engineMins % 60)
-						engine.engineHours++;
- 				}
 
+					if (engine.engineMins == 60)		// every 60 minutes increment hours
+					{
+						engine.engineHours++;
+						engine.engineMins = 0;
+						// write hours to EEPROM
+					}
+
+					// write minutes to EEPROM
+				}
 			}
 
 			P2OUT |= ACCESSORY_PIN;
@@ -281,22 +298,83 @@ void set_Engine_State(int mode)
 
 		   if (engine.mode != ENGINE_STOP && engine.mode != ENGINE_STOPPING)
 		   {
-			   if (mode == ENGINE_RUNNING)
-				 engine.lastRun = now;
+			   if (engine.mode == ENGINE_RUNNING)
+				   engine.lastRunEnd = now;
 
 			   P2OUT &= ~ACCESSORY_PIN;
 			   P9OUT &= ~CRANK_PIN;
 			   P9OUT &= ~GLOWPLUG_PIN;
 			   P8OUT &= ~ASSET_IGN_PIN;
-
-		   	   engine.mode = ENGINE_STOP;
 		   }
-		   else
-			   engine.mode = ENGINE_STOP;
+
+		   engine.mode = ENGINE_STOP;
 
 	   }
 
 }
+
+//--------------------------------------------------------------------
+//
+int store_idleTime()
+{
+	if (engine.lastRunEnd.year == 0)
+	  return 0;
+
+	int daysInMonth[] = { 31,28,31,30,31,30,31,31,30,31,30,31 };
+	int hrs;
+	int mins;
+	int dayDif;
+	int month;
+
+	if (engine.lastRunEnd.minute > engine.lastRun.minute)
+	{
+		hrs = -1;
+		mins = (60 - engine.lastRunEnd.minute) + engine.lastRun.minute;
+	}
+	else
+		mins = engine.lastRun.minute - engine.lastRunEnd.minute;
+
+	if (engine.lastRunEnd.hour > engine.lastRun.hour)
+	{
+		hrs += (24 - engine.lastRunEnd.hour) + engine.lastRun.hour;
+		dayDif = -1;
+	}
+	else if (engine.lastRunEnd.hour < engine.lastRun.hour)
+		hrs += engine.lastRun.hour - engine.lastRunEnd.hour;
+
+	if (engine.lastRun.day < engine.lastRunEnd.day)
+	{
+		month = engine.lastRun.month - 1;
+		if (month == 0)
+			month = 11;
+
+		dayDif += (daysInMonth[month] - engine.lastRunEnd.day) + engine.lastRun.day;
+	}
+	else
+		dayDif += engine.lastRun.day - engine.lastRunEnd.day;
+
+	hrs += (dayDif * 24);
+
+	int i;
+	for (i = 3; i > 0; i--)
+	{
+		idles[i+1].hours = idles[i].hours;
+		idles[i+1].minutes = idles[i].minutes;
+	}
+
+	idles[0].hours = hrs;
+	idles[0].minutes = mins;
+
+}
+
+
+
+
+
+
+
+
+
 
 
 

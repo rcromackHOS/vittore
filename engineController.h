@@ -32,7 +32,7 @@
 
 //--------------------------------------------------------------------
 
-int engineSetup(int engHrs);
+int engineSetup(int engMins, int engHrs);
 
 void engineStatus();
 void set_Engine_State(int mode);
@@ -40,6 +40,8 @@ void set_Engine_State(int mode);
 int checkOilPressure();
 int checkEngineRPMs();
 int checkEngineTemp();
+
+int store_idleTime();
 
 //--------------------------------------------------------------------
 
