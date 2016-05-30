@@ -15,10 +15,14 @@
 
 //--------------------------------------------------------------------
 //
-void check_BatteryBox_Status()
+void batteryStatus()
 {
 	static int _contactorOn;
+	//static int _engineOn;
 	static int _heaterOn;
+
+	static int _softCount;
+	static int _BMSprefailure;
 
 	//---------------------------------------------- VOLTAGE
 
@@ -55,40 +59,40 @@ void check_BatteryBox_Status()
 
 	//---------------------------------------------- BMS
 
-	// BMS cell monitors. Give them a grace period
+	// BMS cell monitors. Give them a 30 second grace
 	if (P2IN & BMS_PIN == 0)
-	{
-		// if this is a newly detected problem
-		if (_CELLMONITOR_TMR_D == 0 && BMS_EVENT == 0)
-			_CELLMONITOR_TMR_D = _CELLMONITOR_TMR_SP;
-	}
+	    _softCount++;
+
+	else if (_softCount > 0)
+		_softCount--;
 
 	// BMS FAILURE DETECTED
-	// If our cell monitors detect a problem for 30 seconds, and
-	if ( (_CELLMONITOR_TMR_D == 0 && P2IN & BMS_PIN == 0) || VALUE_24V >= _HIGH_SP_BMS || VALUE_24V <= _LOW_SP_BMS)
+	if (_softCount > _CELLMONITOR_SP || VALUE_24V >= _HIGH_SP_BMS || VALUE_24V <= _LOW_SP_BMS)
 	{
-		_BANK_BMS_TMR_D = _BANK_BMS_TMR_SP;		// start counting down the cool-down period
-		_FORCE_ENGINE_RUN = 0;					// turn off the engine
+		_BMSprefailure++;
+		_FORCE_ENGINE_RUN = 0;
 	}
+	else if (_BMSprefailure > 0)
+		_BMSprefailure--;
 
 	// BMS FAILURE APPLIED
-	// apply the failure, alert the system
-	if (_BANK_BMS_TMR_D == 0)
+	if (_BMSprefailure >= 5)
 	{
 		failure = 1;
 		setStateCode( 99 );
 
 		BMS_EVENT = 1;
 
-		// Shut down all the loads
+		// BMS failure
 		_heaterOn = 0;
 		_contactorOn = 0;
 		_FORCE_ENGINE_RUN = 0;
 
-		P3OUT &= ~BIT6;			// lights off
+		P3OUT &= ~BIT6;
 	}
 
 	//----------------------------------------------
+
 
 	setContactor(_contactorOn);
 	setBatteryHeater(_heaterOn);

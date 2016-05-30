@@ -34,7 +34,7 @@
 
 int engineSetup(int engMins, int engHrs);
 
-int check_Engine_Status();
+void engineStatus();
 void set_Engine_State(int mode);
 
 int checkOilPressure();

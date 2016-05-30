@@ -18,8 +18,18 @@ ORDERED_OBJS += \
 "./lcd.obj" \
 "./main.obj" \
 "./timeDate.obj" \
+"./backUp/MCP7940N.obj" \
+"./backUp/bms.obj" \
+"./backUp/button.obj" \
+"./backUp/config.obj" \
+"./backUp/engineController.obj" \
+"./backUp/lcd.obj" \
+"./backUp/main.obj" \
+"./backUp/timeDate.obj" \
 "../MSPMATHLIB_CCS_msp430_4xx_small_code_small_data.lib" \
 "../lnk_msp430f47197.cmd" \
+"../backUp/MSPMATHLIB_CCS_msp430_4xx_small_code_small_data.lib" \
+"../backUp/lnk_msp430f47197.cmd" \
 $(GEN_CMDS__FLAG) \
 -llibmath.a \
 -llibc.a \
@@ -32,7 +42,9 @@ RMDIR := RMDIR /S/Q
 # All of the sources participating in the build are defined here
 -include sources.mk
 -include subdir_vars.mk
+-include backUp/subdir_vars.mk
 -include subdir_rules.mk
+-include backUp/subdir_rules.mk
 -include objects.mk
 
 ifneq ($(MAKECMDGOALS),clean)
@@ -148,7 +160,7 @@ all: vittore.out
 vittore.out: $(OBJS) $(CMD_SRCS) $(LIB_SRCS) $(GEN_CMDS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: MSP430 Linker'
-	"C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/bin/cl430" -vmspx --data_model=restricted --use_hw_mpy=32 --advice:power=all -g --define=__MSP430F47197__ --diag_warning=225 --display_error_number --diag_wrap=off --printf_support=minimal -z -m"vittore.map" --heap_size=80 --stack_size=80 --cinit_hold_wdt=on -i"C:/ti/ccsv6/ccs_base/msp430/include" -i"C:/ti/ccsv6/ccs_base/msp430/lib/4xx" -i"C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/lib" -i"C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include" --reread_libs --display_error_number --warn_sections --diag_wrap=off --xml_link_info="vittore_linkInfo.xml" --use_hw_mpy=32 --rom_model -o "vittore.out" $(ORDERED_OBJS)
+	"C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/bin/cl430" -vmspx --data_model=restricted -Ooff --opt_for_speed=0 --use_hw_mpy=32 --advice:power=all -g --define=__MSP430F47197__ --diag_warning=225 --display_error_number --diag_wrap=off --printf_support=minimal -z -m"vittore.map" --heap_size=80 --stack_size=80 --cinit_hold_wdt=on -i"C:/ti/ccsv6/ccs_base/msp430/include" -i"C:/ti/ccsv6/ccs_base/msp430/lib/4xx" -i"C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/lib" -i"C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include" --reread_libs --display_error_number --warn_sections --diag_wrap=off --xml_link_info="vittore_linkInfo.xml" --use_hw_mpy=32 --rom_model -o "vittore.out" $(ORDERED_OBJS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -161,8 +173,8 @@ vittore.hex: $(EXE_OUTPUTS)
 # Other Targets
 clean:
 	-$(RM) $(EXE_OUTPUTS__QUOTED)$(BIN_OUTPUTS__QUOTED)
-	-$(RM) "MCP7940N.d" "bms.d" "button.d" "config.d" "engineController.d" "lcd.d" "main.d" "timeDate.d" 
-	-$(RM) "MCP7940N.obj" "bms.obj" "button.obj" "config.obj" "engineController.obj" "lcd.obj" "main.obj" "timeDate.obj" 
+	-$(RM) "MCP7940N.d" "bms.d" "button.d" "config.d" "engineController.d" "lcd.d" "main.d" "timeDate.d" "backUp\MCP7940N.d" "backUp\bms.d" "backUp\button.d" "backUp\config.d" "backUp\engineController.d" "backUp\lcd.d" "backUp\main.d" "backUp\timeDate.d" 
+	-$(RM) "MCP7940N.obj" "bms.obj" "button.obj" "config.obj" "engineController.obj" "lcd.obj" "main.obj" "timeDate.obj" "backUp\MCP7940N.obj" "backUp\bms.obj" "backUp\button.obj" "backUp\config.obj" "backUp\engineController.obj" "backUp\lcd.obj" "backUp\main.obj" "backUp\timeDate.obj" 
 	-@echo 'Finished clean'
 	-@echo ' '
 

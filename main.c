@@ -26,6 +26,12 @@ int handle_secondEvents();
 void handle_minuteEvents();
 int setLightsState(int s);
 
+void handle_failEvent();
+void handle_lowfuelEvent();
+void updateDisplay();
+void handle_lighting();
+void resetControl();
+
 //--------------------------------------------------------------------
 
 // outputs
@@ -93,156 +99,61 @@ void delayms(int m)
 
 //--------------------------------------------------------------------
 //
-int handle_secondEvents()
+void inc_secondCounts()
 {
-    static int resetCount;
-    static int lights1hCount;
-    static int clearOilChangeCount;
-    static int oldMinute;
+	//---------------------------------------------
+	// BMS centric timers
+	if (_CELLMONITOR_TMR_D != 0)
+		_CELLMONITOR_TMR_D--;
 
-	// pulse heatbeat
-	P5OUT ^= HEARTBEAT_PIN;
+	if (_BANK_BMS_TMR_D != 0)
+		_BANK_BMS_TMR_D--;
 
-	//OLED_command(0xA0); //on second line
-	//OLED_data(0x1F); //write solid blocks
+	if (_BANK_BMS_TMR_D != 0)
+		_BANK_BMS_TMR_D--;
 
-	// Check the battery box sensor data, also impliments BMS protection
-	batteryStatus();
+	//---------------------------------------------
+	// Engine centric timers
 
-	// System failure
-	// Turn on the LED and alert the asset tracker
-	if (failure == 1)
-	{
-		P9OUT |= FAIL_LED_PIN;
-		P10OUT |= ASSET_IN4_PIN;
-	}
-	else
-	{
-		P9OUT &= ~FAIL_LED_PIN;
-		P10OUT &= ~ASSET_IN4_PIN;
-	}
+	if (count_run > 0)
+		count_run++;
 
-	// if theres a BMS problem, turn off the inverter
-	//if (BMS_EVENT == 1)
-	//	P11OUT &= ~INVERTER_PIN;
-	//else
-	//	P11OUT |= INVERTER_PIN;
+	if (count_RPM_fail > 0)
+		count_RPM_fail++;
 
-	// Low fuel
-	// aler the asset tracker
-	if (P2IN & LOWFUEL == 1)
-		P10OUT |= ASSET_IN3_PIN;
-	else
-		P10OUT &= ~ASSET_IN3_PIN;
+	if (count_oil_fail > 0)
+		count_oil_fail++;
 
-	// Lights 1 hour mode.
-	// Count to 1 hour, then default to auto mode.
-	if (_UNIT_MODE == MODE_LIGHT1H)
-	{
-		lights1hCount++;
-		if (lights1hCount == 3600)
-		{
-			lights1hCount = 0;
-			_UNIT_MODE = MODE_AUTO;
-		}
-	}
+	if (count_temp_fail > 0)
+		count_temp_fail++;
 
-	// Control the light logic.
-	// If it's in auto and it's nighttime, turn lights. Or if lights on mode.
-	if ( (_UNIT_MODE == MODE_AUTO && isQuietTime( now ) == 0) || _UNIT_MODE == MODE_LIGHT1H)
-		setLightsState(1);
-	else
-		setLightsState(0);
+	//
 
-	// Increment through the engine state machine
-	engineStatus();
+	if (PREHEAT_D != 0)
+		PREHEAT_D--;
 
-	// Diagnostic Mode
-	// high-jacks button functions
-	// reset becomes close
-	// mast up/down become page up/down
-	// stays active for 60 seconds
-	if (_DIAGNOSTIC_MODE == 1)
-	{
-		_DIAGNOSTIC_MODE_TMR--;
-		if (_DIAGNOSTIC_MODE_TMR == 0)
-			_DIAGNOSTIC_MODE = 0;
+	if (CRANK_D != 0)
+		CRANK_D--;
 
-	    // update screen diagnostic page
-	}
-	//else
-	//{
+	if (POST_D != 0)
+		POST_D--;
 
-		// update screen
-	//}
+	if (ATTEMPT_D != 0)
+		ATTEMPT_D--;
 
 
-	// Implimentation of reset functionality
-	// hold reset button 5 seconds, apply the reset
-	// then clear, reset flag a second after
+	//---------------------------------------------
+	// Lights centric timers
+
+	if (LIGHTS1HOUR_TMR != 0)
+		LIGHTS1HOUR_TMR--;
+
 	if (_RESETTING_ == 1)
-	{
-		resetCount++;
+		RESET_TMR++;
 
-		if (buttonList[3].state == MAST_NOMINAL)
-		{
-			if (resetCount == 5)
-			{
-				if (_DIAGNOSTIC_MODE == 1)
-				{
-					_DIAGNOSTIC_MODE = 0;
-					_DIAGNOSTIC_MODE_TMR = 0;
-				}
-				else
-				{
-					failure = 0;
-					BMS_EVENT = 0;
+	if (OILCHANGE_PRESS_TMR != 0)
+		OILCHANGE_PRESS_TMR++;
 
-					clearStateCode(_STATE_CODE);
-				}
-			}
-
-		}
-
-		if (resetCount == 6)
-		{
-		  resetCount = 0;
-		  _RESETTING_ = 0;
-		}
-	}
-
-	// Oil Change alert functionality
-	// 25 hours before an oil change is due, report to the asset tracker
-	// hold OCC button for 5 seconds to reset the oil change to 500 hours in the future
-	if (_OILCHANGE_DUE - engine.engineHours <= 25)
-	{
-		P10OUT |= ASSET_IN1_PIN;
-		setStateCode( 4 );
-
-		// pull up and still input?
-		if (P2IN & OIL_RST_PIN == 0)
-		{
-			clearOilChangeCount++;
-			if (clearOilChangeCount == 5)
-			{
-				clearOilChangeCount = 0;
-				_OILCHANGE_DUE += engine.engineHours;
-
-				// write oil change hours to EEPROM
-			}
-		}
-		else if (clearOilChangeCount > 0)
-			clearOilChangeCount = 0;
-	}
-
-	// Jump to minute events
-	if (oldMinute != now.minute())
-	{
-		handle_minuteEvents();
-		oldMinute = now.minute();
-	}
-
-	return 1;
 }
 
 //--------------------------------------------------------------------
@@ -300,6 +211,24 @@ int main()
 
 	volatile int countseconds = 0;
 
+	static int newMode;
+
+	typedef enum
+	{
+		INIT,
+		INCREMENT_COUNTERS,
+		ADCs_UPDATED,
+		BATTERY_STATUS,
+		ENGINE_ANALYSIS,
+		ENGINE_STATUS,
+		ALERT_INDICATORS,
+		HANDLE_UNITMODES,
+		UPDATE_SCREEN,
+		FAILURE_RESET
+	} state_types;
+
+	state_types state_system = INIT;
+
 	while(1)
     {
 	    // I2C stuff
@@ -312,46 +241,115 @@ int main()
 	    //Receive();
 
 	   // ---------------------------------------
-
-		enum state_stystem;
-		{
-
-		}
-
-		Switch(state_system) {
-
-			case Intit: //are we done
-					if(done)
-						state_system++;
-					else
-						break;
-
-			case A_Ds_updated:
-
-			case engine_analysis:
-			case engine_control:
-			case
-
-		}
-
 	   // half-second based events
 	   if (checkMask && 0x2 == 0x2)
 	   {
-		  //checkMask ^= 0x2;
-		   checkMask &= ~0x2;
-		   P8OUT ^= BIT0;
+		   //checkMask ^= 0x2;
+			checkMask &= ~0x2;
+			P8OUT ^= BIT0;
 
-		   countseconds++;
-	       if (countseconds == 2)
-	       {
-	    	   countseconds = 0;
-	    	   secondCount++;
-	    	   handle_secondEvents();
-           }
+			countseconds++;
+		}
 
+	   // ---------------------------------------
+	   // State machine
+	   switch (state_system)
+	   {
+
+			case INIT:
+					if(done)
+						state_system++;
+					else
+					{
+						RTC_begin
+
+
+					}
+
+					break;
+
+			case INCREMENT_COUNTERS: // Increment all the counters
+
+				if (countseconds == 2)	// Increment second counts
+				{
+					countseconds = 0;
+					secondCount++;
+
+					inc_secondCounts();
+
+					// pulse heatbeat
+				    P5OUT ^= HEARTBEAT_PIN;
+				}
+
+				state_system++;
+				break;
+
+			case ADCs_UPDATED:
+
+				if (_ADCs_UPDATED == 1)
+				{
+					_ADCs_UPDATED = 0;
+				}
+
+				state_system++;
+				break;
+
+			case BATTERY_STATUS:		// Check the battery box sensor data, also impliments BMS protection
+
+				check_BatteryBox_Status();
+
+				state_system++;
+				break;
+
+			case ENGINE_ANALYSIS:
+
+				newMode = check_Engine_Status();
+
+				state_system++;
+				break;
+
+			case ENGINE_STATUS:
+
+				set_Engine_State(newMode);
+
+				state_system++;
+				break;
+
+			case ALERT_INDICATORS:
+
+				handle_failEvent();
+				handle_lowfuelEvent();
+				handle_oilchangeClear();
+
+				state_system++;
+				break;
+
+			case HANDLE_UNITMODES:
+
+				if (_RESETTING_ == 1)
+					handle_reset();
+
+				handle_lighting();
+
+				state_system++;
+				break;
+
+			case UPDATE_SCREEN:
+
+				updateDisplay();
+
+				state_system++;
+				break;
 	   }
 
     }
+
+	// if theres a BMS problem, turn off the inverter
+	//if (BMS_EVENT == 1)
+	//	P11OUT &= ~INVERTER_PIN;
+	//else
+	//	P11OUT |= INVERTER_PIN;
+
 }
 
 //--------------------------------------------------------------------
@@ -379,6 +377,46 @@ __interrupt void Timer_A (void)
 	 //if (checkMask && 0x4 != 0x4)
    //	   checkMask |= 0x4;
    //}
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------
+// Initialize the RTC
+// Check for lost tme or errors
+int RTC_init(void)
+{
+	if (RTC_isrunning == 99)	// 99 = no I2C response
+	{
+		setStateCode(11);
+	}
+	else
+    {
+		// If we've lost the time
+		if (RTC.lostTime() == 1)
+	    {
+	      setStateCode(10);     // 10 = RTC lost time (LIR32 failure?)
+	      RTC.adjust(now);
+	    }
+	}
+
+	return 1;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------
+// Initialize the GPS
+// If
+int GPS_init(void)
+{
+	/*
+	if (pokeGPS())
+	{
+		if (stateCode == 10) // lost time, update by GPS
+	    {
+	        RTC.adjust(GPS._utc);
+	        now = RTC.now();
+	    }
+	}
+*/
+	return 1;
 }
 
 //--------------------------------------------------------------------
@@ -443,6 +481,152 @@ void setStateCode(int code)
 {
 	if (code > _STATE_CODE)
 		_STATE_CODE = code;
+}
+
+
+
+//--------------------------------------------------------------------
+// System failure
+// Turn on the LED and alert the asset tracker
+void handle_failEvent()
+{
+	if (failure == 1)
+	{
+		P9OUT |= FAIL_LED_PIN;
+		P10OUT |= ASSET_IN4_PIN;
+	}
+	else
+	{
+		P9OUT &= ~FAIL_LED_PIN;
+		P10OUT &= ~ASSET_IN4_PIN;
+	}
+}
+
+//--------------------------------------------------------------------
+// Low fuel
+// alert the asset tracker
+void handle_lowfuelEvent()
+{
+
+	if (P2IN & LOWFUEL == 1)
+		P10OUT |= ASSET_IN3_PIN;
+	else
+		P10OUT &= ~ASSET_IN3_PIN;
+}
+
+//--------------------------------------------------------------------
+// Handles the way the unit using
+void handle_lighting()
+{
+	// Lights 1 hour mode.
+	// Count to 1 hour, then default to auto mode.
+	if (_UNIT_MODE == MODE_LIGHT1H)
+	{
+		if (LIGHTS1HOUR_TMR == 0)
+			LIGHTS1HOUR_TMR = 1;
+
+		if (LIGHTS1HOUR_TMR == 3600)
+		{
+			_UNIT_MODE = MODE_AUTO;
+			LIGHTS1HOUR_TMR = 0;
+		}
+	}
+
+	// Control the light logic.
+	// If it's in auto and it's nighttime, turn lights. Or if lights on mode.
+	if ( (_UNIT_MODE == MODE_AUTO && isQuietTime( now ) == 0) || _UNIT_MODE == MODE_LIGHT1H)
+		setLightsState(1);
+	else
+		setLightsState(0);
+}
+
+
+//--------------------------------------------------------------------
+// Screen Update
+void updateDisplay()
+{
+	// Diagnostic Mode
+	// high-jacks button functions
+	// reset becomes close
+	// mast up/down become page up/down
+	// stays active for 60 seconds
+	if (_DIAGNOSTIC_MODE == 1)
+	{
+		_DIAGNOSTIC_MODE_TMR--;
+		if (_DIAGNOSTIC_MODE_TMR == 0)
+			_DIAGNOSTIC_MODE = 0;
+
+	    // update screen diagnostic page
+	}
+	else
+	{
+		// update screen
+	}
+}
+
+//--------------------------------------------------------------------
+// Handle the reset button functionality
+void handle_reset()
+{
+	// Implimentation of reset functionality
+	// hold reset button 5 seconds, apply the reset
+	// then clear, reset flag a second after
+		if (buttonList[3].state == MAST_NOMINAL)
+		{
+			if (RESET_TMR == 5)
+			{
+				if (_DIAGNOSTIC_MODE == 1)
+				{
+					_DIAGNOSTIC_MODE = 0;
+					_DIAGNOSTIC_MODE_TMR = 0;
+				}
+				else
+				{
+					failure = 0;
+					BMS_EVENT = 0;
+
+					clearStateCode(_STATE_CODE);
+				}
+			}
+
+		}
+
+		if (RESET_TMR == 6)
+		{
+			RESET_TMR = 0;
+			_RESETTING_ = 0;
+		}
+}
+
+
+
+//--------------------------------------------------------------------
+// Handle oil change indication and reset
+// Oil Change alert functionality
+// 25 hours before an oil change is due, report to the asset tracker
+// hold OCC button for 5 seconds to reset the oil change to 500 hours in the future
+void handle_oilchangeClear()
+{
+	if (_OILCHANGE_DUE - engine.engineHours <= 25)
+	{
+		P10OUT |= ASSET_IN1_PIN;
+		setStateCode( 4 );
+
+		// pull up and still input?
+		if (P2IN & OIL_RST_PIN == 0)
+		{
+			if (OILCHANGE_PRESS_TMR == 0)
+				OILCHANGE_PRESS_TMR = 1;
+
+			if (OILCHANGE_PRESS_TMR == 6)
+			{
+				OILCHANGE_PRESS_TMR = 0;
+				_OILCHANGE_DUE += engine.engineHours;
+
+				// write oil change hours to EEPROM
+			}
+		}
+	}
 }
 
 

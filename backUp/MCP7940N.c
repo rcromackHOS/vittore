@@ -17,6 +17,14 @@ static int bcd2bin (int val) { return val - 6 * (val >> 4); }
 static int bin2bcd (int val) { return val + 6 * (val / 10); }
 static int i = 0;
 
+//------------------------------------------------------------------------------------------------------------------------------------
+//
+int RTC_begin(void)
+{
+	init_I2C();
+	return 1;
+}
+
 //--------------------------------------------------------------------
 //
 int RTC_isrunning(void)

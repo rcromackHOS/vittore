@@ -52,8 +52,13 @@ int checkEngineRPMs()
 
 //--------------------------------------------------------------------
 //
-int check_Engine_Status()
+void engineStatus()
 {
+	static int count_run;
+	static int count_RPM_fail;
+	static int count_oil_fail;
+	static int count_temp_fail;
+
 	int mode = engine.mode;
 
 	// See if the engine started
@@ -62,10 +67,8 @@ int check_Engine_Status()
 		engine.mode != ENGINE_STOP &&
 		checkOilPressure() == 1)
 	{
-		if (count_run == 0 && mode != ENGINE_POST)
-			count_run = 1;
-
-		if (count_run == 3)
+		count_run++;
+		if (count_run > 2)
 		{
 			mode = ENGINE_POST;
 			count_run = 0;
@@ -79,60 +82,61 @@ int check_Engine_Status()
 		// Check engine RPMS
 		if (checkEngineRPMs() != 1)
 		{
-			if (count_RPM_fail == 0)
-				count_RPM_fail = 1;
-
-			if (count_RPM_fail == 4)
+			count_RPM_fail++;
+			if (count_RPM_fail > 3)
 			{
 				if (checkEngineRPMs() == 0)
+				{
+					mode = ENGINE_STOPPING;
+					failure = 1;
 					setStateCode( 32 );
+				}
 
 				if (checkEngineRPMs() == 2)
-				    setStateCode( 31 );
-
-				mode = ENGINE_STOPPING;
-				failure = 1;
-
-				count_RPM_fail = 0;
+				{
+					mode = ENGINE_STOPPING;
+					failure = 1;
+					setStateCode( 31 );
+				}
 			}
 		}
+		else if (count_RPM_fail > 0)
+			count_RPM_fail--;
 
 		// Check Engine Oil Pressure
 		if (checkOilPressure() == 0)
 		{
-			if (count_oil_fail == 0)
-				count_oil_fail = 1;
-
-		    if (count_oil_fail == 4)
+			count_oil_fail++;
+		    if (count_oil_fail > 3)
 		    {
 		    	mode = ENGINE_STOPPING;
 
 				failure = 1;
 				setStateCode( 34 );
-
-				count_oil_fail = 0;
 		    }
 		}
+		else if (count_oil_fail > 0)
+			count_oil_fail--;
 
 		// Check Engine Temperature
 		if (checkEngineTemp() == 0)
 		{
-			if (count_temp_fail == 0)
-				count_temp_fail = 1;
-
-		    if (count_temp_fail == 4)
+			count_temp_fail++;
+		    if (count_temp_fail > 3)
 		    {
 		    	mode = ENGINE_STOPPING;
 
 				failure = 1;
 				setStateCode( 33 );
-
-				count_temp_fail = 0;
 		    }
 		}
+		else if (count_temp_fail > 0)
+			count_temp_fail--;
 	}
 
-	return mode;
+	// After all else, increment the engine state.
+	set_Engine_State(mode);
+
 }
 
 //--------------------------------------------------------------------
@@ -142,105 +146,120 @@ void set_Engine_State(int mode)
 	if (failure == 1)
 	  mode = ENGINE_STOPPING;
 
-	switch (mode)
-	{
-		case ENGINE_STOP:
+	   if (mode == ENGINE_STOP)
+	   {
+		   engine.mode = ENGINE_STOPPING;
+	   }
 
-			   engine.mode = ENGINE_STOPPING;
+	   if (mode == ENGINE_PRE)
+	   {
 
-			   break;
+		 if (engine.mode != ENGINE_PRE)
+		 {
+		   P2OUT |= ACCESSORY_PIN;
+		   P9OUT |= GLOWPLUG_PIN;
+		   P8OUT |= ASSET_IGN_PIN;
 
+		   engine.mode = ENGINE_PRE;
 
-		case ENGINE_PRE:
+		   PREHEAT_D = _PREHEAT_SP;
+		   REATTEMPTS_D = _REATTEMPTS_SP;
+		 }
 
-			 if (engine.mode != ENGINE_PRE)
+		 if (PREHEAT_D > 0)
+		 {
+		   PREHEAT_D--;
+
+		   if (PREHEAT_D == 0)
+		     set_Engine_State(ENGINE_CRANK);
+		 }
+
+	   }
+
+	   else if (mode == ENGINE_CRANK)
+	   {
+		 if (engine.mode != ENGINE_CRANK)
+		 {
+		   P9OUT |= CRANK_PIN;
+
+		   engine.mode = ENGINE_CRANK;
+
+		   CRANK_D = _CRANK_SP;
+		 }
+
+		 if (CRANK_D > 0)
+		 {
+		    CRANK_D--;
+
+		    if (CRANK_D == 0)
+		        set_Engine_State(ENGINE_REATTEMPT);
+
+		 }
+
+	   }
+
+	   else if (mode == ENGINE_REATTEMPT)
+	   {
+		 if (engine.mode != ENGINE_REATTEMPT)
+		 {
+		    P9OUT &= ~CRANK_PIN;
+
+		    engine.mode = ENGINE_REATTEMPT;
+
+		    ATTEMPT_D = _ATTEMPT_SP;
+		    REATTEMPTS_D--;
+		 }
+
+		 if (REATTEMPTS_D > 0)
+		 {
+		 	if (ATTEMPT_D > 0)
+		 	   ATTEMPT_D--;
+
+		 	else if (ATTEMPT_D == 0)
+			   set_Engine_State(ENGINE_CRANK);
+		 }
+
+ 	 	 if (REATTEMPTS_D <= 0)
+		 {
+		    failure = 1;
+		    setStateCode( 30 );
+
+		    set_Engine_State(ENGINE_STOPPING);
+		 }
+
+	   }
+
+	   else if (mode == ENGINE_POST)
+	   {
+		 if (engine.mode != ENGINE_POST)
+		 {
+		   engine.mode = ENGINE_POST;
+
+		   P9OUT &= ~CRANK_PIN;
+
+		   POST_D = _POST_SP;
+		 }
+
+		 if (POST_D > 0)
+		 {
+		   POST_D--;
+
+		   if (POST_D == 0)
+		   {
+			 if (checkEngineRPMs())
 			 {
-			   P2OUT |= ACCESSORY_PIN;
-			   P9OUT |= GLOWPLUG_PIN;
-			   P8OUT |= ASSET_IGN_PIN;
-
-			   engine.mode = ENGINE_PRE;
-
-			   PREHEAT_D = _PREHEAT_SP;
-			   REATTEMPTS_D = _REATTEMPTS_SP;
+			   P9OUT &= ~GLOWPLUG_PIN;
+		       set_Engine_State(ENGINE_RUNNING);
 			 }
+			 else
+			   set_Engine_State(ENGINE_REATTEMPT);
+		   }
+		 }
 
-			 if (PREHEAT_D == 0)
-				 set_Engine_State(ENGINE_CRANK);
+	   }
 
-			 break;
-
-
-		case ENGINE_CRANK:
-
-			 if (engine.mode != ENGINE_CRANK)
-			 {
-			   P9OUT |= CRANK_PIN;
-
-			   engine.mode = ENGINE_CRANK;
-
-			   CRANK_D = _CRANK_SP;
-			 }
-
-			 if (CRANK_D == 0)
-				 set_Engine_State(ENGINE_REATTEMPT);
-
-			 break;
-
-
-		case ENGINE_REATTEMPT:
-
-			 if (engine.mode != ENGINE_REATTEMPT)
-			 {
-				P9OUT &= ~CRANK_PIN;
-
-				engine.mode = ENGINE_REATTEMPT;
-
-				ATTEMPT_D = _ATTEMPT_SP;
-				REATTEMPTS_D--;
-			 }
-
-			 if (ATTEMPT_D == 0)
-				 set_Engine_State(ENGINE_CRANK);
-
-			 if (REATTEMPTS_D <= 0)
-			 {
-				failure = 1;
-				setStateCode( 30 );
-
-				set_Engine_State(ENGINE_STOPPING);
-			 }
-
-			 break;
-
-
-		case ENGINE_POST:
-
-			 if (engine.mode != ENGINE_POST)
-			 {
-			   engine.mode = ENGINE_POST;
-
-			   P9OUT &= ~CRANK_PIN;
-
-			   POST_D = _POST_SP;
-			 }
-
-			 if (POST_D == 0)
-			 {
-				 if (checkEngineRPMs() == 1)
-				 {
-					 P9OUT &= ~GLOWPLUG_PIN;
-					 set_Engine_State(ENGINE_RUNNING);
-				 }
-				 else
-					 set_Engine_State(ENGINE_REATTEMPT);
-			 }
-
-			 break;
-
-
-		case ENGINE_RUNNING:
-
+	   else if (mode == ENGINE_RUNNING)
+	   {
 			if (engine.mode != ENGINE_RUNNING)
 			{
 		   	    engine.mode = ENGINE_RUNNING;
@@ -271,10 +290,11 @@ void set_Engine_State(int mode)
 			P2OUT |= ACCESSORY_PIN;
 			P9OUT &= ~CRANK_PIN;
 		    P9OUT &= ~GLOWPLUG_PIN;
-		    break;
 
+	   }
 
-		case ENGINE_STOPPING:
+	   else if (mode == ENGINE_STOPPING)
+	   {
 
 		   if (engine.mode != ENGINE_STOP && engine.mode != ENGINE_STOPPING)
 		   {
@@ -289,10 +309,8 @@ void set_Engine_State(int mode)
 
 		   engine.mode = ENGINE_STOP;
 
-		   break;
+	   }
 
-
-	}
 }
 
 //--------------------------------------------------------------------

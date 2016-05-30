@@ -19,10 +19,7 @@
 
 //--------------------------------------------------------------------
 
-void check_BatteryBox_Status();
-
-
-
+void batteryStatus();
 int setContactor(int s);
 int setBatteryHeater(int s);
 int setEngineRun(int s);
