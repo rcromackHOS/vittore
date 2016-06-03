@@ -34,7 +34,7 @@ static int bin2bcd (int val);
 
 int RTC_begin(void);
 int RTC_adjust(dateTimeStruct dt);
-int RTC_isrunning(void);
+int RTC_isRunning(void);
 int RTC_lostTime(void);
 dateTimeStruct RTC_now();
 

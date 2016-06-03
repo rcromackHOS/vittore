@@ -9,6 +9,7 @@
 #define BMS_H_
 
 #include <msp430.h>
+#include "config.h"
 
 //--------------------------------------------------------------------
 // battery controller outputs

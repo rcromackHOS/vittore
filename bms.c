@@ -38,7 +38,7 @@ void check_BatteryBox_Status()
 	//---------------------------------------------- TEMPERATURE
 
 	// if battery box is colder than 1C
-	if (VALUE_BAT_TEMP < 1)
+	if (VALUE_BAT_TEMP < 100)
 	    _contactorOn = 0;
 
 	// if battery box is colder than 5C

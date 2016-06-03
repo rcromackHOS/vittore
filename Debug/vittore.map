@@ -1,7 +1,7 @@
 ******************************************************************************
                   MSP430 Linker PC v15.12.1                    
 ******************************************************************************
->> Linked Thu May 26 16:03:50 2016
+>> Linked Fri Jun 03 16:01:20 2016
 
 OUTPUT FILE NAME:   <vittore.out>
 ENTRY POINT SYMBOL: "_c_int00_noargs_noexit"  address: 00002128
@@ -18,8 +18,8 @@ MEMORY CONFIGURATION
   INFOC                 00001040   00000040  00000000  00000040  RWIX
   INFOB                 00001080   00000040  00000000  00000040  RWIX
   INFOA                 000010c0   00000040  00000000  00000040  RWIX
-  RAM                   00001100   00001000  0000010a  00000ef6  RWIX
-  FLASH                 00002100   0000debe  000000e4  0000ddda  RWIX
+  RAM                   00001100   00001000  00000162  00000e9e  RWIX
+  FLASH                 00002100   0000debe  00000108  0000ddb6  RWIX
   BSLSIGNATURE          0000ffbe   00000002  00000002  00000000  RWIX  ffff 
   INT00                 0000ffc0   00000002  00000000  00000002  RWIX
   INT01                 0000ffc2   00000002  00000000  00000002  RWIX
@@ -53,7 +53,7 @@ MEMORY CONFIGURATION
   INT29                 0000fffa   00000002  00000002  00000000  RWIX
   INT30                 0000fffc   00000002  00000002  00000000  RWIX
   RESET                 0000fffe   00000002  00000002  00000000  RWIX
-  FLASH2                00010000   00010000  00000b46  0000f4ba  RWIX
+  FLASH2                00010000   00010000  00000c8c  0000f374  RWIX
 
 
 SECTION ALLOCATION MAP
@@ -61,19 +61,17 @@ SECTION ALLOCATION MAP
  output                                  attributes/
 section   page    origin      length       input sections
 --------  ----  ----------  ----------   ----------------
-.bss       0    00001100    00000070     UNINITIALIZED
-                  00001100    0000003c     (.common:buttonList)
-                  0000113c    0000000c     (.common:now)
-                  00001148    0000000a     bms.obj (.bss)
-                  00001152    00000008     engineController.obj (.bss)
-                  0000115a    00000006     (.common:defaultSunrise)
-                  00001160    00000006     (.common:defaultSunset)
-                  00001166    00000006     (.common:engine)
-                  0000116c    00000004     main.obj (.bss)
+.bss       0    00001100    00000098     UNINITIALIZED
+                  00001100    00000048     (.common:buttonList)
+                  00001148    00000020     (.common:engine)
+                  00001168    00000018     solar.obj (.bss)
+                  00001180    0000000c     (.common:now)
+                  0000118c    00000006     (.common:defaultSunrise)
+                  00001192    00000006     (.common:defaultSunset)
 
-.data      0    00001170    0000004a     UNINITIALIZED
-                  00001170    00000044     config.obj (.data)
-                  000011b4    00000006     main.obj (.data)
+.data      0    00001198    0000007a     UNINITIALIZED
+                  00001198    00000074     config.obj (.data)
+                  0000120c    00000006     main.obj (.data)
 
 .stack     0    000020b0    00000050     UNINITIALIZED
                   000020b0    00000004     rts430x_lc_rd_eabi.lib : boot.obj (.stack)
@@ -86,19 +84,25 @@ section   page    origin      length       input sections
                   00002142    00000008                            : isr_trap.obj (.text:_isr:__TI_ISR_TRAP)
                   0000214a    00000002     MCP7940N.obj (.text:_isr:USCIAB0TX_ISR)
 
-.cinit     0    00002188    0000005c     
-                  00002188    00000039     (.cinit..data.load) [load image, compression = rle]
-                  000021c1    00000001     --HOLE-- [fill = 0]
-                  000021c2    00000009     (.cinit..bss.load) [load image, compression = rle]
-                  000021cb    00000001     --HOLE-- [fill = 0]
-                  000021cc    00000008     (__TI_handler_table)
-                  000021d4    00000010     (__TI_cinit_table)
+.cinit     0    000021a4    00000064     
+                  000021a4    00000041     (.cinit..data.load) [load image, compression = rle]
+                  000021e5    00000001     --HOLE-- [fill = 0]
+                  000021e6    00000009     (.cinit..bss.load) [load image, compression = rle]
+                  000021ef    00000001     --HOLE-- [fill = 0]
+                  000021f0    00000008     (__TI_handler_table)
+                  000021f8    00000010     (__TI_cinit_table)
 
 .init_array 
 *          0    00002100    00000000     UNINITIALIZED
 
-.const     0    0000214c    0000003c     
-                  0000214c    0000003c     button.obj (.const:$P$T0$1)
+.const     0    0000214c    00000058     
+                  0000214c    00000010     main.obj (.const:$P$T0$2)
+                  0000215c    0000000c     button.obj (.const:$P$T0$1)
+                  00002168    0000000c     button.obj (.const:$P$T1$2)
+                  00002174    0000000c     button.obj (.const:$P$T2$3)
+                  00002180    0000000c     button.obj (.const:$P$T3$4)
+                  0000218c    0000000c     button.obj (.const:$P$T4$5)
+                  00002198    0000000c     button.obj (.const:$P$T5$6)
 
 $fill000   0    0000ffbe    00000002     
                   0000ffbe    00000002     --HOLE-- [fill = ffff]
@@ -160,63 +164,53 @@ NMI        0    0000fffc    00000002
 .reset     0    0000fffe    00000002     
                   0000fffe    00000002     rts430x_lc_rd_eabi.lib : boot.obj (.reset)
 
-.text      0    00010000    00000b46     
-                  00010000    00000198     engineController.obj (.text:set_Engine_State)
-                  00010198    0000011a     lcd.obj (.text:OLED_setup)
-                  000102b2    000000f2     engineController.obj (.text:engineStatus)
-                  000103a4    000000e8     bms.obj (.text:batteryStatus)
-                  0001048c    000000d8     main.obj (.text:handle_secondEvents)
-                  00010564    000000ba     main.obj (.text:isQuietTime)
-                  0001061e    000000a2     main.obj (.text:main)
-                  000106c0    00000082     rts430x_lc_rd_eabi.lib : autoinit_wdt.obj (.text:_auto_init_hold_wdt)
-                  00010742    00000076     lcd.obj (.text:OLED_sendByte)
-                  000107b8    00000068     rts430x_lc_rd_eabi.lib : copy_decompress_rle.obj (.text:__TI_decompress_rle_core)
-                  00010820    00000066                            : cpy_tbl.obj (.text:copy_in)
-                  00010886    00000040     lcd.obj (.text:OLED_data)
-                  000108c6    00000040     timeDate.obj (.text:datetime)
-                  00010906    00000038     lcd.obj (.text:OLED_command)
-                  0001093e    00000036     main.obj (.text:setupPorts)
-                  00010974    0000002c     MCP7940N.obj (.text:init_I2C)
-                  000109a0    0000002c     timeDate.obj (.text:time)
-                  000109cc    00000028     lcd.obj (.text:OLED_clockCycle)
-                  000109f4    00000028     bms.obj (.text:setBatteryHeater)
-                  00010a1c    00000024     bms.obj (.text:setContactor)
-                  00010a40    0000001c     main.obj (.text:setLightsState)
-                  00010a5c    00000018     button.obj (.text:buildButtonStateMachine)
-                  00010a74    00000018     rts430x_lc_rd_eabi.lib : mult16_hw.obj (.text)
-                  00010a8c    00000016     lcd.obj (.text:OLED_clearDisplay)
-                  00010aa2    00000016     rts430x_lc_rd_eabi.lib : div16u.obj (.text)
-                  00010ab8    00000014                            : memcpy.obj (.text:memcpy)
-                  00010acc    00000014     bms.obj (.text:setEngineRun)
-                  00010ae0    00000012     rts430x_lc_rd_eabi.lib : copy_decompress_none.obj (.text:decompress:none:__TI_decompress_none)
-                  00010af2    0000000c     main.obj (.text:clearStateCode)
-                  00010afe    0000000c     main.obj (.text:setStateCode)
-                  00010b0a    00000008     button.obj (.text:button_stateMachine)
-                  00010b12    00000008     engineController.obj (.text:checkEngineTemp)
-                  00010b1a    00000008     engineController.obj (.text:checkOilPressure)
-                  00010b22    00000008     engineController.obj (.text:engineSetup)
-                  00010b2a    00000006     rts430x_lc_rd_eabi.lib : exit.obj (.text:abort)
-                  00010b30    00000006                            : copy_decompress_rle.obj (.text:decompress:rle24:__TI_decompress_rle24)
-                  00010b36    00000006     main.obj (.text:handle_minuteEvents)
-                  00010b3c    00000004     rts430x_lc_rd_eabi.lib : pre_init.obj (.text:_system_pre_init)
-                  00010b40    00000004     engineController.obj (.text:checkEngineRPMs)
-                  00010b44    00000002     rts430x_lc_rd_eabi.lib : startup.obj (.text:_system_post_cinit)
+.text      0    00010000    00000c8c     
+                  00010000    000001fa     button.obj (.text:button_stateMachine)
+                  000101fa    00000180     main.obj (.text:main)
+                  0001037a    0000012e     lcd.obj (.text:OLED_setup)
+                  000104a8    000000da     button.obj (.text:buildButtonStateMachine)
+                  00010582    000000d0     button.obj (.text:mast_stateMachine)
+                  00010652    000000b2     lcd.obj (.text:OLED_sendByte)
+                  00010704    00000098     main.obj (.text:inc_secondCounts)
+                  0001079c    00000082     rts430x_lc_rd_eabi.lib : autoinit_wdt.obj (.text:_auto_init_hold_wdt)
+                  0001081e    00000074     button.obj (.text:mastUpDown)
+                  00010892    00000068     rts430x_lc_rd_eabi.lib : copy_decompress_rle.obj (.text:__TI_decompress_rle_core)
+                  000108fa    00000066                            : cpy_tbl.obj (.text:copy_in)
+                  00010960    0000005a     lcd.obj (.text:OLED_command)
+                  000109ba    0000005a     lcd.obj (.text:OLED_data)
+                  00010a14    00000054     engineController.obj (.text:engineSetup)
+                  00010a68    0000004a     timeDate.obj (.text:datetime)
+                  00010ab2    00000048     solar.obj (.text:solar_setCoords)
+                  00010afa    00000044     timeDate.obj (.text:time)
+                  00010b3e    0000003e     main.obj (.text:handle_unitModeIndicator)
+                  00010b7c    0000003c     lcd.obj (.text:OLED_clockCycle)
+                  00010bb8    00000034     main.obj (.text:setupPorts)
+                  00010bec    00000022     lcd.obj (.text:OLED_clearDisplay)
+                  00010c0e    00000018     main.obj (.text:buildIdleArray)
+                  00010c26    00000018     rts430x_lc_rd_eabi.lib : mult16_hw.obj (.text)
+                  00010c3e    00000016                            : div16u.obj (.text)
+                  00010c54    00000014                            : memcpy.obj (.text:memcpy)
+                  00010c68    00000012                            : copy_decompress_none.obj (.text:decompress:none:__TI_decompress_none)
+                  00010c7a    00000006                            : exit.obj (.text:abort)
+                  00010c80    00000006                            : copy_decompress_rle.obj (.text:decompress:rle24:__TI_decompress_rle24)
+                  00010c86    00000004                            : pre_init.obj (.text:_system_pre_init)
+                  00010c8a    00000002                            : startup.obj (.text:_system_post_cinit)
 
 MODULE SUMMARY
 
        Module                     code   ro data   rw data
        ------                     ----   -------   -------
     .\
-       main.obj                   716    2         34     
-       engineController.obj       678    0         8      
-       lcd.obj                    582    0         0      
-       bms.obj                    328    0         10     
-       button.obj                 32     60        60     
-       timeDate.obj               108    0         0      
-       config.obj                 0      0         68     
-       MCP7940N.obj               46     2         6      
+       button.obj                 1048   72        0      
+       lcd.obj                    754    0         0      
+       main.obj                   714    18        18     
+       timeDate.obj               142    0         0      
+       MCP7940N.obj               2      2         116    
+       config.obj                 0      0         116    
+       solar.obj                  72     0         24     
+       engineController.obj       84     0         0      
     +--+--------------------------+------+---------+---------+
-       Total:                     2490   64        186    
+       Total:                     2816   92        274    
                                                           
     C:\ti\ccsv6\tools\compiler\ti-cgt-msp430_15.12.1.LTS\lib\rts430x_lc_rd_eabi.lib
        autoinit_wdt.obj           130    0         0      
@@ -250,21 +244,21 @@ MODULE SUMMARY
        Total:                     472    30        0      
                                                           
        Stack:                     0      0         80     
-       Linker Generated:          0      90        0      
+       Linker Generated:          0      98        0      
     +--+--------------------------+------+---------+---------+
-       Grand Total:               2962   184       266    
+       Grand Total:               3288   220       354    
 
 
 LINKER GENERATED COPY TABLES
 
-__TI_cinit_table @ 000021d4 records: 2, size/record: 8, table size: 16
-	.data: load addr=00002188, load size=00000039 bytes, run addr=00001170, run size=0000004a bytes, compression=rle
-	.bss: load addr=000021c2, load size=00000009 bytes, run addr=00001100, run size=00000070 bytes, compression=rle
+__TI_cinit_table @ 000021f8 records: 2, size/record: 8, table size: 16
+	.data: load addr=000021a4, load size=00000041 bytes, run addr=00001198, run size=0000007a bytes, compression=rle
+	.bss: load addr=000021e6, load size=00000009 bytes, run addr=00001100, run size=00000098 bytes, compression=rle
 
 
 LINKER GENERATED HANDLER TABLE
 
-__TI_handler_table @ 000021cc records: 2, size/record: 4, table size: 8
+__TI_handler_table @ 000021f0 records: 2, size/record: 4, table size: 8
 	index: 0, handler: __TI_decompress_rle24
 	index: 1, handler: __TI_decompress_none
 
@@ -273,17 +267,17 @@ GLOBAL SYMBOLS: SORTED ALPHABETICALLY BY Name
 
 address   name                    
 -------   ----                    
-000011ac  ATTEMPT_D               
-00001192  BMS_EVENT               
+000011f4  ATTEMPT_D               
+000011b6  BMS_EVENT               
 00000046  BTCNT1                  
 00000046  BTCNT12                 
 00000047  BTCNT2                  
 00000040  BTCTL                   
-00010b2a  C$$EXIT                 
+00010c7a  C$$EXIT                 
 00000059  CACTL1                  
 0000005a  CACTL2                  
 0000005b  CAPD                    
-000011a4  CRANK_D                 
+000011ec  CRANK_D                 
 000001d0  DMA0CTL                 
 000001d6  DMA0DA                  
 000001d6  DMA0DAL                 
@@ -341,6 +335,7 @@ address   name
 00000097  LCDM7                   
 00000098  LCDM8                   
 00000099  LCDM9                   
+000011b2  LIGHTS1HOUR_TMR         
 00000134  MAC                     
 0000014a  MAC32H                  
 0000014a  MAC32H_B                
@@ -366,12 +361,13 @@ address   name
 00000144  MPYS32L_B               
 00000132  MPYS_B                  
 00000130  MPY_B                   
-00010a8c  OLED_clearDisplay       
-000109cc  OLED_clockCycle         
-00010906  OLED_command            
-00010886  OLED_data               
-00010742  OLED_sendByte           
-00010198  OLED_setup              
+000011ca  OILCHANGE_PRESS_TMR     
+00010bec  OLED_clearDisplay       
+00010b7c  OLED_clockCycle         
+00010960  OLED_command            
+000109ba  OLED_data               
+00010652  OLED_sendByte           
+0001037a  OLED_setup              
 00000138  OP2                     
 00000152  OP2H                    
 00000152  OP2H_B                  
@@ -439,13 +435,14 @@ address   name
 0000000a  PBOUT                   
 00000016  PBREN                   
 0000000e  PBSEL                   
-000011a8  POST_D                  
-000011a0  PREHEAT_D               
-000011b0  REATTEMPTS_D            
+000011f0  POST_D                  
+000011e8  PREHEAT_D               
+000011f8  REATTEMPTS_D            
 00000154  RES0                    
 00000156  RES1                    
 00000158  RES2                    
 0000015a  RES3                    
+000011c8  RESET_TMR               
 0000013c  RESHI                   
 0000013a  RESLO                   
 00000041  RTCCTL                  
@@ -462,7 +459,6 @@ address   name
 0000004e  RTCYEAR                 
 0000004f  RTCYEARH                
 0000004e  RTCYEARL                
-00010974  RTC_begin               
 00000050  SCFI0                   
 00000051  SCFI1                   
 00000052  SCFQCTL                 
@@ -563,47 +559,55 @@ address   name
 000000dd  UCB1STAT                
 000000df  UCB1TXBUF               
 0000214a  USCIAB0TX_ISR           
-0000117e  VALUE_12V               
-00001174  VALUE_24V               
-00001186  VALUE_BAT_TEMP          
-0000118c  VALUE_RPM               
+000011a0  VALUE_12V               
+0000119c  VALUE_24V               
+000011a8  VALUE_BAT_TEMP          
+000011ae  VALUE_RPM               
 00000120  WDTCTL                  
-000011aa  _ATTEMPT_SP             
-0000117a  _CELLMONITOR_SP         
-000011a2  _CRANK_SP               
-0000119a  _DIAGNOSTIC_MODE        
-0000119c  _DIAGNOSTIC_MODE_TMR    
-00001198  _FORCE_LIGHTS_ON        
-00001170  _HIGH_SP_24V            
-00001176  _HIGH_SP_BMS            
-00001188  _HIGH_SP_RPM            
-00001180  _HIGH_SP_TEMP           
-0000117c  _LOW_SP_12V             
-00001172  _LOW_SP_24V             
-00001178  _LOW_SP_BMS             
-0000118a  _LOW_SP_RPM             
-00001184  _LOW_SP_TEMP            
-00001194  _MAST_STATUS            
-00001182  _NOMINAL_SP_TEMP        
-000011a6  _POST_SP                
-0000119e  _PREHEAT_SP             
-000011ae  _REATTEMPTS_SP          
-00001196  _RESETTING_             
-00001190  _STATE_CODE             
-0000118e  _UNIT_MODE              
+000011d0  _ADCs_UPDATED           
+000011f2  _ATTEMPT_SP             
+000011c2  _BANK_BMS_TMR_D         
+000011be  _BANK_BMS_TMR_SP        
+000011c0  _CELLMONITOR_TMR_D      
+000011bc  _CELLMONITOR_TMR_SP     
+000011ea  _CRANK_SP               
+000011d2  _DIAGNOSTIC_MODE        
+000011d4  _DIAGNOSTIC_MODE_TMR    
+000011d6  _DIAGNOSTIC_PAGE        
+000011d8  _DIAGNOSTIC_PAGES       
+000011ce  _FORCE_ENGINE_RUN       
+000011cc  _FORCE_LIGHTS_ON        
+00001198  _HIGH_SP_24V            
+000011b8  _HIGH_SP_BMS            
+000011aa  _HIGH_SP_RPM            
+000011a2  _HIGH_SP_TEMP           
+0000119e  _LOW_SP_12V             
+0000119a  _LOW_SP_24V             
+000011ba  _LOW_SP_BMS             
+000011ac  _LOW_SP_RPM             
+000011a6  _LOW_SP_TEMP            
+000011c4  _MAST_STATUS            
+000011a4  _NOMINAL_SP_TEMP        
+000011da  _OILCHANGE_DUE          
+000011ee  _POST_SP                
+000011e6  _PREHEAT_SP             
+000011f6  _REATTEMPTS_SP          
+000011c6  _RESETTING_             
+000011b4  _STATE_CODE             
+000011b0  _UNIT_MODE              
 00002100  __STACK_END             
 00000050  __STACK_SIZE            
 UNDEFED   __TI_BINIT_Base         
 UNDEFED   __TI_BINIT_Limit        
-000021d4  __TI_CINIT_Base         
-000021e4  __TI_CINIT_Limit        
-000021cc  __TI_Handler_Table_Base 
-000021d4  __TI_Handler_Table_Limit
+000021f8  __TI_CINIT_Base         
+00002208  __TI_CINIT_Limit        
+000021f0  __TI_Handler_Table_Base 
+000021f8  __TI_Handler_Table_Limit
 UNDEFED   __TI_INITARRAY_Base     
 UNDEFED   __TI_INITARRAY_Limit    
 00002142  __TI_ISR_TRAP           
-00010ae0  __TI_decompress_none    
-00010b30  __TI_decompress_rle24   
+00010c68  __TI_decompress_none    
+00010c80  __TI_decompress_rle24   
 0000ffde  __TI_int15              
 0000ffe0  __TI_int16              
 0000ffe2  __TI_int17              
@@ -624,47 +628,44 @@ ffffffff  __TI_pprof_out_hndl
 ffffffff  __TI_prof_data_size     
 ffffffff  __TI_prof_data_start    
 ffffffff  __c_args__              
-00010aa2  __mspabi_divu           
-00010a74  __mspabi_mpyi_hw        
-00010aa2  __mspabi_remu           
-000106c0  _auto_init_hold_wdt     
+00010c3e  __mspabi_divu           
+00010c26  __mspabi_mpyi_hw        
+00010c3e  __mspabi_remu           
+0001079c  _auto_init_hold_wdt     
 00002128  _c_int00_noargs_noexit  
 0000fffe  _reset_vector           
 000020b0  _stack                  
-00010b44  _system_post_cinit      
-00010b3c  _system_pre_init        
-00010b2a  abort                   
-000103a4  batteryStatus           
-00010a5c  buildButtonStateMachine 
+00010c8a  _system_post_cinit      
+00010c86  _system_pre_init        
+00010c7a  abort                   
+000104a8  buildButtonStateMachine 
+00010c0e  buildIdleArray          
 00001100  buttonList              
-00010b0a  button_stateMachine     
-00010b40  checkEngineRPMs         
-00010b12  checkEngineTemp         
-00010b1a  checkOilPressure        
-00010af2  clearStateCode          
-00010820  copy_in                 
-000108c6  datetime                
-0000115a  defaultSunrise          
-00001160  defaultSunset           
-00001166  engine                  
-00010b22  engineSetup             
-000102b2  engineStatus            
-000011b2  failure                 
-00010b36  handle_minuteEvents     
-0001048c  handle_secondEvents     
-00010974  init_I2C                
-00010564  isQuietTime             
-0001061e  main                    
-00010ab8  memcpy                  
-0000113c  now                     
-000109f4  setBatteryHeater        
-00010a1c  setContactor            
-00010acc  setEngineRun            
-00010a40  setLightsState          
-00010afe  setStateCode            
-00010000  set_Engine_State        
-0001093e  setupPorts              
-000109a0  time                    
+00010000  button_stateMachine     
+000108fa  copy_in                 
+000011e0  count_RPM_fail          
+000011e2  count_oil_fail          
+000011de  count_run               
+000011e4  count_temp_fail         
+00010a68  datetime                
+0000118c  defaultSunrise          
+00001192  defaultSunset           
+00001148  engine                  
+00010a14  engineSetup             
+000011dc  failure                 
+00010b3e  handle_unitModeIndicator
+000011fa  idleCount               
+00010704  inc_secondCounts        
+000011fc  lat                     
+00001204  lng                     
+000101fa  main                    
+0001081e  mastUpDown              
+00010582  mast_stateMachine       
+00010c54  memcpy                  
+00001180  now                     
+00010bb8  setupPorts              
+00010ab2  solar_setCoords         
+00010afa  time                    
 
 
 GLOBAL SYMBOLS: SORTED BY Symbol Address 
@@ -948,54 +949,72 @@ address   name
 000001ee  DMA2DAL                 
 000001f2  DMA2SZ                  
 00001100  buttonList              
-0000113c  now                     
-0000115a  defaultSunrise          
-00001160  defaultSunset           
-00001166  engine                  
-00001170  _HIGH_SP_24V            
-00001172  _LOW_SP_24V             
-00001174  VALUE_24V               
-00001176  _HIGH_SP_BMS            
-00001178  _LOW_SP_BMS             
-0000117a  _CELLMONITOR_SP         
-0000117c  _LOW_SP_12V             
-0000117e  VALUE_12V               
-00001180  _HIGH_SP_TEMP           
-00001182  _NOMINAL_SP_TEMP        
-00001184  _LOW_SP_TEMP            
-00001186  VALUE_BAT_TEMP          
-00001188  _HIGH_SP_RPM            
-0000118a  _LOW_SP_RPM             
-0000118c  VALUE_RPM               
-0000118e  _UNIT_MODE              
-00001190  _STATE_CODE             
-00001192  BMS_EVENT               
-00001194  _MAST_STATUS            
-00001196  _RESETTING_             
-00001198  _FORCE_LIGHTS_ON        
-0000119a  _DIAGNOSTIC_MODE        
-0000119c  _DIAGNOSTIC_MODE_TMR    
-0000119e  _PREHEAT_SP             
-000011a0  PREHEAT_D               
-000011a2  _CRANK_SP               
-000011a4  CRANK_D                 
-000011a6  _POST_SP                
-000011a8  POST_D                  
-000011aa  _ATTEMPT_SP             
-000011ac  ATTEMPT_D               
-000011ae  _REATTEMPTS_SP          
-000011b0  REATTEMPTS_D            
-000011b2  failure                 
+00001148  engine                  
+00001180  now                     
+0000118c  defaultSunrise          
+00001192  defaultSunset           
+00001198  _HIGH_SP_24V            
+0000119a  _LOW_SP_24V             
+0000119c  VALUE_24V               
+0000119e  _LOW_SP_12V             
+000011a0  VALUE_12V               
+000011a2  _HIGH_SP_TEMP           
+000011a4  _NOMINAL_SP_TEMP        
+000011a6  _LOW_SP_TEMP            
+000011a8  VALUE_BAT_TEMP          
+000011aa  _HIGH_SP_RPM            
+000011ac  _LOW_SP_RPM             
+000011ae  VALUE_RPM               
+000011b0  _UNIT_MODE              
+000011b2  LIGHTS1HOUR_TMR         
+000011b4  _STATE_CODE             
+000011b6  BMS_EVENT               
+000011b8  _HIGH_SP_BMS            
+000011ba  _LOW_SP_BMS             
+000011bc  _CELLMONITOR_TMR_SP     
+000011be  _BANK_BMS_TMR_SP        
+000011c0  _CELLMONITOR_TMR_D      
+000011c2  _BANK_BMS_TMR_D         
+000011c4  _MAST_STATUS            
+000011c6  _RESETTING_             
+000011c8  RESET_TMR               
+000011ca  OILCHANGE_PRESS_TMR     
+000011cc  _FORCE_LIGHTS_ON        
+000011ce  _FORCE_ENGINE_RUN       
+000011d0  _ADCs_UPDATED           
+000011d2  _DIAGNOSTIC_MODE        
+000011d4  _DIAGNOSTIC_MODE_TMR    
+000011d6  _DIAGNOSTIC_PAGE        
+000011d8  _DIAGNOSTIC_PAGES       
+000011da  _OILCHANGE_DUE          
+000011dc  failure                 
+000011de  count_run               
+000011e0  count_RPM_fail          
+000011e2  count_oil_fail          
+000011e4  count_temp_fail         
+000011e6  _PREHEAT_SP             
+000011e8  PREHEAT_D               
+000011ea  _CRANK_SP               
+000011ec  CRANK_D                 
+000011ee  _POST_SP                
+000011f0  POST_D                  
+000011f2  _ATTEMPT_SP             
+000011f4  ATTEMPT_D               
+000011f6  _REATTEMPTS_SP          
+000011f8  REATTEMPTS_D            
+000011fa  idleCount               
+000011fc  lat                     
+00001204  lng                     
 000020b0  _stack                  
 00002100  Timer_A                 
 00002100  __STACK_END             
 00002128  _c_int00_noargs_noexit  
 00002142  __TI_ISR_TRAP           
 0000214a  USCIAB0TX_ISR           
-000021cc  __TI_Handler_Table_Base 
-000021d4  __TI_CINIT_Base         
-000021d4  __TI_Handler_Table_Limit
-000021e4  __TI_CINIT_Limit        
+000021f0  __TI_Handler_Table_Base 
+000021f8  __TI_CINIT_Base         
+000021f8  __TI_Handler_Table_Limit
+00002208  __TI_CINIT_Limit        
 0000ffde  __TI_int15              
 0000ffe0  __TI_int16              
 0000ffe2  __TI_int17              
@@ -1013,48 +1032,37 @@ address   name
 0000fffa  __TI_int29              
 0000fffc  __TI_int30              
 0000fffe  _reset_vector           
-00010000  set_Engine_State        
-00010198  OLED_setup              
-000102b2  engineStatus            
-000103a4  batteryStatus           
-0001048c  handle_secondEvents     
-00010564  isQuietTime             
-0001061e  main                    
-000106c0  _auto_init_hold_wdt     
-00010742  OLED_sendByte           
-00010820  copy_in                 
-00010886  OLED_data               
-000108c6  datetime                
-00010906  OLED_command            
-0001093e  setupPorts              
-00010974  RTC_begin               
-00010974  init_I2C                
-000109a0  time                    
-000109cc  OLED_clockCycle         
-000109f4  setBatteryHeater        
-00010a1c  setContactor            
-00010a40  setLightsState          
-00010a5c  buildButtonStateMachine 
-00010a74  __mspabi_mpyi_hw        
-00010a8c  OLED_clearDisplay       
-00010aa2  __mspabi_divu           
-00010aa2  __mspabi_remu           
-00010ab8  memcpy                  
-00010acc  setEngineRun            
-00010ae0  __TI_decompress_none    
-00010af2  clearStateCode          
-00010afe  setStateCode            
-00010b0a  button_stateMachine     
-00010b12  checkEngineTemp         
-00010b1a  checkOilPressure        
-00010b22  engineSetup             
-00010b2a  C$$EXIT                 
-00010b2a  abort                   
-00010b30  __TI_decompress_rle24   
-00010b36  handle_minuteEvents     
-00010b3c  _system_pre_init        
-00010b40  checkEngineRPMs         
-00010b44  _system_post_cinit      
+00010000  button_stateMachine     
+000101fa  main                    
+0001037a  OLED_setup              
+000104a8  buildButtonStateMachine 
+00010582  mast_stateMachine       
+00010652  OLED_sendByte           
+00010704  inc_secondCounts        
+0001079c  _auto_init_hold_wdt     
+0001081e  mastUpDown              
+000108fa  copy_in                 
+00010960  OLED_command            
+000109ba  OLED_data               
+00010a14  engineSetup             
+00010a68  datetime                
+00010ab2  solar_setCoords         
+00010afa  time                    
+00010b3e  handle_unitModeIndicator
+00010b7c  OLED_clockCycle         
+00010bb8  setupPorts              
+00010bec  OLED_clearDisplay       
+00010c0e  buildIdleArray          
+00010c26  __mspabi_mpyi_hw        
+00010c3e  __mspabi_divu           
+00010c3e  __mspabi_remu           
+00010c54  memcpy                  
+00010c68  __TI_decompress_none    
+00010c7a  C$$EXIT                 
+00010c7a  abort                   
+00010c80  __TI_decompress_rle24   
+00010c86  _system_pre_init        
+00010c8a  _system_post_cinit      
 ffffffff  __TI_pprof_out_hndl     
 ffffffff  __TI_prof_data_size     
 ffffffff  __TI_prof_data_start    
@@ -1064,4 +1072,4 @@ UNDEFED   __TI_BINIT_Limit
 UNDEFED   __TI_INITARRAY_Base     
 UNDEFED   __TI_INITARRAY_Limit    
 
-[392 symbols]
+[399 symbols]

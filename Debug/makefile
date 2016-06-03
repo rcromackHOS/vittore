@@ -17,19 +17,10 @@ ORDERED_OBJS += \
 "./engineController.obj" \
 "./lcd.obj" \
 "./main.obj" \
+"./solar.obj" \
 "./timeDate.obj" \
-"./backUp/MCP7940N.obj" \
-"./backUp/bms.obj" \
-"./backUp/button.obj" \
-"./backUp/config.obj" \
-"./backUp/engineController.obj" \
-"./backUp/lcd.obj" \
-"./backUp/main.obj" \
-"./backUp/timeDate.obj" \
 "../MSPMATHLIB_CCS_msp430_4xx_small_code_small_data.lib" \
 "../lnk_msp430f47197.cmd" \
-"../backUp/MSPMATHLIB_CCS_msp430_4xx_small_code_small_data.lib" \
-"../backUp/lnk_msp430f47197.cmd" \
 $(GEN_CMDS__FLAG) \
 -llibmath.a \
 -llibc.a \
@@ -42,9 +33,7 @@ RMDIR := RMDIR /S/Q
 # All of the sources participating in the build are defined here
 -include sources.mk
 -include subdir_vars.mk
--include backUp/subdir_vars.mk
 -include subdir_rules.mk
--include backUp/subdir_rules.mk
 -include objects.mk
 
 ifneq ($(MAKECMDGOALS),clean)
@@ -173,8 +162,8 @@ vittore.hex: $(EXE_OUTPUTS)
 # Other Targets
 clean:
 	-$(RM) $(EXE_OUTPUTS__QUOTED)$(BIN_OUTPUTS__QUOTED)
-	-$(RM) "MCP7940N.d" "bms.d" "button.d" "config.d" "engineController.d" "lcd.d" "main.d" "timeDate.d" "backUp\MCP7940N.d" "backUp\bms.d" "backUp\button.d" "backUp\config.d" "backUp\engineController.d" "backUp\lcd.d" "backUp\main.d" "backUp\timeDate.d" 
-	-$(RM) "MCP7940N.obj" "bms.obj" "button.obj" "config.obj" "engineController.obj" "lcd.obj" "main.obj" "timeDate.obj" "backUp\MCP7940N.obj" "backUp\bms.obj" "backUp\button.obj" "backUp\config.obj" "backUp\engineController.obj" "backUp\lcd.obj" "backUp\main.obj" "backUp\timeDate.obj" 
+	-$(RM) "MCP7940N.d" "bms.d" "button.d" "config.d" "engineController.d" "lcd.d" "main.d" "solar.d" "timeDate.d" 
+	-$(RM) "MCP7940N.obj" "bms.obj" "button.obj" "config.obj" "engineController.obj" "lcd.obj" "main.obj" "solar.obj" "timeDate.obj" 
 	-@echo 'Finished clean'
 	-@echo ' '
 

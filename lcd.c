@@ -6,13 +6,189 @@
  */
 
 #include "lcd.h"
+#include "config.h"
 
+//--------------------------------------------------------------------
+/*
+const char modename0[] PROGMEM = "  Automatic Lights  ";
+const char modename1[] PROGMEM = "      No Lights     ";
+const char modename2[] PROGMEM = "Temporary Lights 1hr";
+const char* const modeArray[] PROGMEM = {modename0, modename1, modename2};
+
+const char msg1[] PROGMEM = {"   Contactor Open   "};
+const char msg2[] PROGMEM = {"    Low Voltage     "};
+const char msg3[] PROGMEM = {"   Cold Batteries   "};
+const char msg4[] PROGMEM = {"Oil Change due soon "};
+const char msg5[] PROGMEM = {"    Aquiring Time   "};
+const char msg6[] PROGMEM = {"   RTC Malfunction  "};
+const char msg7[] PROGMEM = {" Driver Malfunction "};
+const char msg8[] PROGMEM = {"Voltage Reg. failure"};
+const char msg9[] PROGMEM = {" Battery TC failure "};
+const char msg10[] PROGMEM = {"Reaquiring Satellite"};
+const char msg11[] PROGMEM = {"Aquiring Satellites "};
+const char msg12[] PROGMEM = {"Engine Failed Start "};
+const char msg13[] PROGMEM = {"  Engine Overspeed  "};
+const char msg14[] PROGMEM = {"  Engine Underspeed "};
+const char msg15[] PROGMEM = {"Engine Overheat Fail"};
+const char msg16[] PROGMEM = {"Engine Low oil pres."};
+const char msg17[] PROGMEM = {"   No GPS or RTC.   "};
+const char msg18[] PROGMEM = {"BMS FAIL, CALL TECH."};
+const char msg19[] PROGMEM = {"Engine starting     "};
+const char msg20[] PROGMEM = {"   Bank charging    "};
+const char msg21[] PROGMEM = {"Sunrise:    "};
+const char msg22[] PROGMEM = {"Sunset:     "};
+const char msg23[] PROGMEM = {"Lat:         "};
+const char msg24[] PROGMEM = {"Lng:         "};
+
+const char* const messages[] PROGMEM = {
+msg1,
+msg2,
+msg3,
+msg4,
+msg5,
+msg6,
+msg7,
+msg8,
+msg9,
+msg10,
+msg11,
+msg12,
+msg13,
+msg14,
+msg15,
+msg16,
+msg17,
+msg18,
+msg19,
+msg20,
+msg21,
+msg22,
+msg23,
+msg24
+};
+
+const char li0[] PROGMEM = "  HORIZON OILFIELD  ";
+const char li1[] PROGMEM = "     SOLUTIONS      ";
+const char* const cmpyName[] PROGMEM = {li0, li1};
+*/
 //--------------------------------------------------------------------
 
 int OLED_new_line[4] = {0x80, 0xA0, 0xC0, 0xE0};
 int OLED_rows = 0x08;
 
+char __screenbuffer[20];
+char __screenbuffer2[20];
+
 //--------------------------------------------------------------------
+//
+void updateDisplay()
+{
+	static int toggle_screen_msg;
+
+	if (_DIAGNOSTIC_MODE_TMR == 0)
+		_DIAGNOSTIC_MODE = 0;
+
+	if (_DIAGNOSTIC_MODE == 1)
+	{
+		if (_DIAGNOSTIC_PAGE == 0)
+		{
+			DIAG_showDate();
+			DIAG_showVoltage();
+			DIAG_showRPM();
+		}
+		else if (_DIAGNOSTIC_PAGE == 1)
+		{
+
+		}
+		else if (_DIAGNOSTIC_PAGE == 2)
+		{
+
+		}
+		else if (_DIAGNOSTIC_PAGE == 3)
+		{
+
+		}
+	}
+	else
+	{
+		Norm_showCompanyName();
+
+		toggle_screen_msg = !toggle_screen_msg;
+
+		if (toggle_screen_msg == 0)
+			Norm_showMode();
+
+		if (toggle_screen_msg == 1 && _STATE_CODE > 0)
+			Norm_showStateCode();
+
+
+	}
+
+}
+
+//--------------------------------------------------------------------
+//
+void Norm_showCompanyName()
+{
+
+
+}
+
+//--------------------------------------------------------------------
+//
+void Norm_showMode()
+{
+
+
+}
+
+//--------------------------------------------------------------------
+//
+void Norm_showStateCode()
+{
+
+
+}
+
+//====================================================================
+//
+//====================================================================
+//
+void DIAG_showDate()
+{
+
+
+}
+
+//--------------------------------------------------------------------
+//
+void DIAG_showVoltage()
+{
+
+
+
+}
+
+//--------------------------------------------------------------------
+//
+void DIAG_showRPM()
+{
+
+
+
+}
+
+//--------------------------------------------------------------------
+//
+//void DIAG_show12v()
+//{
+
+
+
+//}
+
+
+//====================================================================
 // Simulates a clock pulse
 void OLED_clockCycle()
 {

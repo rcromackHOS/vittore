@@ -19,7 +19,7 @@ static int i = 0;
 
 //--------------------------------------------------------------------
 //
-int RTC_isrunning(void)
+int RTC_isRunning(void)
 {
 //  Wire.beginTransmission(RTC_ADDRESS);
 //  Wire.write(i);

@@ -18,7 +18,7 @@
 #define STATE_NOMINAL     0x0
 #define STATE_PRESSING    0x1
 #define STATE_PRESSED     0x2
-#define STATE_RELEASING	  0x3
+#define STATE_RELEASED	  0x3
 
 #define MODE_AUTO  	  	  0x0
 #define MODE_LIGHT1H  	  0x1
@@ -57,21 +57,6 @@
 #define CUTOUT_MAST_PIN   BIT2
 #define DOWN_EXTENT_PIN   BIT6
 #define UP_EXTENT_PIN     BIT7
-
-//--------------------------------------------------------------------
-
-typedef struct
-{
-	int pin;
-	int LEDpin;
-
-	int mode;
-	int state;
-	int counts;
-
-} button;
-
-button buttonList[6];
 
 //--------------------------------------------------------------------
 

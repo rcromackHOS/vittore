@@ -347,6 +347,7 @@ int store_idleTime()
 	idles[0].hours = hrs;
 	idles[0].minutes = mins;
 
+	return 1;
 }
 
 

@@ -12,9 +12,9 @@
 #include "timeDate.h"
 #include "engineController.h"
 #include "lcd.h"
-#include "bms.h"
 #include "button.h"
 #include "MCP7940N.h"
+#include "bms.h"
 
 //--------------------------------------------------------------------
 
@@ -28,9 +28,13 @@ int setLightsState(int s);
 
 void handle_failEvent();
 void handle_lowfuelEvent();
-void updateDisplay();
 void handle_lighting();
 void resetControl();
+void buildIdleArray();
+void handle_oilchangeClear();
+void handle_reset();
+int RTC_init();
+void handle_unitModeIndicator();
 
 //--------------------------------------------------------------------
 
@@ -71,7 +75,7 @@ static int secondCount = 0;
 
 void setupPorts()
 {
-	P1DIR |= 0xdf;
+	P1DIR |= 0x02;
 	P2DIR |= 0x21;
 	P3DIR |= 0x80;
 	P4DIR |= 0x3f;
@@ -154,6 +158,12 @@ void inc_secondCounts()
 	if (OILCHANGE_PRESS_TMR != 0)
 		OILCHANGE_PRESS_TMR++;
 
+	//---------------------------------------------
+	// screen centric timers
+
+	if (_DIAGNOSTIC_MODE_TMR != 0)
+		_DIAGNOSTIC_MODE_TMR--;
+
 }
 
 //--------------------------------------------------------------------
@@ -182,7 +192,6 @@ int main()
 	buildButtonStateMachine();
 	OLED_setup();
 
-
 	// pull stored oil change due hours
 	_OILCHANGE_DUE = 500;
 
@@ -193,9 +202,9 @@ int main()
 
 	engineSetup(EngineMinutes, EngineHours);
 
-	RTC_begin();
+	//RTC_begin();
 
-	now = RTC_now();
+	//now = RTC_now();
 
 	// -------------------------- default values
 
@@ -203,11 +212,18 @@ int main()
 	defaultSunrise = time(0, 0, 7);
 	now = datetime(0, 0, 0, 1, 1, 2015);
 
-	_UNIT_MODE = 0;
+	// pull coorindates from memory
+	lat = 0.0;
+	lng = 0.0;
 
-	// --------------------------
+	solar_setCoords(lat, lng);
 
-	_BIS_SR(GIE); // interrupts enabled
+	//sunSet = solar_getSunset(now);
+	//sunRise = solar_getSunrise(now);
+
+	_UNIT_MODE = 1;
+
+	buildIdleArray();
 
 	volatile int countseconds = 0;
 
@@ -216,7 +232,6 @@ int main()
 	typedef enum
 	{
 		INIT,
-		INCREMENT_COUNTERS,
 		ADCs_UPDATED,
 		BATTERY_STATUS,
 		ENGINE_ANALYSIS,
@@ -225,9 +240,16 @@ int main()
 		HANDLE_UNITMODES,
 		UPDATE_SCREEN,
 		FAILURE_RESET
+
 	} state_types;
 
-	state_types state_system = INIT;
+	state_types state_system = ADCs_UPDATED;
+
+	int done = 0;
+
+	// --------------------------
+
+	_BIS_SR(GIE); // interrupts enabled
 
 	while(1)
     {
@@ -252,93 +274,94 @@ int main()
 		}
 
 	   // ---------------------------------------
+	   // Increment second counts
+	   if (countseconds == 2)
+	   {
+			countseconds = 0;
+			secondCount++;
+
+			inc_secondCounts();
+
+			// pulse heatbeat
+		    P5OUT ^= HEARTBEAT_PIN;
+	   }
+
+	   // ---------------------------------------
 	   // State machine
 	   switch (state_system)
 	   {
 
 			case INIT:
-					if(done)
+					if (done == 1)
 						state_system++;
 					else
 					{
-						RTC_begin
+						//RTC_begin();
 
-
+						done = 1;
 					}
 
 					break;
 
-			case INCREMENT_COUNTERS: // Increment all the counters
-
-				if (countseconds == 2)	// Increment second counts
-				{
-					countseconds = 0;
-					secondCount++;
-
-					inc_secondCounts();
-
-					// pulse heatbeat
-				    P5OUT ^= HEARTBEAT_PIN;
-				}
-
-				state_system++;
-				break;
-
 			case ADCs_UPDATED:
 
-				if (_ADCs_UPDATED == 1)
-				{
-					_ADCs_UPDATED = 0;
-				}
+				//if (_ADCs_UPDATED == 1)
+				//{
+				//	_ADCs_UPDATED = 0;
+				//}
 
 				state_system++;
 				break;
 
 			case BATTERY_STATUS:		// Check the battery box sensor data, also impliments BMS protection
 
-				check_BatteryBox_Status();
+				//check_BatteryBox_Status();
 
 				state_system++;
 				break;
 
 			case ENGINE_ANALYSIS:
 
-				newMode = check_Engine_Status();
+				//newMode = check_Engine_Status();
 
 				state_system++;
 				break;
 
 			case ENGINE_STATUS:
 
-				set_Engine_State(newMode);
+				//set_Engine_State(newMode);
 
 				state_system++;
 				break;
 
 			case ALERT_INDICATORS:
 
-				handle_failEvent();
-				handle_lowfuelEvent();
-				handle_oilchangeClear();
+				//handle_failEvent();
+				//handle_lowfuelEvent();
+				//handle_oilchangeClear();
 
 				state_system++;
 				break;
 
 			case HANDLE_UNITMODES:
 
-				if (_RESETTING_ == 1)
-					handle_reset();
+				handle_unitModeIndicator();
 
-				handle_lighting();
+				//if (_RESETTING_ == 1)
+				//	handle_reset();
+
+				//handle_lighting();
 
 				state_system++;
 				break;
 
 			case UPDATE_SCREEN:
 
-				updateDisplay();
-
-				state_system++;
+				//updateDisplay();
+				P8OUT ^= BIT0;
+				//for (j = 100; j > 0; j--)
+				//{}
+				state_system = ADCs_UPDATED;
 				break;
 	   }
 
@@ -358,14 +381,9 @@ int main()
 __interrupt void Timer_A (void)
 {
    tmrCnt++;
-
-   //tom
-   if(engine_countdown != 0)
-	   engine_countdown--;
-
    // ten millis events
-   //if (tmrCnt % 2 == 0)
-	//   button_stateMachine();
+   if (tmrCnt % 2 == 0)
+   	   button_stateMachine();
 
    // half-second based events
    if (tmrCnt % 50 == 0)
@@ -380,21 +398,38 @@ __interrupt void Timer_A (void)
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------
+
+void handle_unitModeIndicator()
+{
+	int i;
+	for (i = 2; i >= 0; i--)
+	{
+		if (_UNIT_MODE == buttonList[i].mode)
+		{
+			P4OUT |= buttonList[i].LEDpin;
+			break;
+		}
+		else
+			P4OUT &= ~buttonList[i].LEDpin;
+	}
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------
 // Initialize the RTC
 // Check for lost tme or errors
-int RTC_init(void)
+int RTC_init()
 {
-	if (RTC_isrunning == 99)	// 99 = no I2C response
+	if (RTC_isrunning() == 99)	// 99 = no I2C response
 	{
 		setStateCode(11);
 	}
 	else
     {
 		// If we've lost the time
-		if (RTC.lostTime() == 1)
+		if (RTC_lostTime() == 1)
 	    {
 	      setStateCode(10);     // 10 = RTC lost time (LIR32 failure?)
-	      RTC.adjust(now);
+	      RTC_adjust(now);
 	    }
 	}
 
@@ -540,30 +575,6 @@ void handle_lighting()
 		setLightsState(0);
 }
 
-
-//--------------------------------------------------------------------
-// Screen Update
-void updateDisplay()
-{
-	// Diagnostic Mode
-	// high-jacks button functions
-	// reset becomes close
-	// mast up/down become page up/down
-	// stays active for 60 seconds
-	if (_DIAGNOSTIC_MODE == 1)
-	{
-		_DIAGNOSTIC_MODE_TMR--;
-		if (_DIAGNOSTIC_MODE_TMR == 0)
-			_DIAGNOSTIC_MODE = 0;
-
-	    // update screen diagnostic page
-	}
-	else
-	{
-		// update screen
-	}
-}
-
 //--------------------------------------------------------------------
 // Handle the reset button functionality
 void handle_reset()
@@ -629,6 +640,17 @@ void handle_oilchangeClear()
 	}
 }
 
-
+//--------------------------------------------------------------------
+// Build the Idle time array with 0s
+void buildIdleArray()
+{
+	idleTime idles[4] =
+			{
+					{0, 0},
+					{0, 0},
+					{0, 0},
+					{0, 0}
+			};
+}
 
 

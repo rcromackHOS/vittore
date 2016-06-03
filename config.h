@@ -18,15 +18,15 @@ extern volatile int VALUE_24V;
 
 //--------------------------------------------------------------------
 
-extern int BMS_EVENT =					0;
+extern int BMS_EVENT;
 
-extern int _HIGH_SP_BMS = 				2850;
-extern int _LOW_SP_BMS = 				2300;
-extern int _CELLMONITOR_TMR_SP = 		30;
-extern int _BANK_BMS_TMR_SP = 			5;
+extern int _HIGH_SP_BMS;
+extern int _LOW_SP_BMS;
+extern int _CELLMONITOR_TMR_SP;
+extern int _BANK_BMS_TMR_SP;
 
-extern int _CELLMONITOR_TMR_D = 		0;
-extern int _BANK_BMS_TMR_D = 			0;
+extern int _CELLMONITOR_TMR_D;
+extern int _BANK_BMS_TMR_D;
 
 //--------------------------------------------------------------------
 extern volatile int _LOW_SP_12V;
@@ -47,8 +47,6 @@ extern int LIGHTS1HOUR_TMR;
 extern volatile int _STATE_CODE;
 
 extern volatile int _MAST_STATUS;
-
-extern int BMS_EVENT;
 
 extern int _RESETTING_;
 extern int RESET_TMR;
@@ -88,7 +86,6 @@ extern int count_RPM_fail;
 extern int count_oil_fail;
 extern int count_temp_fail;
 
-
 //--------------------------------------------------------------------
 
 extern int failure;
@@ -111,7 +108,7 @@ typedef struct
 
 engineStruct engine;
 
-dateTimeStruct now;
+//--------------------------------------------------------------------
 
 typedef struct
 {
@@ -120,15 +117,36 @@ typedef struct
 
 } idleTime;
 
-idleTime idles[4] =
-		{
-				{0, 0},
-				{0, 0},
-				{0, 0},
-				{0, 0}
-		};
+idleTime idles[4];
 
 extern int idleCount;
+
+
+//--------------------------------------------------------------------
+
+typedef struct
+{
+	int pin;
+	int LEDpin;
+
+	int mode;
+	int state;
+	int Oncounts;
+	int Offcounts;
+
+} button;
+
+button buttonList[6];
+
+//--------------------------------------------------------------------
+
+extern double lat;
+extern double lng;
+
+dateTimeStruct now;
+
+timeStruct sunSet;
+timeStruct sunRise;
 
 //--------------------------------------------------------------------
 

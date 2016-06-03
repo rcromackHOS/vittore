@@ -21,6 +21,16 @@
 
 //--------------------------------------------------------------------
 
+void updateDisplay();
+
+void Norm_showCompanyName();
+void Norm_showMode();
+void Norm_showStateCode();
+
+void DIAG_showDate();
+void DIAG_showVoltage();
+void DIAG_showRPM();
+
 void OLED_setup();
 void OLED_clockCycle();
 void OLED_command(int c);
