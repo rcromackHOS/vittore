@@ -125,6 +125,7 @@ void button_stateMachine()
 		{
 			if (buttonList[i].state == STATE_RELEASED)
 			    _UNIT_MODE = buttonList[i].mode;
+
 		}
 	}
 

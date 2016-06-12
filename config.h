@@ -41,7 +41,7 @@ extern volatile int _HIGH_SP_RPM;
 extern volatile int _LOW_SP_RPM;
 extern volatile int VALUE_RPM;
 
-extern volatile int _UNIT_MODE;
+extern int _UNIT_MODE;
 extern int LIGHTS1HOUR_TMR;
 
 extern volatile int _STATE_CODE;

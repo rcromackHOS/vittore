@@ -149,7 +149,7 @@ all: vittore.out
 vittore.out: $(OBJS) $(CMD_SRCS) $(LIB_SRCS) $(GEN_CMDS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: MSP430 Linker'
-	"C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/bin/cl430" -vmspx --data_model=restricted -Ooff --opt_for_speed=0 --use_hw_mpy=32 --advice:power=all -g --define=__MSP430F47197__ --diag_warning=225 --display_error_number --diag_wrap=off --printf_support=minimal -z -m"vittore.map" --heap_size=80 --stack_size=80 --cinit_hold_wdt=on -i"C:/ti/ccsv6/ccs_base/msp430/include" -i"C:/ti/ccsv6/ccs_base/msp430/lib/4xx" -i"C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/lib" -i"C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include" --reread_libs --display_error_number --warn_sections --diag_wrap=off --xml_link_info="vittore_linkInfo.xml" --use_hw_mpy=32 --rom_model -o "vittore.out" $(ORDERED_OBJS)
+	"C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/bin/cl430" -vmspx --data_model=restricted -Ooff --opt_for_speed=0 --use_hw_mpy=32 --advice:power=all -g --define=__MSP430F47197__ --diag_warning=225 --display_error_number --diag_wrap=off --printf_support=minimal -z -m"vittore.map" --heap_size=80 --stack_size=80 --cinit_hold_wdt=on -i"C:/ti/ccsv6/ccs_base/msp430/include" -i"C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/lib" -i"C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include" -i"C:/ti/ccsv6/ccs_base/msp430/lib/4xx" --reread_libs --display_error_number --warn_sections --diag_wrap=off --xml_link_info="vittore_linkInfo.xml" --use_hw_mpy=32 --rom_model -o "vittore.out" $(ORDERED_OBJS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 

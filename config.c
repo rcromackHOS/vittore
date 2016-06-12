@@ -25,7 +25,7 @@ volatile int _HIGH_SP_RPM = 	3900;
 volatile int _LOW_SP_RPM = 	 	1000;
 volatile int VALUE_RPM = 	    0;
 
-volatile int _UNIT_MODE =		0;
+int _UNIT_MODE =				0;
 int LIGHTS1HOUR_TMR =			0;
 
 volatile int _STATE_CODE =		0;

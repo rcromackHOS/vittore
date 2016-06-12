@@ -21,8 +21,8 @@
 #define STATE_RELEASED	  0x3
 
 #define MODE_AUTO  	  	  0x0
-#define MODE_LIGHT1H  	  0x1
-#define MODE_STANDBY  	  0x2
+#define MODE_STANDBY  	  0x1
+#define MODE_LIGHT1H  	  0x2
 #define MODE_RESET	  	  0x3
 #define MODE_UP       	  0x4
 #define MODE_DOWN     	  0x5

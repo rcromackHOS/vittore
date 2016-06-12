@@ -144,7 +144,7 @@ void init_I2C(void)
       UCB0BR1 = 0;
       UCB0I2CSA = RTC_ADDRESS;                  // Slave Address
       UCB0CTL1 &= ~UCSWRST;                     // Clear SW reset, resume operation
-      IE2 |= UCB0RXIE + UCB0TXIE;               //Enable RX and TX interrupt
+      //IE2 |= UCB0RXIE + UCB0TXIE;               //Enable RX and TX interrupt
 }
 
 void Transmit(void)

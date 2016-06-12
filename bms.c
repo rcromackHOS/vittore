@@ -23,17 +23,10 @@ void check_BatteryBox_Status()
 	//---------------------------------------------- VOLTAGE
 
 	if (VALUE_24V < _LOW_SP_24V && _FORCE_ENGINE_RUN == 0)
-	{
 		_FORCE_ENGINE_RUN = 1;
-		set_Engine_State(ENGINE_PRE);
-	}
 
-	// doesn't look for _engineOn because we want it to respect _FORCE_ENGINE_RUN calls
 	if (VALUE_24V > _HIGH_SP_24V && _FORCE_ENGINE_RUN == 1)
-	{
 		_FORCE_ENGINE_RUN = 0;
-		set_Engine_State(ENGINE_STOP);
-	}
 
 	//---------------------------------------------- TEMPERATURE
 
@@ -56,7 +49,7 @@ void check_BatteryBox_Status()
 	//---------------------------------------------- BMS
 
 	// BMS cell monitors. Give them a grace period
-	if (P2IN & BMS_PIN == 0)
+	if ((P2IN & BMS_PIN) == 0)
 	{
 		// if this is a newly detected problem
 		if (_CELLMONITOR_TMR_D == 0 && BMS_EVENT == 0)
@@ -65,20 +58,26 @@ void check_BatteryBox_Status()
 
 	// BMS FAILURE DETECTED
 	// If our cell monitors detect a problem for 30 seconds, and
-	if ( (_CELLMONITOR_TMR_D == 0 && P2IN & BMS_PIN == 0) || VALUE_24V >= _HIGH_SP_BMS || VALUE_24V <= _LOW_SP_BMS)
+	if ( (_CELLMONITOR_TMR_D == 1 && (P2IN & BMS_PIN) == 0) ||
+		 VALUE_24V >= _HIGH_SP_BMS ||
+		 VALUE_24V <= _LOW_SP_BMS  &&
+		 _BANK_BMS_TMR_D == 0 &&
+		 BMS_EVENT == 0)
 	{
-		_BANK_BMS_TMR_D = _BANK_BMS_TMR_SP;		// start counting down the cool-down period
+		_BANK_BMS_TMR_D = 1;		// start counting down the cool-down period
 		_FORCE_ENGINE_RUN = 0;					// turn off the engine
 	}
 
 	// BMS FAILURE APPLIED
 	// apply the failure, alert the system
-	if (_BANK_BMS_TMR_D == 0)
+	if (_BANK_BMS_TMR_D >= _BANK_BMS_TMR_SP)
 	{
 		failure = 1;
 		setStateCode( 99 );
 
 		BMS_EVENT = 1;
+
+		_BANK_BMS_TMR_D = 0;
 
 		// Shut down all the loads
 		_heaterOn = 0;

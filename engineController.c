@@ -30,16 +30,21 @@ int engineSetup(int engMins, int engHrs)
 int checkEngineTemp()
 {
 	if (P7IN & ENGINE_TEMP_PIN == 0)
-	  return 0;
-	return 1;
+	  return 1;
+	return 0;
 }
 
 //--------------------------------------------------------------------
 //
 int checkOilPressure()
 {
-	if (P7IN & OIL_PIN == 0)
-	  return 1;
+//	if (P7IN & OIL_PIN == 0)
+//	  return 1;
+//	return 0;
+	int dw = P1IN & BIT7;
+
+	if (dw > 0)
+		return 1;
 	return 0;
 }
 
@@ -47,6 +52,8 @@ int checkOilPressure()
 //
 int checkEngineRPMs()
 {
+	if (P1IN & BIT7 >= 0)
+		return 1;
 	return 0;
 }
 
@@ -56,79 +63,100 @@ int check_Engine_Status()
 {
 	int mode = engine.mode;
 
-	// See if the engine started
-	if (engine.mode != ENGINE_RUNNING &&
-		engine.mode != ENGINE_POST &&
-		engine.mode != ENGINE_STOP &&
-		checkOilPressure() == 1)
+	if (_FORCE_ENGINE_RUN == 1)
 	{
-		if (count_run == 0 && mode != ENGINE_POST)
-			count_run = 1;
-
-		if (count_run == 3)
+		if (failure == 0 &&
+			mode == ENGINE_STOP)
 		{
-			mode = ENGINE_POST;
-			count_run = 0;
+			mode = ENGINE_PRE;
+		}
+
+		// ---------------------------------------- See if the engine started
+		if (mode != ENGINE_RUNNING &&
+			mode != ENGINE_POST &&
+			mode != ENGINE_STOP)
+		{
+			if (checkOilPressure() == 1)
+			{
+				if (count_run == 0 && mode != ENGINE_POST)
+					count_run = 1;
+
+				if (count_run == 3)
+				{
+					mode = ENGINE_POST;
+					count_run = 0;
+				}
+			}
+			else if (count_run > 0)
+				count_run = 0;
+		}
+
+		// ---------------------------------------- Engine running checks
+		else if (mode == ENGINE_RUNNING)
+		{
+			// Check engine RPMS
+			if (checkEngineRPMs() != 1)
+			{
+				if (count_RPM_fail == 0)
+					count_RPM_fail = 1;
+
+				if (count_RPM_fail == 4)
+				{
+					if (checkEngineRPMs() == 0)
+						setStateCode( 32 );
+
+					if (checkEngineRPMs() == 2)
+						setStateCode( 31 );
+
+					mode = ENGINE_STOPPING;
+					failure = 1;
+
+					count_RPM_fail = 0;
+				}
+			}
+
+			// ---------------------------------------- Check Engine Oil Pressure
+			if (checkOilPressure() == 0)
+			{
+				if (count_oil_fail == 0)
+					count_oil_fail = 1;
+
+				if (count_oil_fail == 4)
+				{
+					mode = ENGINE_STOPPING;
+
+					failure = 1;
+					setStateCode( 34 );
+
+					count_oil_fail = 0;
+				}
+			}
+			/*
+			// ----------------------------------------  Check Engine Temperature
+			if (checkEngineTemp() == 0)
+			{
+				if (count_temp_fail == 0)
+					count_temp_fail = 1;
+
+				if (count_temp_fail == 4)
+				{
+					mode = ENGINE_STOPPING;
+
+					failure = 1;
+					setStateCode( 33 );
+
+					count_temp_fail = 0;
+				}
+			}
+			 */
 		}
 	}
-
-	// Engine running checks
-	else if (engine.mode == ENGINE_RUNNING)
+	else
 	{
-
-		// Check engine RPMS
-		if (checkEngineRPMs() != 1)
+		if (mode != ENGINE_STOP &&
+			mode != ENGINE_STOPPING)
 		{
-			if (count_RPM_fail == 0)
-				count_RPM_fail = 1;
-
-			if (count_RPM_fail == 4)
-			{
-				if (checkEngineRPMs() == 0)
-					setStateCode( 32 );
-
-				if (checkEngineRPMs() == 2)
-				    setStateCode( 31 );
-
-				mode = ENGINE_STOPPING;
-				failure = 1;
-
-				count_RPM_fail = 0;
-			}
-		}
-
-		// Check Engine Oil Pressure
-		if (checkOilPressure() == 0)
-		{
-			if (count_oil_fail == 0)
-				count_oil_fail = 1;
-
-		    if (count_oil_fail == 4)
-		    {
-		    	mode = ENGINE_STOPPING;
-
-				failure = 1;
-				setStateCode( 34 );
-
-				count_oil_fail = 0;
-		    }
-		}
-
-		// Check Engine Temperature
-		if (checkEngineTemp() == 0)
-		{
-			if (count_temp_fail == 0)
-				count_temp_fail = 1;
-
-		    if (count_temp_fail == 4)
-		    {
-		    	mode = ENGINE_STOPPING;
-
-				failure = 1;
-				setStateCode( 33 );
-
-				count_temp_fail = 0;
-		    }
+			mode = ENGINE_STOPPING;
 		}
 	}
 

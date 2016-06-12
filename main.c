@@ -4,7 +4,7 @@
 //***************************************************************************************
 
 
-//#include <msp430f47197.h>
+//#include <msp430f5419a.h>
 //#include <msp430_math.h>
 #include <msp430.h>
 #include "config.h"
@@ -17,6 +17,8 @@
 #include "bms.h"
 
 //--------------------------------------------------------------------
+
+void init_clocks();
 
 int isQuietTime(dateTimeStruct now);
 void setStateCode(int code);
@@ -76,9 +78,9 @@ static int secondCount = 0;
 void setupPorts()
 {
 	P1DIR |= 0x02;
-	P2DIR |= 0x21;
-	P3DIR |= 0x80;
-	P4DIR |= 0x3f;
+	P2DIR |= 0x91;
+	P3DIR |= 0x40;
+	P4DIR |= 0xff;
 	P5DIR |= 0x3f;
 
 	P7DIR |= 0x00;
@@ -86,6 +88,11 @@ void setupPorts()
 	P9DIR |= 0x7f;
 	P10DIR |= 0xff;
 
+	// Enable pull-ups on these inputs
+	P2REN |= 0x2E;
+	P7REN |= 0x40;
+	//P6REN |= 0x80;
+	P9REN |= 0x80;
 }
 
 //--------------------------------------------------------------------
@@ -101,6 +108,28 @@ void delayms(int m)
 
 }
 
+void init_clocks()
+{
+    // CCR0 interrupt enabled
+	CCTL0 = CCIE;
+	// SMCLK/8/countup
+	TACTL = TASSEL_2 + MC_1 + ID_3;
+	// 1MHz / 8(ID_3) / 100Hz
+	CCR0 = 374;
+	/*
+
+	P5SEL |= 0x0C;                        // Port select XT2
+	P7SEL |= 0x03;                        // Select XT1
+
+	// -------------------------- clock
+
+	TA0CCTL0 |= CCIE;
+	TA0CCR0 = 1000;
+
+	TA0CTL |= TASSEL__SMCLK + MC__UP + ID__1 + TACLR;
+    */
+}
+
 //--------------------------------------------------------------------
 //
 void inc_secondCounts()
@@ -111,10 +140,7 @@ void inc_secondCounts()
 		_CELLMONITOR_TMR_D--;
 
 	if (_BANK_BMS_TMR_D != 0)
-		_BANK_BMS_TMR_D--;
-
-	if (_BANK_BMS_TMR_D != 0)
-		_BANK_BMS_TMR_D--;
+		_BANK_BMS_TMR_D++;
 
 	//---------------------------------------------
 	// Engine centric timers
@@ -179,12 +205,7 @@ int main()
 {
 	WDTCTL = WDTPW | WDTHOLD;		// Stop watchdog timer
 
-    // CCR0 interrupt enabled
-	CCTL0 = CCIE;
-	// SMCLK/8/countup
-	TACTL = TASSEL_2 + MC_1 + ID_3;
-	// 1MHz / 8(ID_3) / 100Hz
-	CCR0 = 374;
+    init_clocks();
 
 	// -------------------------- initization
 
@@ -221,13 +242,15 @@ int main()
 	//sunSet = solar_getSunset(now);
 	//sunRise = solar_getSunrise(now);
 
-	_UNIT_MODE = 1;
+	_UNIT_MODE = MODE_AUTO;
 
 	buildIdleArray();
 
 	volatile int countseconds = 0;
 
 	static int newMode;
+
+	failure = 0;
 
 	typedef enum
 	{
@@ -246,6 +269,11 @@ int main()
 	state_types state_system = ADCs_UPDATED;
 
 	int done = 0;
+
+	   P2OUT &= ~ACCESSORY_PIN;
+	   P9OUT &= ~CRANK_PIN;
+	   P9OUT &= ~GLOWPLUG_PIN;
+	   P8OUT &= ~ASSET_IGN_PIN;
 
 	// --------------------------
 
@@ -315,28 +343,35 @@ int main()
 
 			case BATTERY_STATUS:		// Check the battery box sensor data, also impliments BMS protection
 
-				//check_BatteryBox_Status();
+				check_BatteryBox_Status();
 
 				state_system++;
 				break;
 
 			case ENGINE_ANALYSIS:
+				/*
+				if (P1IN & BIT0 != 0)
+					_FORCE_ENGINE_RUN = 1;
 
-				//newMode = check_Engine_Status();
+				else
+					_FORCE_ENGINE_RUN = 0;
+				*/
+
+				newMode = check_Engine_Status();
 
 				state_system++;
 				break;
 
 			case ENGINE_STATUS:
 
-				//set_Engine_State(newMode);
+				set_Engine_State(newMode);
 
 				state_system++;
 				break;
 
 			case ALERT_INDICATORS:
 
-				//handle_failEvent();
+				handle_failEvent();
 				//handle_lowfuelEvent();
 				//handle_oilchangeClear();
 
@@ -402,16 +437,17 @@ __interrupt void Timer_A (void)
 void handle_unitModeIndicator()
 {
 	int i;
+//	button sample;
 	for (i = 2; i >= 0; i--)
 	{
+//		sample = buttonList[i];
 		if (_UNIT_MODE == buttonList[i].mode)
-		{
 			P4OUT |= buttonList[i].LEDpin;
-			break;
-		}
+
 		else
 			P4OUT &= ~buttonList[i].LEDpin;
 	}
+	P4OUT &= ~BIT0;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------
