@@ -20,16 +20,6 @@
 #define ENGINE_RUNNING   0x5
 #define ENGINE_STOPPING  0x6
 
-// engine controller outputs
-#define ACCESSORY_PIN    BIT0
-#define CRANK_PIN        BIT6
-#define GLOWPLUG_PIN     BIT5
-
-// asset tracker outputs
-#define ASSET_IGN_PIN    BIT5
-#define OIL_PIN		     BIT7
-#define ENGINE_TEMP_PIN  BIT6
-
 //--------------------------------------------------------------------
 
 int engineSetup(int engMins, int engHrs);

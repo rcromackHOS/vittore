@@ -29,9 +29,6 @@ unsigned int I2C_TXBUFFER;
 
 //--------------------------------------------------------------------
 
-static int bcd2bin (int val);
-static int bin2bcd (int val);
-
 int RTC_begin(void);
 int RTC_adjust(dateTimeStruct dt);
 int RTC_isRunning(void);

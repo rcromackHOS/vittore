@@ -7,6 +7,7 @@
 
 #include "bms.h"
 #include "config.h"
+#include "Hardware.h"
 #include "engineController.h"
 
 //--------------------------------------------------------------------
@@ -49,7 +50,7 @@ void check_BatteryBox_Status()
 	//---------------------------------------------- BMS
 
 	// BMS cell monitors. Give them a grace period
-	if ((P2IN & BMS_PIN) == 0)
+	if ((P2IN & IN_BAT_CELL_FAIL) == 0)
 	{
 		// if this is a newly detected problem
 		if (_CELLMONITOR_TMR_D == 0 && BMS_EVENT == 0)
@@ -58,7 +59,7 @@ void check_BatteryBox_Status()
 
 	// BMS FAILURE DETECTED
 	// If our cell monitors detect a problem for 30 seconds, and
-	if ( (_CELLMONITOR_TMR_D == 1 && (P2IN & BMS_PIN) == 0) ||
+	if ( (_CELLMONITOR_TMR_D == 1 && (P2IN & IN_BAT_CELL_FAIL) == 0) ||
 		 VALUE_24V >= _HIGH_SP_BMS ||
 		 VALUE_24V <= _LOW_SP_BMS  &&
 		 _BANK_BMS_TMR_D == 0 &&
@@ -100,13 +101,13 @@ int setContactor(int s)
 {
 	  if (s && BMS_EVENT == 0)
 	  {
-	    P10OUT |= CONTACTOR_PIN;
-	    P10OUT |= ASSET_IN2_PIN;
+	    P10OUT |= OUT_nCONTACTOR_ON;
+	    P10OUT |= OUT_ASSET_I2;
 	  }
 	  else
 	  {
-	    P10OUT &= ~CONTACTOR_PIN;
-	    P10OUT &= ~ASSET_IN2_PIN;
+	    P10OUT &= ~OUT_nCONTACTOR_ON;
+	    P10OUT &= ~OUT_ASSET_I2;
 	  }
 	  return 1;
 }
@@ -118,12 +119,12 @@ int setBatteryHeater(int s)
 	if (s && BMS_EVENT == 0)
 	{
 	    setStateCode(2);
-	    P10OUT |= BATTERYHTR_PIN;
+	    P10OUT |= OUT_nBATTERY_HEATER_ON;
 	}
     else
 	{
 	    clearStateCode(2);
-	    P10OUT &= ~BATTERYHTR_PIN;
+	    P10OUT &= ~OUT_nBATTERY_HEATER_ON;
 	}
 	return 1;
 }

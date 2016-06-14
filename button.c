@@ -13,34 +13,34 @@
 
 void buildButtonStateMachine()
 {
-    button x = {AUTO_PB_PIN, AUTO_LED_PIN, MODE_AUTO, STATE_NOMINAL, 0, 0};
+    button x = {BUTTON_nAUTO, AUTO_LED_PIN, MODE_AUTO, STATE_NOMINAL, 0, 0};
     buttonList[0] = x;
 
-    button y = {STANDBY_PB_PIN, STANDBY_LED_PIN, MODE_STANDBY, STATE_NOMINAL, 0, 0};
+    button y = {BUTTON_nSTANDBY, STANDBY_LED_PIN, MODE_STANDBY, STATE_NOMINAL, 0, 0};
     buttonList[1] = y;
 
-    button z = {LIGHT1H_PB_PIN, LIGHT1H_LED_PIN, MODE_LIGHT1H, STATE_NOMINAL, 0, 0};
+    button z = {BUTTON_nLIGHT_1H, LIGHT1H_LED_PIN, MODE_LIGHT1H, STATE_NOMINAL, 0, 0};
     buttonList[2] = z;
 
-    button a = {RESET_PB_PIN, RESET_LED_PIN, MODE_RESET, STATE_NOMINAL, 0, 0};
+    button a = {BUTTON_nRESET, RESET_LED_PIN, MODE_RESET, STATE_NOMINAL, 0, 0};
     buttonList[3] = a;
 
-    button b = {DOWN_PB_PIN, DOWN_LED_PIN, MODE_UP, STATE_NOMINAL, 0, 0};
+    button b = {BUTTON_nDOWN, DOWN_LED_PIN, MODE_UP, STATE_NOMINAL, 0, 0};
     buttonList[4] = b;
 
-    button c = {UP_PB_PIN, UP_LED_PIN, MODE_DOWN, STATE_NOMINAL, 0, 0};
+    button c = {BUTTON_nUP, UP_LED_PIN, MODE_DOWN, STATE_NOMINAL, 0, 0};
     buttonList[5] = c;
 
 
     /*
 	 buttonList[5] =
 	{
-			{AUTO_PB_PIN, AUTO_LED_PIN, MODE_AUTO, STATE_NOMINAL, 0, 0},
-			{STANDBY_PB_PIN, STANDBY_LED_PIN, MODE_STANDBY, STATE_NOMINAL, 0, 0},
-			{LIGHT1H_PB_PIN, LIGHT1H_LED_PIN, MODE_LIGHT1H, STATE_NOMINAL, 0, 0},
-			{RESET_PB_PIN, RESET_LED_PIN, MODE_RESET, STATE_NOMINAL, 0, 0},
-			{DOWN_PB_PIN, DOWN_LED_PIN, MODE_UP, STATE_NOMINAL, 0, 0},
-			{UP_PB_PIN, UP_LED_PIN, MODE_DOWN, STATE_NOMINAL, 0, 0}
+			{BUTTON_nAUTO, AUTO_LED_PIN, MODE_AUTO, STATE_NOMINAL, 0, 0},
+			{BUTTON_nSTANDBY, STANDBY_LED_PIN, MODE_STANDBY, STATE_NOMINAL, 0, 0},
+			{BUTTON_nLIGHT_1H, LIGHT1H_LED_PIN, MODE_LIGHT1H, STATE_NOMINAL, 0, 0},
+			{BUTTON_nRESET, RESET_LED_PIN, MODE_RESET, STATE_NOMINAL, 0, 0},
+			{BUTTON_nDOWN, DOWN_LED_PIN, MODE_UP, STATE_NOMINAL, 0, 0},
+			{BUTTON_nUP, UP_LED_PIN, MODE_DOWN, STATE_NOMINAL, 0, 0}
 	};
 	*/
 }
@@ -176,32 +176,32 @@ void mast_stateMachine(int deltastate)
     	{
 			case MAST_MAXDOWN: 		// raise mast passed the lower extent
 
-				if (P2IN & CUTOUT_MAST_PIN == 1)
-					P7OUT |= UP_MAST_PIN;
+				if (P2IN & IN_MAST_CUT_OUT != 0)
+					P7OUT |= OUT_UP_MAST;
 				else
-					P7OUT &= ~UP_MAST_PIN;
+					P7OUT &= ~OUT_UP_MAST;
 
-				if (P8IN & DOWN_EXTENT_PIN == 1)
+				if (P8IN & IN_MAST_DOWN_EXTENT != 0)
 					_MAST_STATUS = MAST_NOMINAL;
 
 				break;
 
 			case MAST_NOMINAL: 	// raise mast as normal, watch for upper threshold
 
-				if (P8IN & UP_EXTENT_PIN == 0)
+				if (P8IN & IN_MAST_UP_EXTENT == 0)
 				{
 					_MAST_STATUS = MAST_MAXUP;
-					P7OUT &= ~UP_MAST_PIN;
+					P7OUT &= ~OUT_UP_MAST;
 				}
 
-				else if (P8IN & UP_EXTENT_PIN == 1)
-					P7OUT |= UP_MAST_PIN;
+				else if (P8IN & IN_MAST_UP_EXTENT != 0)
+					P7OUT |= OUT_UP_MAST;
 
 				break;
 
 			case MAST_MAXUP: 		// don't let the mast keep rising if we're maxed
 
-				P7OUT &= ~UP_MAST_PIN;
+				P7OUT &= ~OUT_UP_MAST;
 				break;
     	}
     }
@@ -212,27 +212,27 @@ void mast_stateMachine(int deltastate)
     	{
 			case MAST_MAXDOWN: 		// raise mast passed the lower extent
 
-				P7OUT &= ~DOWN_MAST_PIN;
+				P7OUT &= ~OUT_DOWN_MAST;
 				break;
 
 			case MAST_NOMINAL: 	// lower mast as normal, watch for lower threshold
 
-				if (P8IN & DOWN_EXTENT_PIN == 0)
+				if (P8IN & IN_MAST_DOWN_EXTENT == 0)
 				{
 					_MAST_STATUS = MAST_MAXDOWN;
-					P7OUT &= ~DOWN_MAST_PIN;
+					P7OUT &= ~OUT_DOWN_MAST;
 				}
 
-				else if (P8IN & DOWN_EXTENT_PIN == 1)
-					P7OUT |= DOWN_MAST_PIN;
+				else if (P8IN & IN_MAST_DOWN_EXTENT != 0)
+					P7OUT |= OUT_DOWN_MAST;
 
 				break;
 
 			case MAST_MAXUP: 		// No restrictions if the mast is coming down from max up
 
-				P7OUT |= DOWN_MAST_PIN;
+				P7OUT |= OUT_DOWN_MAST;
 
-				if (P8IN & UP_EXTENT_PIN == 1)
+				if (P8IN & IN_MAST_UP_EXTENT != 0)
 					_MAST_STATUS = MAST_NOMINAL;
 				break;
 
@@ -241,8 +241,8 @@ void mast_stateMachine(int deltastate)
 
     if (deltastate == 0)
     {
-		P7OUT &= ~DOWN_MAST_PIN;
-		P7OUT &= ~UP_MAST_PIN;
+		P7OUT &= ~OUT_DOWN_MAST;
+		P7OUT &= ~OUT_UP_MAST;
     }
 }
 

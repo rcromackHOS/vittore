@@ -33,31 +33,6 @@
 #define MAST_LOWERING  	  0x3
 #define MAST_MAXUP  	  0x4
 
-// Button/Mast outputs
-#define RESET_LED_PIN     BIT0
-#define LIGHT1H_LED_PIN   BIT1
-#define AUTO_LED_PIN      BIT2
-#define STANDBY_LED_PIN   BIT3
-#define DOWN_LED_PIN      BIT4
-#define UP_LED_PIN        BIT5
-
-#define UP_MAST_PIN       BIT3
-#define DOWN_MAST_PIN     BIT2
-
-// Button/Mast inputs
-#define RESET_PB_PIN      BIT0
-#define LIGHT1H_PB_PIN    BIT3
-#define AUTO_PB_PIN       BIT4
-#define STANDBY_PB_PIN    BIT5
-#define DOWN_PB_PIN       BIT6
-#define UP_PB_PIN         BIT7
-
-#define UP_MAST_PIN       BIT3
-#define DOWN_MAST_PIN     BIT2
-#define CUTOUT_MAST_PIN   BIT2
-#define DOWN_EXTENT_PIN   BIT6
-#define UP_EXTENT_PIN     BIT7
-
 //--------------------------------------------------------------------
 
 void buildButtonStateMachine();

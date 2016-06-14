@@ -12,17 +12,8 @@
 #include "config.h"
 
 //--------------------------------------------------------------------
-// battery controller outputs
-#define BMS_PIN      	  BIT3
-#define BATTERYHTR_PIN    BIT4
-#define CONTACTOR_PIN     BIT5
-#define ASSET_IN2_PIN     BIT1
-
-//--------------------------------------------------------------------
 
 void check_BatteryBox_Status();
-
-
 
 int setContactor(int s);
 int setBatteryHeater(int s);

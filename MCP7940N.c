@@ -8,13 +8,12 @@
 
 #include "MCP7940N.h"
 #include "timeDate.h"
+#include "Common.h"
 
 //--------------------------------------------------------------------
 
 //const int daysInMonth [] = { 31,28,31,30,31,30,31,31,30,31,30,31 }; //has to be const or compiler compaints
 
-static int bcd2bin (int val) { return val - 6 * (val >> 4); }
-static int bin2bcd (int val) { return val + 6 * (val / 10); }
 static int i = 0;
 
 //--------------------------------------------------------------------

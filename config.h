@@ -12,6 +12,10 @@
 
 //--------------------------------------------------------------------
 
+extern int _ADCs_UPDATED_;
+
+//--------------------------------------------------------------------
+
 extern volatile int _HIGH_SP_24V;
 extern volatile int _LOW_SP_24V;
 extern volatile int VALUE_24V;
@@ -29,8 +33,17 @@ extern int _CELLMONITOR_TMR_D;
 extern int _BANK_BMS_TMR_D;
 
 //--------------------------------------------------------------------
-extern volatile int _LOW_SP_12V;
-extern volatile int VALUE_12V;
+
+extern int _LOW_SP_12V;
+extern int VALUE_12V;
+
+//--------------------------------------------------------------------
+
+extern int _HIGH_SP_INTERNAL_TEMP;
+extern int _LOW_SP_INTERNAL_TEMP;
+extern int VALUE_INTERNAL_TEMP;
+
+//--------------------------------------------------------------------
 
 extern volatile int _HIGH_SP_TEMP;
 extern volatile int _NOMINAL_SP_TEMP;

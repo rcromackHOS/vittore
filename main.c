@@ -1,13 +1,25 @@
-//***************************************************************************************
-//
-//  Built with Code Composer Studio v5
-//***************************************************************************************
+/*****< Main.c>    ************************************************************/
+/*                                                                            */
+/*  Main Loop							  					  				  */
+/*                                                                            */
+/*  Author: Tom Nixon / Rhys Cromack                                          */
+/*                                                                            */
+/*** MODIFICATION HISTORY *****************************************************/
+/*                                                                            */
+/*   mm/dd/yy  F. Lastname    Description of Modification                     */
+/*   --------  -----------    ------------------------------------------------*/
+/*   06/13/16  Tom Nixon       Initial creation.
+/*   06/14/16  R Cromack	   Integration with program main
+/******************************************************************************/
 
-
-//#include <msp430f5419a.h>
-//#include <msp430_math.h>
 #include <msp430.h>
 #include "config.h"
+
+// toms includes
+#include "Hardware.h"
+#include "msp430f5419A.h"
+#include "Common.h"
+#include "WatchdogTimerControl.h"
 
 #include "timeDate.h"
 #include "engineController.h"
@@ -23,13 +35,14 @@ void init_clocks();
 int isQuietTime(dateTimeStruct now);
 void setStateCode(int code);
 void clearStateCode(int code);
-void setupPorts();
+
 int handle_secondEvents();
 void handle_minuteEvents();
+
 int setLightsState(int s);
 
 void handle_failEvent();
-void handle_lowfuelEvent();
+void handleLowFuelEvent();
 void handle_lighting();
 void resetControl();
 void buildIdleArray();
@@ -37,30 +50,6 @@ void handle_oilchangeClear();
 void handle_reset();
 int RTC_init();
 void handle_unitModeIndicator();
-
-//--------------------------------------------------------------------
-
-// outputs
-#define HEARTBEAT_PIN 	BIT1
-#define FAIL_LED_PIN   	BIT4
-#define LIGHTS_PIN   	BIT4
-
-// port 2
-#define OIL_RST_PIN   	BIT1
-
-// port 10
-#define ASSET_IN1_PIN   BIT0
-#define ASSET_IN3_PIN   BIT2
-#define ASSET_IN4_PIN  	BIT3
-
-// Port 11
-#define CABINET_HTR_PIN	BIT7
-#define INVERTER_PIN	BIT1
-#define SPARE3_PIN   	BIT0
-#define SPARE4_PIN  	BIT2
-
-// Inputs
-#define LOWFUEL   		BIT5
 
 //--------------------------------------------------------------------
 
@@ -72,28 +61,6 @@ timeStruct defaultSunrise;
 static unsigned int tmrCnt = 0;
 static volatile int checkMask = 0x0;
 static int secondCount = 0;
-
-//--------------------------------------------------------------------
-
-void setupPorts()
-{
-	P1DIR |= 0x02;
-	P2DIR |= 0x91;
-	P3DIR |= 0x40;
-	P4DIR |= 0xff;
-	P5DIR |= 0x3f;
-
-	P7DIR |= 0x00;
-	P8DIR |= 0x21;
-	P9DIR |= 0x7f;
-	P10DIR |= 0xff;
-
-	// Enable pull-ups on these inputs
-	P2REN |= 0x2E;
-	P7REN |= 0x40;
-	//P6REN |= 0x80;
-	P9REN |= 0x80;
-}
 
 //--------------------------------------------------------------------
 //
@@ -203,15 +170,22 @@ void handle_minuteEvents()
 //
 int main()
 {
-	WDTCTL = WDTPW | WDTHOLD;		// Stop watchdog timer
+    WdtDisable();
+    __disable_interrupt();
+
+    // -------------------------- initization
 
     init_clocks();
 
-	// -------------------------- initization
+    ConfigurePins();
 
-	setupPorts();
+    ConfigureA2D();
+
 	buildButtonStateMachine();
+
 	OLED_setup();
+
+	// -------------------------- Engine
 
 	// pull stored oil change due hours
 	_OILCHANGE_DUE = 500;
@@ -277,7 +251,11 @@ int main()
 
 	// --------------------------
 
-	_BIS_SR(GIE); // interrupts enabled
+	WdtEnable();  // enable Watch dog
+
+	__enable_interrupt();
+
+	//_BIS_SR(GIE); // interrupts enabled
 
 	while(1)
     {
@@ -311,7 +289,7 @@ int main()
 			inc_secondCounts();
 
 			// pulse heatbeat
-		    P5OUT ^= HEARTBEAT_PIN;
+		    P5OUT ^= OUT_HEARTBEAT_LED;
 	   }
 
 	   // ---------------------------------------
@@ -333,10 +311,12 @@ int main()
 
 			case ADCs_UPDATED:
 
-				//if (_ADCs_UPDATED == 1)
-				//{
-				//	_ADCs_UPDATED = 0;
-				//}
+				if (_ADCs_UPDATED_ == 1)
+				{
+					loadAnalogData();
+
+					_ADCs_UPDATED_ = 0;
+				}
 
 				state_system++;
 				break;
@@ -372,7 +352,7 @@ int main()
 			case ALERT_INDICATORS:
 
 				handle_failEvent();
-				//handle_lowfuelEvent();
+				//handle_IN_nLOW_FUELEvent();
 				//handle_oilchangeClear();
 
 				state_system++;
@@ -400,13 +380,15 @@ int main()
 				break;
 	   }
 
+
+	   WdtKeepAlive();  // reset Watch dog
     }
 
 	// if theres a BMS problem, turn off the inverter
 	//if (BMS_EVENT == 1)
-	//	P11OUT &= ~INVERTER_PIN;
+	//	P11OUT &= ~OUT_nSPARE2_ON;
 	//else
-	//	P11OUT |= INVERTER_PIN;
+	//	P11OUT |= OUT_nSPARE2_ON;
 
 }
 
@@ -495,10 +477,10 @@ int GPS_init(void)
 int setLightsState(int s)
 {
 	if (s && BMS_EVENT == 0)
-		P3OUT |= LIGHTS_PIN;
+		P3OUT |= OUT_LIGHTS_ON;
 
     else
-    	P3OUT &= ~LIGHTS_PIN;
+    	P3OUT &= ~OUT_LIGHTS_ON;
 
 	return 1;
 }
@@ -563,26 +545,26 @@ void handle_failEvent()
 {
 	if (failure == 1)
 	{
-		P9OUT |= FAIL_LED_PIN;
-		P10OUT |= ASSET_IN4_PIN;
+		P9OUT |= OUT_ENGINE_FAIL;
+		P10OUT |= OUT_ASSET_I4;
 	}
 	else
 	{
-		P9OUT &= ~FAIL_LED_PIN;
-		P10OUT &= ~ASSET_IN4_PIN;
+		P9OUT &= ~OUT_ENGINE_FAIL;
+		P10OUT &= ~OUT_ASSET_I4;
 	}
 }
 
 //--------------------------------------------------------------------
 // Low fuel
 // alert the asset tracker
-void handle_lowfuelEvent()
+void handleLowFuelEvent()
 {
 
-	if (P2IN & LOWFUEL == 1)
-		P10OUT |= ASSET_IN3_PIN;
+	if (P2IN & IN_nLOW_FUEL == 1)
+		P10OUT |= OUT_ASSET_I3;
 	else
-		P10OUT &= ~ASSET_IN3_PIN;
+		P10OUT &= ~OUT_ASSET_I3;
 }
 
 //--------------------------------------------------------------------
@@ -656,11 +638,11 @@ void handle_oilchangeClear()
 {
 	if (_OILCHANGE_DUE - engine.engineHours <= 25)
 	{
-		P10OUT |= ASSET_IN1_PIN;
+		P10OUT |= OUT_ASSET_I1;
 		setStateCode( 4 );
 
 		// pull up and still input?
-		if (P2IN & OIL_RST_PIN == 0)
+		if (P2IN & BUTTON_nOIL_RST == 0)
 		{
 			if (OILCHANGE_PRESS_TMR == 0)
 				OILCHANGE_PRESS_TMR = 1;

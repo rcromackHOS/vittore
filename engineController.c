@@ -29,7 +29,7 @@ int engineSetup(int engMins, int engHrs)
 //
 int checkEngineTemp()
 {
-	if (P7IN & ENGINE_TEMP_PIN == 0)
+	if (P7IN & IN_ENGINE_TEMP_FAIL == 0)
 	  return 1;
 	return 0;
 }
@@ -38,12 +38,12 @@ int checkEngineTemp()
 //
 int checkOilPressure()
 {
-//	if (P7IN & OIL_PIN == 0)
+//	if (P7IN & IN_OIL_PRESSURE_OK == 0)
 //	  return 1;
 //	return 0;
 	int dw = P1IN & BIT7;
 
-	if (dw > 0)
+	if (dw != 0)
 		return 1;
 	return 0;
 }
@@ -52,7 +52,7 @@ int checkOilPressure()
 //
 int checkEngineRPMs()
 {
-	if (P1IN & BIT7 >= 0)
+	if (P1IN & BIT7 != 0)
 		return 1;
 	return 0;
 }
@@ -183,9 +183,9 @@ void set_Engine_State(int mode)
 
 			 if (engine.mode != ENGINE_PRE)
 			 {
-			   P2OUT |= ACCESSORY_PIN;
-			   P9OUT |= GLOWPLUG_PIN;
-			   P8OUT |= ASSET_IGN_PIN;
+			   P2OUT |= OUT_ENGINE_ACC;
+			   P9OUT |= OUT_ENGINE_GLOW;
+			   P8OUT |= OUT_ASSET_IGNITION;
 
 			   engine.mode = ENGINE_PRE;
 
@@ -203,7 +203,7 @@ void set_Engine_State(int mode)
 
 			 if (engine.mode != ENGINE_CRANK)
 			 {
-			   P9OUT |= CRANK_PIN;
+			   P9OUT |= OUT_ENGINE_CRANK;
 
 			   engine.mode = ENGINE_CRANK;
 
@@ -220,7 +220,7 @@ void set_Engine_State(int mode)
 
 			 if (engine.mode != ENGINE_REATTEMPT)
 			 {
-				P9OUT &= ~CRANK_PIN;
+				P9OUT &= ~OUT_ENGINE_CRANK;
 
 				engine.mode = ENGINE_REATTEMPT;
 
@@ -248,7 +248,7 @@ void set_Engine_State(int mode)
 			 {
 			   engine.mode = ENGINE_POST;
 
-			   P9OUT &= ~CRANK_PIN;
+			   P9OUT &= ~OUT_ENGINE_CRANK;
 
 			   POST_D = _POST_SP;
 			 }
@@ -257,7 +257,7 @@ void set_Engine_State(int mode)
 			 {
 				 if (checkEngineRPMs() == 1)
 				 {
-					 P9OUT &= ~GLOWPLUG_PIN;
+					 P9OUT &= ~OUT_ENGINE_GLOW;
 					 set_Engine_State(ENGINE_RUNNING);
 				 }
 				 else
@@ -296,9 +296,9 @@ void set_Engine_State(int mode)
 				}
 			}
 
-			P2OUT |= ACCESSORY_PIN;
-			P9OUT &= ~CRANK_PIN;
-		    P9OUT &= ~GLOWPLUG_PIN;
+			P2OUT |= OUT_ENGINE_ACC;
+			P9OUT &= ~OUT_ENGINE_CRANK;
+		    P9OUT &= ~OUT_ENGINE_GLOW;
 		    break;
 
 
@@ -309,10 +309,10 @@ void set_Engine_State(int mode)
 			   if (engine.mode == ENGINE_RUNNING)
 				   engine.lastRunEnd = now;
 
-			   P2OUT &= ~ACCESSORY_PIN;
-			   P9OUT &= ~CRANK_PIN;
-			   P9OUT &= ~GLOWPLUG_PIN;
-			   P8OUT &= ~ASSET_IGN_PIN;
+			   P2OUT &= ~OUT_ENGINE_ACC;
+			   P9OUT &= ~OUT_ENGINE_CRANK;
+			   P9OUT &= ~OUT_ENGINE_GLOW;
+			   P8OUT &= ~OUT_ASSET_IGNITION;
 		   }
 
 		   engine.mode = ENGINE_STOP;
