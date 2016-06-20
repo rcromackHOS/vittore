@@ -7,40 +7,45 @@
 
 #include "lcd.h"
 #include "config.h"
+#include "Hardware.h"
+
+//#include "strcpy.h"
+#include "string.h"
 
 //--------------------------------------------------------------------
-/*
-const char modename0[] PROGMEM = "  Automatic Lights  ";
-const char modename1[] PROGMEM = "      No Lights     ";
-const char modename2[] PROGMEM = "Temporary Lights 1hr";
-const char* const modeArray[] PROGMEM = {modename0, modename1, modename2};
 
-const char msg1[] PROGMEM = {"   Contactor Open   "};
-const char msg2[] PROGMEM = {"    Low Voltage     "};
-const char msg3[] PROGMEM = {"   Cold Batteries   "};
-const char msg4[] PROGMEM = {"Oil Change due soon "};
-const char msg5[] PROGMEM = {"    Aquiring Time   "};
-const char msg6[] PROGMEM = {"   RTC Malfunction  "};
-const char msg7[] PROGMEM = {" Driver Malfunction "};
-const char msg8[] PROGMEM = {"Voltage Reg. failure"};
-const char msg9[] PROGMEM = {" Battery TC failure "};
-const char msg10[] PROGMEM = {"Reaquiring Satellite"};
-const char msg11[] PROGMEM = {"Aquiring Satellites "};
-const char msg12[] PROGMEM = {"Engine Failed Start "};
-const char msg13[] PROGMEM = {"  Engine Overspeed  "};
-const char msg14[] PROGMEM = {"  Engine Underspeed "};
-const char msg15[] PROGMEM = {"Engine Overheat Fail"};
-const char msg16[] PROGMEM = {"Engine Low oil pres."};
-const char msg17[] PROGMEM = {"   No GPS or RTC.   "};
-const char msg18[] PROGMEM = {"BMS FAIL, CALL TECH."};
-const char msg19[] PROGMEM = {"Engine starting     "};
-const char msg20[] PROGMEM = {"   Bank charging    "};
-const char msg21[] PROGMEM = {"Sunrise:    "};
-const char msg22[] PROGMEM = {"Sunset:     "};
-const char msg23[] PROGMEM = {"Lat:         "};
-const char msg24[] PROGMEM = {"Lng:         "};
+const char modename0[] = "  Automatic Lights  ";
+const char modename1[] = "      No Lights     ";
+const char modename2[] = "Temporary Lights 1hr";
+const char* const modeArray[] = {modename0, modename1, modename2};
 
-const char* const messages[] PROGMEM = {
+const char msg1[] = {"   Contactor Open   "};
+const char msg2[] = {"    Low Voltage     "};
+const char msg3[] = {"   Cold Batteries   "};
+const char msg4[] = {"Oil Change due soon "};
+const char msg5[] = {"    Aquiring Time   "};
+const char msg6[] = {"   RTC Malfunction  "};
+const char msg7[] = {"Unexpected Exception"};
+const char msg8[] = {"Voltage Reg. failure"};
+const char msg9[] = {" Thermocouple Open  "};
+const char msg10[] = {"Reaquiring Satellite"};
+const char msg11[] = {"Aquiring Satellites "};
+const char msg12[] = {"Engine Failed Start "};
+const char msg13[] = {"  Engine Overspeed  "};
+const char msg14[] = {"  Engine Underspeed "};
+const char msg15[] = {"Engine Overheat Fail"};
+const char msg16[] = {"Engine Low oil pres."};
+const char msg17[] = {" Hardware Exception "};
+const char msg18[] = {"BMS FAIL, CALL TECH."};
+const char msg19[] = {"   Engine Starting  "};
+const char msg20[] = {"    Bank Charging   "};
+const char msg21[] = {"Sunrise:    "};
+const char msg22[] = {"Sunset:     "};
+const char msg23[] = {"Lat:         "};
+const char msg24[] = {"Lng:         "};
+const char msg25[] = {"                    "};
+
+const char* const messages[] = {
 msg1,
 msg2,
 msg3,
@@ -67,10 +72,10 @@ msg23,
 msg24
 };
 
-const char li0[] PROGMEM = "  HORIZON OILFIELD  ";
-const char li1[] PROGMEM = "     SOLUTIONS      ";
-const char* const cmpyName[] PROGMEM = {li0, li1};
-*/
+const char li0[] = "  HORIZON OILFIELD  ";
+const char li1[] = "     SOLUTIONS      ";
+//const char* const cmpyName[] = {li0, li1};
+
 //--------------------------------------------------------------------
 
 int OLED_new_line[4] = {0x80, 0xA0, 0xC0, 0xE0};
@@ -83,7 +88,7 @@ char __screenbuffer2[20];
 //
 void updateDisplay()
 {
-	static int toggle_screen_msg;
+	static int toggle_screen_msg = 0;
 
 	if (_DIAGNOSTIC_MODE_TMR == 0)
 		_DIAGNOSTIC_MODE = 0;
@@ -113,12 +118,12 @@ void updateDisplay()
 	{
 		Norm_showCompanyName();
 
-		toggle_screen_msg = !toggle_screen_msg;
+		toggle_screen_msg = ~toggle_screen_msg;
 
 		if (toggle_screen_msg == 0)
 			Norm_showMode();
 
-		if (toggle_screen_msg == 1 && _STATE_CODE > 0)
+		if (toggle_screen_msg != 0 && _STATE_CODE > 0)
 			Norm_showStateCode();
 
 
@@ -130,25 +135,116 @@ void updateDisplay()
 //
 void Norm_showCompanyName()
 {
+	strcpy(__screenbuffer, li0);
+	OLED_writeLine(__screenbuffer, 0);
 
-
+	strcpy(__screenbuffer, li1);
+	OLED_writeLine(__screenbuffer, 1);
 }
 
 //--------------------------------------------------------------------
 //
 void Norm_showMode()
 {
-
-
+	strcpy(__screenbuffer, modeArray[_UNIT_MODE]);
+	OLED_writeLine(__screenbuffer, 3);
 }
 
 //--------------------------------------------------------------------
 //
 void Norm_showStateCode()
 {
+	switch (_STATE_CODE)
+	{
+		case 1:
+			strcpy(__screenbuffer, msg1);
+			break;
 
+		case 2:
+			strcpy(__screenbuffer, msg2);
+			break;
 
+		case 3:
+			strcpy(__screenbuffer, msg3);
+			break;
+
+		case 4:
+			strcpy(__screenbuffer, msg4);
+			break;
+
+		case 10:
+			strcpy(__screenbuffer, msg5);
+			break;
+
+		case 11:
+			strcpy(__screenbuffer, msg6);
+			break;
+
+			/*
+		case 0:
+			strcpy(__screenbuffer, msg7);
+
+		case 1:
+			strcpy(__screenbuffer, msg8);
+
+		case 2:
+			strcpy(__screenbuffer, msg9);
+
+		case 3:
+			strcpy(__screenbuffer, msg10);
+
+		case 10:
+			strcpy(__screenbuffer, msg11);
+		*/
+		case 30:
+			strcpy(__screenbuffer, msg12);
+			break;
+
+		case 31:
+			strcpy(__screenbuffer, msg13);
+			break;
+
+		case 32:
+			strcpy(__screenbuffer, msg14);
+			break;
+
+		case 33:
+			strcpy(__screenbuffer, msg15);
+			break;
+
+		case 34:
+			strcpy(__screenbuffer, msg16);
+			break;
+
+		case 40:
+			strcpy(__screenbuffer, msg19);
+			break;
+
+		case 41:
+			strcpy(__screenbuffer, msg20);
+			break;
+
+		case 98:
+			strcpy(__screenbuffer, msg17);
+			break;
+
+		case 99:
+			strcpy(__screenbuffer, msg18);
+			break;
+
+	}
+
+	OLED_writeLine(__screenbuffer, 3);
 }
+
+/*
+const char msg7[] = {" Driver Malfunction "};
+const char msg8[] = {"Voltage Reg. failure"};
+const char msg9[] = {" Battery TC failure "};
+const char msg10[] = {"Reaquiring Satellite"};
+const char msg11[] = {"Aquiring Satellites "};
+
+*/
 
 //====================================================================
 //
@@ -187,6 +283,26 @@ void DIAG_showRPM()
 
 //}
 
+//====================================================================
+//
+void OLED_writeLine(char* chars, int line)
+{
+	OLED_command(OLED_new_line[line]);
+
+	unsigned int i;
+	for (i = 0; i < 20; i++)
+	{
+		OLED_data(chars[i]);
+	}
+}
+
+//====================================================================
+//
+void clearLine(int line)
+{
+	strcpy(__screenbuffer, msg25);
+	OLED_writeLine(__screenbuffer, line);
+}
 
 //====================================================================
 // Simulates a clock pulse
@@ -196,9 +312,9 @@ void OLED_clockCycle()
    for(i = 0; i < 5; i++)
    {
 	 if (i == 1)
-	   P5OUT &= ~OLED_SCK;
+	   P5OUT &= ~LCD_SPI_SCK;
 	 if (i == 3)
-	   P5OUT |= OLED_SCK;
+	   P5OUT |= LCD_SPI_SCK;
    }
 }
 
@@ -208,13 +324,13 @@ void OLED_command(int c)
 {
    int i = 0;
 
-   for(i = 0; i<5; i++)
-   {
-	  P3OUT |= OLED_MOSI;
-      OLED_clockCycle();
-   }
+   P3OUT |= LCD_SPI_SIMO;
 
-   P3OUT &= ~OLED_MOSI;
+   for(i = 0; i<5; i++)
+      OLED_clockCycle();
+
+   P3OUT &= ~LCD_SPI_SIMO;
+
    for(i = 3; i > 0; i--)
       OLED_clockCycle();
 
@@ -222,24 +338,23 @@ void OLED_command(int c)
    OLED_sendByte(c);
 }
 
-
 //--------------------------------------------------------------------
 //  PREPAOLED_Reset THE TRANSMISSION OF A BYTE OF DATA
 void OLED_data(int d)
 {
    int i = 0;
 
-   P3OUT |= OLED_MOSI;
-   for (i=5; i>5; i--)
+   P3OUT |= LCD_SPI_SIMO;
+   for(i = 0; i<5; i++)
       OLED_clockCycle();
 
-   P3OUT &= ~OLED_MOSI;
+   P3OUT &= ~LCD_SPI_SIMO;
    OLED_clockCycle();
 
-   P3OUT |= OLED_MOSI;
+   P3OUT |= LCD_SPI_SIMO;
    OLED_clockCycle();
 
-   P3OUT &= ~OLED_MOSI;
+   P3OUT &= ~LCD_SPI_SIMO;
    OLED_clockCycle();
 
    OLED_sendByte(d);
@@ -253,13 +368,13 @@ void OLED_sendByte(int tx_b)
 
    for(i=4; i>0; i--)
    {
-      if((tx_b & 0x01) == 1)
+      if((tx_b & 0x1) == 1)
       {
-    	  P3OUT |= OLED_MOSI;
+    	  P3OUT |= LCD_SPI_SIMO;
       }
       else
       {
-    	  P3OUT &= ~OLED_MOSI;
+    	  P3OUT &= ~LCD_SPI_SIMO;
       }
       OLED_clockCycle();
       tx_b = tx_b >> 1;
@@ -267,7 +382,7 @@ void OLED_sendByte(int tx_b)
 
    for(i=4; i>0; i--)
    {
-	   P3OUT &= ~OLED_MOSI;
+	   P3OUT &= ~LCD_SPI_SIMO;
 	   OLED_clockCycle();
    }
 
@@ -275,11 +390,11 @@ void OLED_sendByte(int tx_b)
    {
       if((tx_b & 0x1) == 0x1)             // <------- Change
       {
-    	  P3OUT |= OLED_MOSI;
+    	  P3OUT |= LCD_SPI_SIMO;
       }
       else
       {
-    	  P3OUT &= ~OLED_MOSI;
+    	  P3OUT &= ~LCD_SPI_SIMO;
       }
       OLED_clockCycle();
       tx_b = tx_b >> 1;
@@ -287,7 +402,7 @@ void OLED_sendByte(int tx_b)
 
    for(i=4; i>0; i--)
    {
-	   P3OUT &= ~OLED_MOSI;
+	   P3OUT &= ~LCD_SPI_SIMO;
 	   OLED_clockCycle();
    }
 }
@@ -305,16 +420,33 @@ void OLED_clearDisplay()
 
 //--------------------------------------------------------------------
 // INITIAL SETUP
-void OLED_setup()
+void InitializeDisplay()
 {
-   // Sets HIGH the OLED_SCK line of the display
-   P5OUT |= OLED_SCK;
+   // Sets HIGH the LCD_SPI_SCK line of the display
+   P5OUT |= LCD_SPI_SCK;
 
-   // Sets LOW the OLED_MOSI line of the display
-   P3OUT &= ~OLED_MOSI;
+   // Sets LOW the LCD_SPI_SIMO line of the display
+   P3OUT &= ~LCD_SPI_SIMO;
 
-   //Sets HIGH the OLED_Resetet line of the display (optional, can be always high)
-   P5OUT |= OLED_RST;
+   //Sets HIGH the OLED_Reset line of the display (optional, can be always high)
+   P5OUT |= LCD_SPI_RESET;
+/*
+    P3SEL = LCD_SPI_SIMO;
+	P5SEL = LCD_SPI_SCK;
+
+	UCB1CTL1 = UCSWRST;
+	UCB1CTL0 |= UCCKPH + UCMSB + UCMST + UCSYNC; // 3-pin, 8-bit SPI master
+	UCB1CTL1 |= UCSSEL__SMCLK; // SMCLK
+	UCB1BR0 |= 0x02; // /2
+    UCB1BR1 = 0; //
+    UCB1ICTL = 0; // No modulation
+	UCB1CTL1 &= ~UCSWRST; // **Initialize USCI state machine**
+
+	while (!(UCTXIFG & UCB1IFG)); // USCI_A0 TX buffer ready?
+    UCB1TXBUF = 0xAA; // Send 0xAA over SPI to Slave
+	//while (!(IFG2 & UCB1RXIFG)); // USCI_A0 RX Received?
+	//received_ch = UCB1RXBUF; // Store received data
+*/
 
    int i;
    for(i=200; i>0; i--)
@@ -361,7 +493,9 @@ void OLED_setup()
    {}
 
    OLED_clearDisplay();
+
 }
+
 
 
 

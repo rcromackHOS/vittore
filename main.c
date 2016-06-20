@@ -8,8 +8,8 @@
 /*                                                                            */
 /*   mm/dd/yy  F. Lastname    Description of Modification                     */
 /*   --------  -----------    ------------------------------------------------*/
-/*   06/13/16  Tom Nixon       Initial creation.
-/*   06/14/16  R Cromack	   Integration with program main
+/*   06/13/16  Tom Nixon       Initial creation.							  */
+/*   06/14/16  R Cromack	   Integration with program main				  */
 /******************************************************************************/
 
 #include <msp430.h>
@@ -20,6 +20,7 @@
 #include "msp430f5419A.h"
 #include "Common.h"
 #include "WatchdogTimerControl.h"
+#include "AtoD.h"
 
 #include "timeDate.h"
 #include "engineController.h"
@@ -27,14 +28,13 @@
 #include "button.h"
 #include "MCP7940N.h"
 #include "bms.h"
+#include "solar.h"
 
 //--------------------------------------------------------------------
 
-void init_clocks();
+void InitializeClocks();
 
 int isQuietTime(dateTimeStruct now);
-void setStateCode(int code);
-void clearStateCode(int code);
 
 int handle_secondEvents();
 void handle_minuteEvents();
@@ -45,11 +45,10 @@ void handle_failEvent();
 void handleLowFuelEvent();
 void handle_lighting();
 void resetControl();
-void buildIdleArray();
-void handle_oilchangeClear();
-void handle_reset();
+
 int RTC_init();
 void handle_unitModeIndicator();
+void handleCabinetHeating();
 
 //--------------------------------------------------------------------
 
@@ -59,48 +58,15 @@ timeStruct defaultSunrise;
 //--------------------------------------------------------------------
 
 static unsigned int tmrCnt = 0;
-static volatile int checkMask = 0x0;
+static int checkMask = 0;
 static int secondCount = 0;
-
-//--------------------------------------------------------------------
-//
-void delayms(int m)
-{
-  int i;
-  //int j;
-  for (i = m; i > 0; i--)
-  {
-	//  for (j = m; j > 0; j--) { }
-  }
-
-}
-
-void init_clocks()
-{
-    // CCR0 interrupt enabled
-	CCTL0 = CCIE;
-	// SMCLK/8/countup
-	TACTL = TASSEL_2 + MC_1 + ID_3;
-	// 1MHz / 8(ID_3) / 100Hz
-	CCR0 = 374;
-	/*
-
-	P5SEL |= 0x0C;                        // Port select XT2
-	P7SEL |= 0x03;                        // Select XT1
-
-	// -------------------------- clock
-
-	TA0CCTL0 |= CCIE;
-	TA0CCR0 = 1000;
-
-	TA0CTL |= TASSEL__SMCLK + MC__UP + ID__1 + TACLR;
-    */
-}
 
 //--------------------------------------------------------------------
 //
 void inc_secondCounts()
 {
+	secondCount++;
+
 	//---------------------------------------------
 	// BMS centric timers
 	if (_CELLMONITOR_TMR_D != 0)
@@ -145,9 +111,6 @@ void inc_secondCounts()
 	if (LIGHTS1HOUR_TMR != 0)
 		LIGHTS1HOUR_TMR--;
 
-	if (_RESETTING_ == 1)
-		RESET_TMR++;
-
 	if (OILCHANGE_PRESS_TMR != 0)
 		OILCHANGE_PRESS_TMR++;
 
@@ -156,6 +119,9 @@ void inc_secondCounts()
 
 	if (_DIAGNOSTIC_MODE_TMR != 0)
 		_DIAGNOSTIC_MODE_TMR--;
+
+	if (_SCREEN_UPDATE_D != 0)
+		_SCREEN_UPDATE_D--;
 
 }
 
@@ -168,6 +134,20 @@ void handle_minuteEvents()
 
 //--------------------------------------------------------------------
 //
+void InitializeClocks()
+{
+	// ACLK/countup/divby 1
+	TA0CTL = TASSEL__ACLK + MC_1 + ID_2;
+
+	//TA0CCR0 = ACLK / ID_2 / 100 - 1;
+	TA0CCR0 = ((32768 / 4) / 100) - 1;
+
+	// CCR0 interrupt enabled
+	TA0CCTL0 = CCIE;
+}
+
+//--------------------------------------------------------------------
+//
 int main()
 {
     WdtDisable();
@@ -175,68 +155,61 @@ int main()
 
     // -------------------------- initization
 
-    init_clocks();
+    InitializeClocks();
 
-    ConfigurePins();
+    InitializeHardware();
 
     ConfigureA2D();
 
-	buildButtonStateMachine();
+	InitializeRTC();
 
-	OLED_setup();
+    buildButtonStateMachine();
 
-	// -------------------------- Engine
+    InitializeDisplay();
 
-	// pull stored oil change due hours
-	_OILCHANGE_DUE = 500;
+    InitializeEngine();
 
-	// pull stored engine hours
-    int EngineHours = 0;
-	// pull store engine minutes
-    int EngineMinutes = 0;
+	//InitializeSolar();
 
-	engineSetup(EngineMinutes, EngineHours);
-
-	//RTC_begin();
-
-	//now = RTC_now();
-
-	// -------------------------- default values
+    // -------------------------- default values
 
 	defaultSunset = time(0, 0, 19);
 	defaultSunrise = time(0, 0, 7);
-	now = datetime(0, 0, 0, 1, 1, 2015);
 
 	// pull coorindates from memory
-	lat = 0.0;
-	lng = 0.0;
+	//lat = 51.2;
+	//lng = -113.9;
+	/*
+	lat = 40.00000;
+	lng = -105.00000;
 
 	solar_setCoords(lat, lng);
 
-	//sunSet = solar_getSunset(now);
-	//sunRise = solar_getSunrise(now);
+	sunSet = solar_getSunset(now);
+	sunRise = solar_getSunrise(now);
+	*/
+	// --------------------------
 
 	_UNIT_MODE = MODE_AUTO;
+    _SYS_FAILURE_ = 0;
 
-	buildIdleArray();
+    updateDisplay();
 
-	volatile int countseconds = 0;
+    // --------------------------
 
-	static int newMode;
+    static int newMode;
 
-	failure = 0;
-
-	typedef enum
+    typedef enum
 	{
 		INIT,
 		ADCs_UPDATED,
 		BATTERY_STATUS,
 		ENGINE_ANALYSIS,
 		ENGINE_STATUS,
-		ALERT_INDICATORS,
+		GENERAL_INDICATORS,
 		HANDLE_UNITMODES,
 		UPDATE_SCREEN,
-		FAILURE_RESET
+		_SYS_FAILURE__RESET
 
 	} state_types;
 
@@ -244,52 +217,32 @@ int main()
 
 	int done = 0;
 
-	   P2OUT &= ~ACCESSORY_PIN;
-	   P9OUT &= ~CRANK_PIN;
-	   P9OUT &= ~GLOWPLUG_PIN;
-	   P8OUT &= ~ASSET_IGN_PIN;
-
 	// --------------------------
 
 	WdtEnable();  // enable Watch dog
+	_BIS_SR(GIE); // interrupts enabled
 
-	__enable_interrupt();
-
-	//_BIS_SR(GIE); // interrupts enabled
+	// --------------------------
 
 	while(1)
     {
-	    // I2C stuff
-		//Transmit process
-	    //Rx = 0;
-	    //TXByteCtr = 1;
-	    //Transmit();
-	    //Receive process
-	    //Rx = 1;
-	    //Receive();
-
 	   // ---------------------------------------
 	   // half-second based events
-	   if (checkMask && 0x2 == 0x2)
+	   if ((checkMask & 0x1) == 1)
 	   {
-		   //checkMask ^= 0x2;
-			checkMask &= ~0x2;
-			P8OUT ^= BIT0;
-
-			countseconds++;
-		}
+			checkMask &= ~0x1;
+	   }
 
 	   // ---------------------------------------
 	   // Increment second counts
-	   if (countseconds == 2)
+	   if ((checkMask & 0x2) == 2)
 	   {
-			countseconds = 0;
-			secondCount++;
+		    checkMask &= ~0x2;
 
 			inc_secondCounts();
 
 			// pulse heatbeat
-		    P5OUT ^= OUT_HEARTBEAT_LED;
+		    P8OUT ^= OUT_HEARTBEAT_LED;
 	   }
 
 	   // ---------------------------------------
@@ -315,6 +268,8 @@ int main()
 				{
 					loadAnalogData();
 
+					//get thermocouple data over SPI
+
 					_ADCs_UPDATED_ = 0;
 				}
 
@@ -329,13 +284,9 @@ int main()
 				break;
 
 			case ENGINE_ANALYSIS:
-				/*
-				if (P1IN & BIT0 != 0)
-					_FORCE_ENGINE_RUN = 1;
 
-				else
-					_FORCE_ENGINE_RUN = 0;
-				*/
+				if (_UNIT_MODE == MODE_LIGHT1H)
+					_FORCE_ENGINE_RUN = 1;
 
 				newMode = check_Engine_Status();
 
@@ -349,11 +300,13 @@ int main()
 				state_system++;
 				break;
 
-			case ALERT_INDICATORS:
+			case GENERAL_INDICATORS:
 
-				handle_failEvent();
-				//handle_IN_nLOW_FUELEvent();
-				//handle_oilchangeClear();
+				handleSystemFailEvent();
+				handleLowFuelEvent();
+				handle_oilchangeClear();
+
+				handleCabinetHeating();
 
 				state_system++;
 				break;
@@ -362,20 +315,22 @@ int main()
 
 				handle_unitModeIndicator();
 
-				//if (_RESETTING_ == 1)
-				//	handle_reset();
+				if (_RESETTING_ == 1)
+					handle_reset();
 
-				//handle_lighting();
+				handle_lighting();
 
 				state_system++;
 				break;
 
 			case UPDATE_SCREEN:
 
-				//updateDisplay();
-				P8OUT ^= BIT0;
-				//for (j = 100; j > 0; j--)
-				//{}
+				if (_SCREEN_UPDATE_D == 0)
+				{
+					_SCREEN_UPDATE_D = 3;
+					updateDisplay();
+				}
+
 				state_system = ADCs_UPDATED;
 				break;
 	   }
@@ -383,18 +338,11 @@ int main()
 
 	   WdtKeepAlive();  // reset Watch dog
     }
-
-	// if theres a BMS problem, turn off the inverter
-	//if (BMS_EVENT == 1)
-	//	P11OUT &= ~OUT_nSPARE2_ON;
-	//else
-	//	P11OUT |= OUT_nSPARE2_ON;
-
 }
 
 //--------------------------------------------------------------------
 // Timer A0 interrupt service routine
-#pragma vector=TIMERA0_VECTOR
+#pragma vector = TIMER0_A0_VECTOR
 __interrupt void Timer_A (void)
 {
    tmrCnt++;
@@ -404,25 +352,22 @@ __interrupt void Timer_A (void)
 
    // half-second based events
    if (tmrCnt % 50 == 0)
-	   checkMask |= 0x2;
+	   checkMask |= 0x1;
 
    // second based events
-   //if (tmrCnt % 100 == 0)
-   //{
-	 //if (checkMask && 0x4 != 0x4)
-   //	   checkMask |= 0x4;
-   //}
+   if (tmrCnt % 100 == 0)
+	   checkMask |= 0x2;
+
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------
-
+//
 void handle_unitModeIndicator()
 {
 	int i;
-//	button sample;
+
 	for (i = 2; i >= 0; i--)
 	{
-//		sample = buttonList[i];
 		if (_UNIT_MODE == buttonList[i].mode)
 			P4OUT |= buttonList[i].LEDpin;
 
@@ -433,42 +378,11 @@ void handle_unitModeIndicator()
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------
-// Initialize the RTC
-// Check for lost tme or errors
-int RTC_init()
-{
-	if (RTC_isrunning() == 99)	// 99 = no I2C response
-	{
-		setStateCode(11);
-	}
-	else
-    {
-		// If we've lost the time
-		if (RTC_lostTime() == 1)
-	    {
-	      setStateCode(10);     // 10 = RTC lost time (LIR32 failure?)
-	      RTC_adjust(now);
-	    }
-	}
-
-	return 1;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------
 // Initialize the GPS
-// If
+//
 int GPS_init(void)
 {
-	/*
-	if (pokeGPS())
-	{
-		if (stateCode == 10) // lost time, update by GPS
-	    {
-	        RTC.adjust(GPS._utc);
-	        now = RTC.now();
-	    }
-	}
-*/
+
 	return 1;
 }
 
@@ -476,7 +390,7 @@ int GPS_init(void)
 //
 int setLightsState(int s)
 {
-	if (s && BMS_EVENT == 0)
+	if (s == 1 && BMS_EVENT == 0)
 		P3OUT |= OUT_LIGHTS_ON;
 
     else
@@ -489,7 +403,7 @@ int setLightsState(int s)
 //
 int isQuietTime(dateTimeStruct now)
 {
-  if (_FORCE_LIGHTS_ON)
+  if (_FORCE_LIGHTS_ON == 1)
     return 0;
 
   timeStruct SS = defaultSunset;
@@ -513,9 +427,9 @@ int isQuietTime(dateTimeStruct now)
   }
   else
   {
-    if (now.hour > SS.hour || (now.hour == SS.hour && now.minute >= SS.minute))
+    if (now.hour < SS.hour || (now.hour == SS.hour && now.minute >= SS.minute))
       return 1;
-    else if (now.hour < SR.hour || (now.hour == SR.hour && now.minute < SR.minute))
+    else if (now.hour > SR.hour || (now.hour == SR.hour && now.minute < SR.minute))
       return 0;
   }
 
@@ -523,27 +437,11 @@ int isQuietTime(dateTimeStruct now)
 }
 
 //--------------------------------------------------------------------
-//
-void clearStateCode(int code)
-{
-	if (code == _STATE_CODE)
-		_STATE_CODE = 0;
-}
-
-void setStateCode(int code)
-{
-	if (code > _STATE_CODE)
-		_STATE_CODE = code;
-}
-
-
-
-//--------------------------------------------------------------------
-// System failure
+// System Failure
 // Turn on the LED and alert the asset tracker
-void handle_failEvent()
+void handleSystemFailEvent()
 {
-	if (failure == 1)
+	if (_SYS_FAILURE_ == 1)
 	{
 		P9OUT |= OUT_ENGINE_FAIL;
 		P10OUT |= OUT_ASSET_I4;
@@ -553,6 +451,12 @@ void handle_failEvent()
 		P9OUT &= ~OUT_ENGINE_FAIL;
 		P10OUT &= ~OUT_ASSET_I4;
 	}
+
+	// if theres a BMS problem, turn off the inverter
+	if (BMS_EVENT == 1)
+		P11OUT &= ~OUT_nSPARE2_ON;
+	else
+		P11OUT |= OUT_nSPARE2_ON;
 }
 
 //--------------------------------------------------------------------
@@ -560,8 +464,7 @@ void handle_failEvent()
 // alert the asset tracker
 void handleLowFuelEvent()
 {
-
-	if (P2IN & IN_nLOW_FUEL == 1)
+	if ((P2IN & IN_nLOW_FUEL) == 0)
 		P10OUT |= OUT_ASSET_I3;
 	else
 		P10OUT &= ~OUT_ASSET_I3;
@@ -594,81 +497,21 @@ void handle_lighting()
 }
 
 //--------------------------------------------------------------------
-// Handle the reset button functionality
-void handle_reset()
+//
+void handleCabinetHeating()
 {
-	// Implimentation of reset functionality
-	// hold reset button 5 seconds, apply the reset
-	// then clear, reset flag a second after
-		if (buttonList[3].state == MAST_NOMINAL)
-		{
-			if (RESET_TMR == 5)
-			{
-				if (_DIAGNOSTIC_MODE == 1)
-				{
-					_DIAGNOSTIC_MODE = 0;
-					_DIAGNOSTIC_MODE_TMR = 0;
-				}
-				else
-				{
-					failure = 0;
-					BMS_EVENT = 0;
+	if (VALUE_INTERNAL_TEMP <= _LOW_SP_INTERNAL_TEMP)
+		P10OUT |= OUT_nCABINET_HEATER_ON;
 
-					clearStateCode(_STATE_CODE);
-				}
-			}
-
-		}
-
-		if (RESET_TMR == 6)
-		{
-			RESET_TMR = 0;
-			_RESETTING_ = 0;
-		}
+	if (VALUE_INTERNAL_TEMP >= _HIGH_SP_INTERNAL_TEMP)
+		P10OUT &= ~OUT_nCABINET_HEATER_ON;
 }
 
 
 
-//--------------------------------------------------------------------
-// Handle oil change indication and reset
-// Oil Change alert functionality
-// 25 hours before an oil change is due, report to the asset tracker
-// hold OCC button for 5 seconds to reset the oil change to 500 hours in the future
-void handle_oilchangeClear()
-{
-	if (_OILCHANGE_DUE - engine.engineHours <= 25)
-	{
-		P10OUT |= OUT_ASSET_I1;
-		setStateCode( 4 );
 
-		// pull up and still input?
-		if (P2IN & BUTTON_nOIL_RST == 0)
-		{
-			if (OILCHANGE_PRESS_TMR == 0)
-				OILCHANGE_PRESS_TMR = 1;
 
-			if (OILCHANGE_PRESS_TMR == 6)
-			{
-				OILCHANGE_PRESS_TMR = 0;
-				_OILCHANGE_DUE += engine.engineHours;
 
-				// write oil change hours to EEPROM
-			}
-		}
-	}
-}
 
-//--------------------------------------------------------------------
-// Build the Idle time array with 0s
-void buildIdleArray()
-{
-	idleTime idles[4] =
-			{
-					{0, 0},
-					{0, 0},
-					{0, 0},
-					{0, 0}
-			};
-}
 
 

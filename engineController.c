@@ -7,22 +7,40 @@
 
 #include "engineController.h"
 #include "config.h"
+#include "Hardware.h"
+#include "timeDate.h"
+#include "Common.h"
 
 //--------------------------------------------------------------------
 
-
-
-//--------------------------------------------------------------------
-// C imitation of a Constructor for the engine
-int engineSetup(int engMins, int engHrs)
+void InitializeEngine()
 {
-	engine.engineHours = engHrs;
-	engine.engineMins = engMins;
+	// pull stored oil change due hours
+	_OILCHANGE_DUE = 500;
+
+    // pull stored engine hours
+    engine.engineHours = 0;
+	// pull store engine minutes
+	engine.engineMins = 0;
 
 	engine.lastRun = datetime( 0, 0, 0, 0, 0, 0 );
 	engine.lastRunEnd = datetime( 0, 0, 0, 0, 0, 0 );
 
-	return 1;
+	// assemble the array of stored idle times
+	buildIdleArray();
+}
+
+//--------------------------------------------------------------------
+// Build the Idle time array with 0s
+void buildIdleArray()
+{
+	idleTime idles[4] =
+			{
+					{0, 0},
+					{0, 0},
+					{0, 0},
+					{0, 0}
+			};
 }
 
 //--------------------------------------------------------------------
@@ -33,18 +51,16 @@ int checkEngineTemp()
 	  return 1;
 	return 0;
 }
+int skippp = 0;
 
 //--------------------------------------------------------------------
 //
 int checkOilPressure()
 {
-//	if (P7IN & IN_OIL_PRESSURE_OK == 0)
-//	  return 1;
-//	return 0;
-	int dw = P1IN & BIT7;
+	return skippp;
 
-	if (dw != 0)
-		return 1;
+	if ((P7IN & IN_OIL_PRESSURE_OK) == 0)
+	  return 1;
 	return 0;
 }
 
@@ -65,7 +81,7 @@ int check_Engine_Status()
 
 	if (_FORCE_ENGINE_RUN == 1)
 	{
-		if (failure == 0 &&
+		if (mode == ENGINE_STOP ||
 			mode == ENGINE_STOP)
 		{
 			mode = ENGINE_PRE;
@@ -108,8 +124,8 @@ int check_Engine_Status()
 					if (checkEngineRPMs() == 2)
 						setStateCode( 31 );
 
-					mode = ENGINE_STOPPING;
-					failure = 1;
+					mode = ENGINE_STOP;
+					_SYS_FAILURE_ = 1;
 
 					count_RPM_fail = 0;
 				}
@@ -123,9 +139,9 @@ int check_Engine_Status()
 
 				if (count_oil_fail == 4)
 				{
-					mode = ENGINE_STOPPING;
+					mode = ENGINE_STOP;
 
-					failure = 1;
+					_SYS_FAILURE_ = 1;
 					setStateCode( 34 );
 
 					count_oil_fail = 0;
@@ -140,9 +156,9 @@ int check_Engine_Status()
 
 				if (count_temp_fail == 4)
 				{
-					mode = ENGINE_STOPPING;
+					mode = ENGINE_STOP;
 
-					failure = 1;
+					_SYS_FAILURE_ = 1;
 					setStateCode( 33 );
 
 					count_temp_fail = 0;
@@ -154,9 +170,9 @@ int check_Engine_Status()
 	else
 	{
 		if (mode != ENGINE_STOP &&
-			mode != ENGINE_STOPPING)
+			mode != ENGINE_STOP)
 		{
-			mode = ENGINE_STOPPING;
+			mode = ENGINE_STOP;
 		}
 	}
 
@@ -167,17 +183,11 @@ int check_Engine_Status()
 //
 void set_Engine_State(int mode)
 {
-	if (failure == 1)
-	  mode = ENGINE_STOPPING;
+	if (_SYS_FAILURE_ == 1)
+	  mode = ENGINE_STOP;
 
 	switch (mode)
 	{
-		case ENGINE_STOP:
-
-			   engine.mode = ENGINE_STOPPING;
-
-			   break;
-
 
 		case ENGINE_PRE:
 
@@ -191,6 +201,8 @@ void set_Engine_State(int mode)
 
 			   PREHEAT_D = _PREHEAT_SP;
 			   REATTEMPTS_D = _REATTEMPTS_SP;
+
+			   setStateCode(40);
 			 }
 
 			 if (PREHEAT_D == 0)
@@ -233,10 +245,10 @@ void set_Engine_State(int mode)
 
 			 if (REATTEMPTS_D <= 0)
 			 {
-				failure = 1;
+				_SYS_FAILURE_ = 1;
 				setStateCode( 30 );
 
-				set_Engine_State(ENGINE_STOPPING);
+				set_Engine_State(ENGINE_STOP);
 			 }
 
 			 break;
@@ -277,6 +289,8 @@ void set_Engine_State(int mode)
 				store_idleTime( );
 
 				engine.lastRunEnd = datetime( 0, 0, 0, 0, 0, 0 );
+
+				setStateCode(41);
 			}
 		   	else
 			{
@@ -302,18 +316,21 @@ void set_Engine_State(int mode)
 		    break;
 
 
-		case ENGINE_STOPPING:
+		case ENGINE_STOP:
 
-		   if (engine.mode != ENGINE_STOP && engine.mode != ENGINE_STOPPING)
-		   {
-			   if (engine.mode == ENGINE_RUNNING)
+		   //if (engine.mode != ENGINE_STOP && engine.mode != ENGINE_STOP)
+		   //{
+			clearStateCode(40);
+			clearStateCode(41);
+
+			if (engine.mode == ENGINE_RUNNING)
 				   engine.lastRunEnd = now;
 
 			   P2OUT &= ~OUT_ENGINE_ACC;
 			   P9OUT &= ~OUT_ENGINE_CRANK;
 			   P9OUT &= ~OUT_ENGINE_GLOW;
 			   P8OUT &= ~OUT_ASSET_IGNITION;
-		   }
+		   //}
 
 		   engine.mode = ENGINE_STOP;
 
@@ -378,7 +395,36 @@ int store_idleTime()
 	return 1;
 }
 
+//--------------------------------------------------------------------
+// Handle oil change indication and reset
+// Oil Change alert functionality
+// 25 hours before an oil change is due, report to the asset tracker
+// hold OCC button for 5 seconds to reset the oil change to 500 hours in the future
+void handle_oilchangeClear()
+{
+	if (_OILCHANGE_DUE - engine.engineHours <= 25)
+	{
+		P10OUT |= OUT_ASSET_I1;
+		setStateCode( 4 );
 
+		// pull up and still input?
+		if ((P2IN & BUTTON_nOIL_RST) == 0)
+		{
+			if (OILCHANGE_PRESS_TMR == 0)
+				OILCHANGE_PRESS_TMR = 1;
+
+			if (OILCHANGE_PRESS_TMR == 6)
+			{
+				OILCHANGE_PRESS_TMR = 0;
+				_OILCHANGE_DUE += engine.engineHours;
+
+				clearStateCode( 4 );
+
+				// write oil change hours to EEPROM
+			}
+		}
+	}
+}
 
 
 

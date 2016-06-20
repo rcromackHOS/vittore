@@ -15,10 +15,6 @@
 #define ROW_N  	 	4;                 // Number of display rows
 #define COLUMN_N  	20;             // Number of display columns
 
-#define OLED_RST	BIT4;
-#define OLED_SCK	BIT5;
-#define OLED_MOSI	BIT7;
-
 //--------------------------------------------------------------------
 
 void updateDisplay();
@@ -31,7 +27,10 @@ void DIAG_showDate();
 void DIAG_showVoltage();
 void DIAG_showRPM();
 
-void OLED_setup();
+void clearLine(int line);
+void OLED_writeLine(char* chars, int line);
+
+void InitializeDisplay();
 void OLED_clockCycle();
 void OLED_command(int c);
 void OLED_sendByte(int tx_b);

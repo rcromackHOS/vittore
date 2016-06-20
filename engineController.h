@@ -11,7 +11,20 @@
 #include <msp430.h>
 
 //--------------------------------------------------------------------
-// state codes
+// states
+/*
+typedef enum {
+	ENGINE_STOP = 0,
+	ENGINE_PRE,
+	ENGINE_CRANK,
+	ENGINE_REATTEMPT,
+	ENGINE_POST,
+	ENGINE_RUNNING,
+	ENGINE_STOPPING
+} engine_statuses_t;
+extern engine_statuses_t engine_statuses;
+*/
+
 #define ENGINE_STOP  	 0x0
 #define ENGINE_PRE       0x1
 #define ENGINE_CRANK     0x2
@@ -22,11 +35,13 @@
 
 //--------------------------------------------------------------------
 
-int engineSetup(int engMins, int engHrs);
+void InitializeEngine();
+void buildIdleArray();
 
 int check_Engine_Status();
 void set_Engine_State(int mode);
 
+void handle_oilchangeClear();
 int checkOilPressure();
 int checkEngineRPMs();
 int checkEngineTemp();

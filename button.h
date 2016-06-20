@@ -41,6 +41,8 @@ void button_stateMachine();
 void mastUpDown();
 void mast_stateMachine(int deltastate);
 
+void handle_reset();
+
 //--------------------------------------------------------------------
 
 #endif /* BUTTON_H_ */

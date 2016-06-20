@@ -183,6 +183,8 @@
 #define OUT_nSPARE4_ON			(BIT2)
 
 extern void InitializeHardware(void);
-
+static void ConfigurePins(void);
+static void ConfigureCrystals(void);
+static void SetVcoreUp (unsigned int level);
 
 #endif

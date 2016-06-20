@@ -12,23 +12,33 @@
 
 #include <stdbool.h>
 #include "Common.h"
+#include "config.h"
 
+//--------------------------------------------------------------------
 // accepts a single character and determines if it is an ASCII number 0-9
-unsigned char IsAsciiDecNumber(unsigned char a) {
-	if( (a >= '0') && (a <= '9') )  return(TRUE);
-	else 							return(FALSE);
+
+unsigned char IsAsciiDecNumber(unsigned char a )
+{
+	if ( (a >= '0') && (a <= '9') )
+		return(TRUE);
+	else
+		return(FALSE);
 }
 
 
+//--------------------------------------------------------------------
 // accepts a single character and determines if it is an ASCII number 0-9, a-f,A-F
-unsigned char IsAsciiNumber(unsigned char a) {
+unsigned char IsAsciiNumber(unsigned char a)
+{
 	if( ((a >= '0') && (a <= '9')) || ((a >= 'A') && (a <= 'F')) || ((a >= 'a') && (a <= 'f')) ) return(TRUE);
 	else 	return(FALSE);
 }
 
+//--------------------------------------------------------------------
 // Accepts a single ASCII digit (0-9 & A-F or a-f) returns hex value
-unsigned char asctohex(unsigned char a) {
-unsigned char c;
+unsigned char asctohex(unsigned char a)
+{
+	unsigned char c;
 	if(a <= '9') c = a - '0';
 	else {
 		if(a <= 'F') 	c = (a - 'A') + 10;
@@ -37,6 +47,7 @@ unsigned char c;
 	return(c);
 }
 
+//--------------------------------------------------------------------
 // Accepts a single decimal ASCII Digit (0-9) returns Decimal
 unsigned char asctodec(unsigned char a) {
 unsigned char c;
@@ -45,6 +56,7 @@ unsigned char c;
 	return(c);
 }
 
+//--------------------------------------------------------------------
 // Accepts a single hex number 0-F converts to ascii and returns
 unsigned char hextoascii(unsigned char h) {
 
@@ -60,6 +72,7 @@ unsigned char hextoascii(unsigned char h) {
 }
 
 
+//--------------------------------------------------------------------
 void HextoAscii(unsigned char* str, unsigned char len, unsigned char val) // could use for larger vals like int or long
 {
   unsigned char i,byte;
@@ -83,6 +96,7 @@ void HextoAscii(unsigned char* str, unsigned char len, unsigned char val) // cou
   str[i-1] = '\0';
 }
 
+//--------------------------------------------------------------------
 // Accepts pointer to an array of Hex values which it converts to ascii and returns
 unsigned char ConvertHexArrayToAscii(unsigned char *hexArray, unsigned int arrayLength, unsigned char *asciiString) {
 unsigned int idx,idx1;
@@ -105,6 +119,7 @@ unsigned int idx,idx1;
 
 
 
+//--------------------------------------------------------------------
 // Accepts a NULL terminated String pointer and copies it to passed string pointer
 void copy_string(char *target, char *source) {
 
@@ -155,7 +170,21 @@ int bin2bcd (int val)
 	return val + 6 * (val / 10);
 }
 
-long map(long x, long in_min, long in_max, long out_min, long out_max)
+int map_adc(unsigned int x, unsigned int in_min, unsigned int in_max, unsigned int out_min, unsigned int out_max)
 {
   return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
+//--------------------------------------------------------------------
+//
+void clearStateCode(int code)
+{
+	if (code == _STATE_CODE)
+		_STATE_CODE = 0;
+}
+
+void setStateCode(int code)
+{
+	if (code > _STATE_CODE)
+		_STATE_CODE = code;
 }

@@ -10,7 +10,11 @@ GEN_OPTS__FLAG :=
 GEN_CMDS__FLAG := 
 
 ORDERED_OBJS += \
+"./AtoD.obj" \
+"./Common.obj" \
+"./Hardware.obj" \
 "./MCP7940N.obj" \
+"./WatchdogTimerControl.obj" \
 "./bms.obj" \
 "./button.obj" \
 "./config.obj" \
@@ -20,7 +24,7 @@ ORDERED_OBJS += \
 "./solar.obj" \
 "./timeDate.obj" \
 "../MSPMATHLIB_CCS_msp430_4xx_small_code_small_data.lib" \
-"../lnk_msp430f47197.cmd" \
+"../lnk_msp430f5419a.cmd" \
 $(GEN_CMDS__FLAG) \
 -llibmath.a \
 -llibc.a \
@@ -149,7 +153,7 @@ all: vittore.out
 vittore.out: $(OBJS) $(CMD_SRCS) $(LIB_SRCS) $(GEN_CMDS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: MSP430 Linker'
-	"C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/bin/cl430" -vmspx --data_model=restricted -Ooff --opt_for_speed=0 --use_hw_mpy=32 --advice:power=all -g --define=__MSP430F47197__ --diag_warning=225 --display_error_number --diag_wrap=off --printf_support=minimal -z -m"vittore.map" --heap_size=80 --stack_size=80 --cinit_hold_wdt=on -i"C:/ti/ccsv6/ccs_base/msp430/include" -i"C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/lib" -i"C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include" -i"C:/ti/ccsv6/ccs_base/msp430/lib/4xx" --reread_libs --display_error_number --warn_sections --diag_wrap=off --xml_link_info="vittore_linkInfo.xml" --use_hw_mpy=32 --rom_model -o "vittore.out" $(ORDERED_OBJS)
+	"C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/bin/cl430" -vmspx --data_model=restricted -Ooff --opt_for_speed=0 --use_hw_mpy=F5 --advice:power=all -g --define=__MSP430F5419A__ --diag_warning=225 --display_error_number --diag_wrap=off --silicon_errata=CPU21 --silicon_errata=CPU22 --silicon_errata=CPU23 --silicon_errata=CPU40 --printf_support=minimal -z -m"vittore.map" --heap_size=160 --stack_size=160 --cinit_hold_wdt=on -i"C:/ti/ccsv6/ccs_base/msp430/include" -i"C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/lib" -i"C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include" -i"C:/ti/ccsv6/ccs_base/msp430/lib/5xx_6xx_FRxx" --reread_libs --display_error_number --warn_sections --diag_wrap=off --xml_link_info="vittore_linkInfo.xml" --use_hw_mpy=F5 --rom_model -o "vittore.out" $(ORDERED_OBJS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -162,8 +166,8 @@ vittore.hex: $(EXE_OUTPUTS)
 # Other Targets
 clean:
 	-$(RM) $(EXE_OUTPUTS__QUOTED)$(BIN_OUTPUTS__QUOTED)
-	-$(RM) "MCP7940N.d" "bms.d" "button.d" "config.d" "engineController.d" "lcd.d" "main.d" "solar.d" "timeDate.d" 
-	-$(RM) "MCP7940N.obj" "bms.obj" "button.obj" "config.obj" "engineController.obj" "lcd.obj" "main.obj" "solar.obj" "timeDate.obj" 
+	-$(RM) "AtoD.d" "Common.d" "Hardware.d" "MCP7940N.d" "WatchdogTimerControl.d" "bms.d" "button.d" "config.d" "engineController.d" "lcd.d" "main.d" "solar.d" "timeDate.d" 
+	-$(RM) "AtoD.obj" "Common.obj" "Hardware.obj" "MCP7940N.obj" "WatchdogTimerControl.obj" "bms.obj" "button.obj" "config.obj" "engineController.obj" "lcd.obj" "main.obj" "solar.obj" "timeDate.obj" 
 	-@echo 'Finished clean'
 	-@echo ' '
 

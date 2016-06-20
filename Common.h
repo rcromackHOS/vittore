@@ -42,7 +42,9 @@ unsigned int 	crc(unsigned char *buf,unsigned int start, unsigned int cnt);
 
 int bcd2bin (int val);
 int bin2bcd (int val);
-long map(long x, long in_min, long in_max, long out_min, long out_max)
+extern int map_adc(unsigned int x, unsigned int in_min, unsigned int in_max, unsigned int out_min, unsigned int out_max);
+extern void setStateCode(int code);
+extern void clearStateCode(int code);
 
 #endif
 

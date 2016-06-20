@@ -18,10 +18,10 @@
 static double _lng;
 static double _lat;
 
-static float _sunset_d;
-static float _sunrise_d;
+static double _sunset_d;
+static double _sunrise_d;
 
-extern int validCalc;
+int validCalc;
 
 dateStruct lastCalculated;
 
@@ -34,7 +34,10 @@ timeStruct solar_getSunrise(dateTimeStruct ds);
 
 int solar_calculate(float y, float m, float d);
 float solar_toJulian(float y, float m, float d);
-void solar_timeFromDayDec(float dec, timeStruct dt);
+timeStruct solar_timeFromDayDec(float dec);//, timeStruct dt);
+
+double degrees(double r);
+double radians(double d);
 
 //--------------------------------------------------------------------
 

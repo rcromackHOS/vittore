@@ -29,6 +29,8 @@ unsigned int I2C_TXBUFFER;
 
 //--------------------------------------------------------------------
 
+void InitializeRTC();
+
 int RTC_begin(void);
 int RTC_adjust(dateTimeStruct dt);
 int RTC_isRunning(void);

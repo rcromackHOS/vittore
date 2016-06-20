@@ -4,13 +4,17 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CMD_SRCS += \
-../lnk_msp430f47197.cmd 
+../lnk_msp430f5419a.cmd 
 
 LIB_SRCS += \
 ../MSPMATHLIB_CCS_msp430_4xx_small_code_small_data.lib 
 
 C_SRCS += \
+../AtoD.c \
+../Common.c \
+../Hardware.c \
 ../MCP7940N.c \
+../WatchdogTimerControl.c \
 ../bms.c \
 ../button.c \
 ../config.c \
@@ -21,7 +25,11 @@ C_SRCS += \
 ../timeDate.c 
 
 OBJS += \
+./AtoD.obj \
+./Common.obj \
+./Hardware.obj \
 ./MCP7940N.obj \
+./WatchdogTimerControl.obj \
 ./bms.obj \
 ./button.obj \
 ./config.obj \
@@ -32,7 +40,11 @@ OBJS += \
 ./timeDate.obj 
 
 C_DEPS += \
+./AtoD.d \
+./Common.d \
+./Hardware.d \
 ./MCP7940N.d \
+./WatchdogTimerControl.d \
 ./bms.d \
 ./button.d \
 ./config.d \
@@ -43,7 +55,11 @@ C_DEPS += \
 ./timeDate.d 
 
 C_DEPS__QUOTED += \
+"AtoD.d" \
+"Common.d" \
+"Hardware.d" \
 "MCP7940N.d" \
+"WatchdogTimerControl.d" \
 "bms.d" \
 "button.d" \
 "config.d" \
@@ -54,7 +70,11 @@ C_DEPS__QUOTED += \
 "timeDate.d" 
 
 OBJS__QUOTED += \
+"AtoD.obj" \
+"Common.obj" \
+"Hardware.obj" \
 "MCP7940N.obj" \
+"WatchdogTimerControl.obj" \
 "bms.obj" \
 "button.obj" \
 "config.obj" \
@@ -65,7 +85,11 @@ OBJS__QUOTED += \
 "timeDate.obj" 
 
 C_SRCS__QUOTED += \
+"../AtoD.c" \
+"../Common.c" \
+"../Hardware.c" \
 "../MCP7940N.c" \
+"../WatchdogTimerControl.c" \
 "../bms.c" \
 "../button.c" \
 "../config.c" \

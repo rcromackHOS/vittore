@@ -19,6 +19,7 @@
 #include "Hardware.h"
 #include "AtoD.h"
 #include "config.h"
+#include "Common.h"
 
 #define CALADC12_15V_30C  *((unsigned int *)0x1A1A)   // Temperature Sensor Calibration-30 C
                                                       //See device datasheet for TLV table memory mapping
@@ -71,7 +72,6 @@ void ConfigureA2D(void) {
 
 	P6SEL |= (AD_P_BATTERY_PIN + AD_N_BATTERY_PIN + AD_P_ENGINE_VER_PIN + AD_N_ENGINE_VER_PIN + AD_P_ENGINE_CUR_PIN + AD_N_ENGINE_CUR_PIN + AD_12V_MONITOR_PIN);
 	P7SEL |= AD_24V_MONITOR_PIN;
-
 
 	/* Initialize the shared reference module */
 	REFCTL0 |= REFMSTR + REFVSEL_3 + REFON;    // Enable internal 2.5V reference & internal temp sensor
@@ -132,6 +132,11 @@ float ConvertInternalTempToCelcius(unsigned int rawCount)
 
 void loadAnalogData()
 {
+
+	//VALUE_24V = ADC[AD_P_BATTERY_VLT];
+	//VALUE_PCB_24V = ADC[AD_24V_POWER_VLT];
+
+	/*
 	v12_total = v12_total - v12_readings[v12_index];
 	v12_readings[v12_index] = ADC[AD_12V_BATTERY_VLT];
 	v12_total = v12_total + v12_readings[v12_index];
@@ -139,11 +144,11 @@ void loadAnalogData()
 
 	if (v12_index >= 20)
 		v12_index = 0;
-
-	VALUE_12V = map( (v12_total / 20), 0, 4095, 0, 1500);
+	*/
+	VALUE_12V = ADC[AD_12V_BATTERY_VLT];
 
 	//----------------------------------------------
-
+	/*
 	iT_total = iT_total - iT_readings[iT_index];
 	iT_readings[iT_index] = ADC[AD_INTERNAL_TEMP];
 	iT_total = iT_total + iT_readings[iT_index];
@@ -151,9 +156,8 @@ void loadAnalogData()
 
 	if (iT_index >= 20)
 		iT_index = 0;
-
-	VALUE_INTERNAL_TEMP = map( (iT_total / 20), 0, 4095, -40, 85);
-
+	*/
+	VALUE_INTERNAL_TEMP = ConvertInternalTempToCelcius(ADC[AD_INTERNAL_TEMP]);
 
 	//----------------------------------------------
 

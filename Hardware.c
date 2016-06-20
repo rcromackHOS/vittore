@@ -19,11 +19,6 @@
 #include "Hardware.h"
 #include "AtoD.h"
 
-static void ConfigurePins(void);
-static void ConfigureCrystals(void);
-static void SetVcoreUp (unsigned int level);
-
-
 void InitializeHardware(void) {
 
 	ConfigurePins();
@@ -53,7 +48,8 @@ static void ConfigurePins(void) {
 	P2IES =  BUTTON_nOIL_RST;
 	P2IE = 0;
 
-	P3DIR = BIT0 + BIT3 + OUT_LIGHTS_ON;
+	//P3DIR = BIT0 + BIT3 + OUT_LIGHTS_ON;
+	P3DIR = BIT0 + BIT3 + OUT_LIGHTS_ON + LCD_SPI_SIMO;
 	P3OUT = BIT0 + BIT3;
 	P3REN = BIT0 + BIT3;
 	P3DS = 0;
@@ -65,8 +61,11 @@ static void ConfigurePins(void) {
 	P4DS = 0;
 	P4SEL = 0;
 
-	P5DIR = BIT0 + BIT1 + LCD_SPI_RESET;
+	//P5DIR = BIT0 + BIT1 + LCD_SPI_RESET;
+	//P5OUT = BIT0 + BIT1;
+	P5DIR = BIT0 + BIT1 + LCD_SPI_RESET + LCD_SPI_SCK;
 	P5OUT = BIT0 + BIT1;
+
 	P5REN = BIT0 + BIT1;
 	P5DS = 0;
 	P5SEL = 0; //enable peripherals individually
@@ -116,9 +115,9 @@ static void ConfigurePins(void) {
 //
 // RETURN/UPDATES:	n/a
 //---------------------------------------------------------------------------------------------
+
 static void ConfigureCrystals(void)
 {
-
 	// Verify!!
 	SetVcoreUp(PMMCOREV_1);
 	SetVcoreUp(PMMCOREV_2);                     // Set VCore to 1.8MHz for 20MHz
@@ -133,9 +132,9 @@ static void ConfigureCrystals(void)
    	// Loop until XT1,XT2 & DCO stabilizes
 	do
 	{
-	UCSCTL7 &= ~(XT2OFFG + XT1LFOFFG + XT1HFOFFG + DCOFFG);
+		UCSCTL7 &= ~(XT2OFFG + XT1LFOFFG + XT1HFOFFG + DCOFFG);
 											// Clear XT2,XT1,DCO fault flags
-	SFRIFG1 &= ~OFIFG;                      // Clear fault flags
+		SFRIFG1 &= ~OFIFG;                      // Clear fault flags
 	}while (SFRIFG1&OFIFG);                   // Test oscillator fault flag
 
 	UCSCTL6 &= ~XT2DRIVE1;							// XT2 drive 1 (01)

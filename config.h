@@ -16,9 +16,11 @@ extern int _ADCs_UPDATED_;
 
 //--------------------------------------------------------------------
 
-extern volatile int _HIGH_SP_24V;
-extern volatile int _LOW_SP_24V;
-extern volatile int VALUE_24V;
+extern int _HIGH_SP_24V;
+extern int _LOW_SP_24V;
+extern int VALUE_24V;
+
+extern int VALUE_PCB_24V;
 
 //--------------------------------------------------------------------
 
@@ -35,31 +37,31 @@ extern int _BANK_BMS_TMR_D;
 //--------------------------------------------------------------------
 
 extern int _LOW_SP_12V;
-extern int VALUE_12V;
+extern unsigned int VALUE_12V;
 
 //--------------------------------------------------------------------
 
 extern int _HIGH_SP_INTERNAL_TEMP;
 extern int _LOW_SP_INTERNAL_TEMP;
-extern int VALUE_INTERNAL_TEMP;
+extern float VALUE_INTERNAL_TEMP;
 
 //--------------------------------------------------------------------
 
-extern volatile int _HIGH_SP_TEMP;
-extern volatile int _NOMINAL_SP_TEMP;
-extern volatile int _LOW_SP_TEMP;
-extern volatile int VALUE_BAT_TEMP;
+extern int _HIGH_SP_TEMP;
+extern int _NOMINAL_SP_TEMP;
+extern int _LOW_SP_TEMP;
+extern int VALUE_BAT_TEMP;
 
-extern volatile int _HIGH_SP_RPM;
-extern volatile int _LOW_SP_RPM;
-extern volatile int VALUE_RPM;
+extern int _HIGH_SP_RPM;
+extern int _LOW_SP_RPM;
+extern int VALUE_RPM;
 
 extern int _UNIT_MODE;
 extern int LIGHTS1HOUR_TMR;
 
-extern volatile int _STATE_CODE;
+extern int _STATE_CODE;
 
-extern volatile int _MAST_STATUS;
+extern int _MAST_STATUS;
 
 extern int _RESETTING_;
 extern int RESET_TMR;
@@ -79,20 +81,20 @@ extern int _ADCs_UPDATED;
 
 //--------------------------------------------------------------------
 
-extern volatile int _PREHEAT_SP;
-extern volatile int PREHEAT_D;
+extern  int _PREHEAT_SP;
+extern  int PREHEAT_D;
 
-extern volatile int _CRANK_SP;
-extern volatile int CRANK_D;
+extern  int _CRANK_SP;
+extern  int CRANK_D;
 
-extern volatile int _POST_SP;
-extern volatile int POST_D;
+extern  int _POST_SP;
+extern  int POST_D;
 
-extern volatile int _ATTEMPT_SP;
-extern volatile int ATTEMPT_D;
+extern  int _ATTEMPT_SP;
+extern  int ATTEMPT_D;
 
-extern volatile int _REATTEMPTS_SP;
-extern volatile int REATTEMPTS_D;
+extern  int _REATTEMPTS_SP;
+extern  int REATTEMPTS_D;
 
 extern int count_run;
 extern int count_RPM_fail;
@@ -101,7 +103,11 @@ extern int count_temp_fail;
 
 //--------------------------------------------------------------------
 
-extern int failure;
+extern int _SCREEN_UPDATE_D;
+
+//--------------------------------------------------------------------
+
+extern int _SYS_FAILURE_;
 
 //--------------------------------------------------------------------
 

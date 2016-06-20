@@ -8,6 +8,7 @@
 
 #include "button.h"
 #include "config.h"
+#include "Hardware.h"
 
 //--------------------------------------------------------------------
 
@@ -52,22 +53,25 @@ void button_stateMachine()
 	int high;
 	int i;
 
-	P4OUT &= ~BIT2;
+	//P4OUT &= ~BIT2;
 
 	// if it seems we're not getting a 3 finger salute, dont enter diagnostic mode
 	for (i = 5; i >= 0; i--)
 	{
-		high = P1IN & buttonList[i].pin;
+		high = 0;
+
+		if ((P1IN & buttonList[i].pin) == 0)
+			high = 1;
 
 		switch (buttonList[i].state)
 		{
 			case STATE_NOMINAL:
 
-				if (high != 0)
+				if (high == 1)
 				{
 					buttonList[i].Oncounts++;
 
-					if (buttonList[i].Oncounts > 2)
+					if (buttonList[i].Oncounts == 4)
 						buttonList[i].state = STATE_PRESSED;
 				}
 
@@ -82,7 +86,7 @@ void button_stateMachine()
 				{
 					buttonList[i].Offcounts++;
 
-					if (buttonList[i].Offcounts >= 2)
+					if (buttonList[i].Offcounts > 4)
 						buttonList[i].state = STATE_RELEASED;
 				}
 				else
@@ -92,14 +96,14 @@ void button_stateMachine()
 
 			case STATE_RELEASED:
 
-				if (buttonList[i].mode == MODE_RESET && buttonList[i].Oncounts >= 120)
+				if (buttonList[i].mode == MODE_RESET && buttonList[i].Oncounts >= 170)
 					_RESETTING_ = 1;
 
 				if (high == 0)
 				{
 					buttonList[i].Offcounts++;
 
-					if (buttonList[i].Offcounts >= 4)
+					if (buttonList[i].Offcounts > 8)
 					{
 						buttonList[i].Oncounts = 0;
 						buttonList[i].Offcounts = 0;
@@ -246,7 +250,31 @@ void mast_stateMachine(int deltastate)
     }
 }
 
+//--------------------------------------------------------------------
+// Handle the reset button functionality
+void handle_reset()
+{
+	// Implimentation of reset functionality
+	// hold reset button 5 seconds, apply the reset
+	// then clear, reset flag a second after
+	if (buttonList[3].state == STATE_NOMINAL)
+	{
+	   if (_DIAGNOSTIC_MODE == 1)
+	   {
+		   _DIAGNOSTIC_MODE = 0;
+		   _DIAGNOSTIC_MODE_TMR = 0;
+	   }
+	   else if (_DIAGNOSTIC_MODE == 0)
+	   {
+		   _SYS_FAILURE_ = 0;
+		   BMS_EVENT = 0;
 
+		   clearStateCode(_STATE_CODE);
+
+		   _RESETTING_ = 0;
+	   }
+	}
+}
 
 
 

@@ -42,12 +42,12 @@ extern float ConvertInternalTempToCelcius(unsigned int);
 //--------------------------------------------------------------------
 
 int v12_readings[20];
-int v12_index = 0;
-int v12_total = 0;
+int v12_index;
+int v12_total;
 
 int iT_readings[20];
-int iT_index = 0;
-int iT_total = 0;
+int iT_index;
+int iT_total;
 
 
 //--------------------------------------------------------------------

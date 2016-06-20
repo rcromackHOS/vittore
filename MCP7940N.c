@@ -9,12 +9,41 @@
 #include "MCP7940N.h"
 #include "timeDate.h"
 #include "Common.h"
+#include "config.h"
 
 //--------------------------------------------------------------------
 
 //const int daysInMonth [] = { 31,28,31,30,31,30,31,31,30,31,30,31 }; //has to be const or compiler compaints
 
 static int i = 0;
+
+//------------------------------------------------------------------------------------------------------------------------------------
+// Initialize the RTC
+// Check for lost tme or errors
+void InitializeRTC()
+{
+	now = datetime(0, 0, 12, 1, 1, 2010);
+
+	if (RTC_isRunning() == 99)	// 99 = no I2C response
+	{
+		setStateCode(11);
+	}
+	else
+    {
+		// If we've lost the time
+		if (RTC_lostTime() == 1)
+	    {
+			setStateCode(10);     // 10 = RTC lost time (LIR32 _SYS_FAILURE_?)
+			RTC_adjust(now);
+	    }
+		else
+			now = RTC_now();
+    }
+
+
+
+	return 1;
+}
 
 //--------------------------------------------------------------------
 //
@@ -95,7 +124,7 @@ dateTimeStruct RTC_now()
   int y = bcd2bin(Wire.read()) + 2000;
 
   return datetime(ss, mm, hh, d, m, y);*/
-  return datetime(0, 0, 0, 1, 1, 2015);
+  return datetime(0, 0, 12, 1, 1, 2015);
 }
 
 
@@ -105,7 +134,7 @@ dateTimeStruct RTC_now()
 // The USCI_B0 data ISR is used to move received data from the I2C slave
 // to the MSP430 memory. It is structured such that it can be used to receive
 //-------------------------------------------------------------------------------
-#pragma vector = USCIAB0TX_VECTOR
+//#pragma vector = USCIAB0TX_VECTOR
 __interrupt void USCIAB0TX_ISR(void)
 {
   /*
