@@ -18,8 +18,8 @@
 #include <msp430.h>        /* Compiler specific Chip header.                  */
 
 
-
-typedef enum {
+typedef enum
+{
    AD_P_BATTERY_VLT = 0,
    AD_N_BATTERY_VLT,
    AD_P_ENGINE_VER,
@@ -37,10 +37,12 @@ extern unsigned int ADC[];
 extern void loadAnalogData();
 
 extern void ConfigureA2D(void);
-extern float ConvertInternalTempToCelcius(unsigned int);
+float ConvertInternalTempToCelcius(unsigned int);
 
 //--------------------------------------------------------------------
 
+extern int TempCountdown;
+/*
 int v12_readings[20];
 int v12_index;
 int v12_total;
@@ -49,7 +51,7 @@ int iT_readings[20];
 int iT_index;
 int iT_total;
 
-
+*/
 //--------------------------------------------------------------------
 
 

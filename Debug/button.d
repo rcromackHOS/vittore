@@ -10,6 +10,8 @@ button.obj: C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include/intrins
 button.obj: ../config.h
 button.obj: ../timeDate.h
 button.obj: ../Hardware.h
+button.obj: ../Common.h
+button.obj: C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include/stdbool.h
 
 ../button.c: 
 ../button.h: 
@@ -21,3 +23,5 @@ C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include/intrinsics_legacy_u
 ../config.h: 
 ../timeDate.h: 
 ../Hardware.h: 
+../Common.h: 
+C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include/stdbool.h: 

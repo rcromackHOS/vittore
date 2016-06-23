@@ -12,6 +12,7 @@ LIB_SRCS += \
 C_SRCS += \
 ../AtoD.c \
 ../Common.c \
+../GPS.c \
 ../Hardware.c \
 ../MCP7940N.c \
 ../WatchdogTimerControl.c \
@@ -27,6 +28,7 @@ C_SRCS += \
 OBJS += \
 ./AtoD.obj \
 ./Common.obj \
+./GPS.obj \
 ./Hardware.obj \
 ./MCP7940N.obj \
 ./WatchdogTimerControl.obj \
@@ -42,6 +44,7 @@ OBJS += \
 C_DEPS += \
 ./AtoD.d \
 ./Common.d \
+./GPS.d \
 ./Hardware.d \
 ./MCP7940N.d \
 ./WatchdogTimerControl.d \
@@ -57,6 +60,7 @@ C_DEPS += \
 C_DEPS__QUOTED += \
 "AtoD.d" \
 "Common.d" \
+"GPS.d" \
 "Hardware.d" \
 "MCP7940N.d" \
 "WatchdogTimerControl.d" \
@@ -72,6 +76,7 @@ C_DEPS__QUOTED += \
 OBJS__QUOTED += \
 "AtoD.obj" \
 "Common.obj" \
+"GPS.obj" \
 "Hardware.obj" \
 "MCP7940N.obj" \
 "WatchdogTimerControl.obj" \
@@ -87,6 +92,7 @@ OBJS__QUOTED += \
 C_SRCS__QUOTED += \
 "../AtoD.c" \
 "../Common.c" \
+"../GPS.c" \
 "../Hardware.c" \
 "../MCP7940N.c" \
 "../WatchdogTimerControl.c" \

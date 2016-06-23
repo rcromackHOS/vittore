@@ -14,6 +14,7 @@ main.obj: ../Common.h
 main.obj: C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include/stdbool.h
 main.obj: ../WatchdogTimerControl.h
 main.obj: ../AtoD.h
+main.obj: ../GPS.h
 main.obj: ../engineController.h
 main.obj: ../lcd.h
 main.obj: ../button.h
@@ -38,6 +39,7 @@ C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include/intrinsics_legacy_u
 C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include/stdbool.h: 
 ../WatchdogTimerControl.h: 
 ../AtoD.h: 
+../GPS.h: 
 ../engineController.h: 
 ../lcd.h: 
 ../button.h: 

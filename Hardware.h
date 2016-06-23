@@ -86,15 +86,14 @@
 /******************************************************************************/
 //	PORT 4 Defines
 /******************************************************************************/
-#define RESET_LED_PIN			(BIT0)
-#define LIGHT1H_LED_PIN			(BIT1)
-#define AUTO_LED_PIN			(BIT2)
-#define STANDBY_LED_PIN			(BIT3)
-#define DOWN_LED_PIN			(BIT4)
-#define UP_LED_PIN				(BIT5)
+#define OUT_RESET_LED			(BIT0)
+#define OUT_LIGHT_1H_LED		(BIT1)
+#define OUT_AUTO_LED			(BIT2)
+#define OUT_STANDBY_LED			(BIT3)
+#define OUT_DOWN_LED			(BIT4)
+#define OUT_UP_LED				(BIT5)
 #define IN_VERSION_BIT3			(BIT6)
 #define IN_VERSION_BIT2			(BIT7)
-
 
 
 /******************************************************************************/
@@ -183,8 +182,6 @@
 #define OUT_nSPARE4_ON			(BIT2)
 
 extern void InitializeHardware(void);
-static void ConfigurePins(void);
-static void ConfigureCrystals(void);
-static void SetVcoreUp (unsigned int level);
+
 
 #endif

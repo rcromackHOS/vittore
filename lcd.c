@@ -8,8 +8,7 @@
 #include "lcd.h"
 #include "config.h"
 #include "Hardware.h"
-
-//#include "strcpy.h"
+#include "Common.h"
 #include "string.h"
 
 //--------------------------------------------------------------------
@@ -43,8 +42,12 @@ const char msg21[] = {"Sunrise:    "};
 const char msg22[] = {"Sunset:     "};
 const char msg23[] = {"Lat:         "};
 const char msg24[] = {"Lng:         "};
-const char msg25[] = {"                    "};
-
+const char empty_char[] = {"                    "};
+const char slash_char[] = {"/"};
+const char space_char[] = {" "};
+const char zero_char[] = {"0"};
+const char bt_tmp_string[] = {"Battery Temp:  "};
+						    // {"    Bank Charging   "};
 const char* const messages[] = {
 msg1,
 msg2,
@@ -99,6 +102,7 @@ void updateDisplay()
 		{
 			DIAG_showDate();
 			DIAG_showVoltage();
+			DIAG_showBatteryTemp();
 			DIAG_showRPM();
 		}
 		else if (_DIAGNOSTIC_PAGE == 1)
@@ -252,26 +256,108 @@ const char msg11[] = {"Aquiring Satellites "};
 //
 void DIAG_showDate()
 {
+	strcpy(__screenbuffer, space_char);
 
+	// date
+	if (now.day < 10)
+		strcat(__screenbuffer, zero_char);
+	itoa(now.day, __screenbuffer2, 10);
+	strcat(__screenbuffer, __screenbuffer2);
 
+	strcat(__screenbuffer, slash_char); 	//-
+
+	if (now.month < 10)
+		strcat(__screenbuffer, zero_char);
+	itoa(now.month, __screenbuffer2, 10);
+	strcat(__screenbuffer, __screenbuffer2);
+
+	strcat(__screenbuffer, slash_char); 	//-
+
+	itoa(now.year - 2000, __screenbuffer2, 10);
+	strcat(__screenbuffer, __screenbuffer2);
+
+	// space
+	int i;
+	for (i = 0; i < 3; i++)
+		strcat(__screenbuffer, space_char);
+
+	// time
+	if (now.second < 10)
+		strcat(__screenbuffer, zero_char);
+	itoa(now.second, __screenbuffer2, 10);
+	strcat(__screenbuffer, __screenbuffer2);
+
+	strcat(__screenbuffer, slash_char); 	//-
+
+	if (now.minute < 10)
+		strcat(__screenbuffer, zero_char);
+	itoa(now.minute, __screenbuffer2, 10);
+	strcat(__screenbuffer, __screenbuffer2);
+
+	strcat(__screenbuffer, slash_char); 	//-
+
+	if (now.hour < 10)
+		strcat(__screenbuffer, zero_char);
+	itoa(now.hour, __screenbuffer2, 10);
+	strcat(__screenbuffer, __screenbuffer2);
+
+	OLED_writeLine(__screenbuffer, 0);
 }
 
 //--------------------------------------------------------------------
 //
 void DIAG_showVoltage()
 {
+	strcpy(__screenbuffer, space_char);
+	strcpy(__screenbuffer2, space_char);
 
+	// date
+	if (VALUE_12V < 1000)
+		strcat(__screenbuffer, zero_char);
+	if (VALUE_12V < 100)
+		strcat(__screenbuffer, zero_char);
+	itoa(VALUE_12V, __screenbuffer2, 10);
+	strcat(__screenbuffer, __screenbuffer2);
 
+	int i;
+	for (i = 0; i < 4; i++)
+		strcat(__screenbuffer, space_char);
+	strcat(__screenbuffer, slash_char); 	//-
 
+	for (i = 0; i < 4; i++)
+		strcat(__screenbuffer, space_char);
+
+	if (VALUE_24V < 1000)
+		strcat(__screenbuffer, zero_char);
+	if (VALUE_24V < 100)
+		strcat(__screenbuffer, zero_char);
+	itoa(VALUE_24V, __screenbuffer2, 10);
+	strcat(__screenbuffer, __screenbuffer2);
+
+	OLED_writeLine(__screenbuffer, 1);
+}
+
+//--------------------------------------------------------------------
+//
+void DIAG_showBatteryTemp()
+{
+	strcpy(__screenbuffer, bt_tmp_string);
+
+	//float temp = VALUE_BAT_TEMP / 100;
+	float temp = VALUE_INTERNAL_TEMP / 100;
+	ftoa(temp, __screenbuffer2);
+
+	strcat(__screenbuffer, __screenbuffer2);
+
+	OLED_writeLine(__screenbuffer, 2);
 }
 
 //--------------------------------------------------------------------
 //
 void DIAG_showRPM()
 {
-
-
-
+	strcpy(__screenbuffer, "");
+	OLED_writeLine(__screenbuffer, 3);
 }
 
 //--------------------------------------------------------------------
@@ -300,7 +386,7 @@ void OLED_writeLine(char* chars, int line)
 //
 void clearLine(int line)
 {
-	strcpy(__screenbuffer, msg25);
+	strcpy(__screenbuffer, empty_char);
 	OLED_writeLine(__screenbuffer, line);
 }
 

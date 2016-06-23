@@ -9,27 +9,29 @@
 #include "button.h"
 #include "config.h"
 #include "Hardware.h"
+#include "Common.h"
+
 
 //--------------------------------------------------------------------
 
 void buildButtonStateMachine()
 {
-    button x = {BUTTON_nAUTO, AUTO_LED_PIN, MODE_AUTO, STATE_NOMINAL, 0, 0};
+    button x = {BUTTON_nAUTO, OUT_AUTO_LED, MODE_AUTO, STATE_NOMINAL, 0, 0};
     buttonList[0] = x;
 
-    button y = {BUTTON_nSTANDBY, STANDBY_LED_PIN, MODE_STANDBY, STATE_NOMINAL, 0, 0};
+    button y = {BUTTON_nSTANDBY, OUT_STANDBY_LED, MODE_STANDBY, STATE_NOMINAL, 0, 0};
     buttonList[1] = y;
 
-    button z = {BUTTON_nLIGHT_1H, LIGHT1H_LED_PIN, MODE_LIGHT1H, STATE_NOMINAL, 0, 0};
+    button z = {BUTTON_nLIGHT_1H, OUT_LIGHT_1H_LED, MODE_LIGHT1H, STATE_NOMINAL, 0, 0};
     buttonList[2] = z;
 
-    button a = {BUTTON_nRESET, RESET_LED_PIN, MODE_RESET, STATE_NOMINAL, 0, 0};
+    button a = {BUTTON_nRESET, OUT_RESET_LED, MODE_RESET, STATE_NOMINAL, 0, 0};
     buttonList[3] = a;
 
-    button b = {BUTTON_nDOWN, DOWN_LED_PIN, MODE_UP, STATE_NOMINAL, 0, 0};
+    button b = {BUTTON_nDOWN, OUT_DOWN_LED, MODE_UP, STATE_NOMINAL, 0, 0};
     buttonList[4] = b;
 
-    button c = {BUTTON_nUP, UP_LED_PIN, MODE_DOWN, STATE_NOMINAL, 0, 0};
+    button c = {BUTTON_nUP, OUT_UP_LED, MODE_DOWN, STATE_NOMINAL, 0, 0};
     buttonList[5] = c;
 
 
@@ -115,8 +117,8 @@ void button_stateMachine()
 		}
 	}
 
-	if ((buttonList[0].state == STATE_RELEASED && buttonList[0].Oncounts >= 50) &&
-		(buttonList[1].state == STATE_RELEASED && buttonList[1].Oncounts >= 50) &&
+	if (//(buttonList[0].state == STATE_RELEASED && buttonList[0].Oncounts >= 50) &&
+		//(buttonList[1].state == STATE_RELEASED && buttonList[1].Oncounts >= 50) &&
 		(buttonList[2].state == STATE_RELEASED && buttonList[2].Oncounts >= 50))
 	{
 		_DIAGNOSTIC_MODE = 1;

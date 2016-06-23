@@ -26,6 +26,7 @@ void Norm_showStateCode();
 void DIAG_showDate();
 void DIAG_showVoltage();
 void DIAG_showRPM();
+void DIAG_showBatteryTemp();
 
 void clearLine(int line);
 void OLED_writeLine(char* chars, int line);

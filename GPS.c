@@ -21,7 +21,7 @@
 
                               /* The following is used to buffer        */
                               /* characters read from the Debug UART.   */
-static unsigned char RecvBufferGps[GPS_UART_RX_BUFFER_SIZE];
+static int RecvBufferGps[GPS_UART_RX_BUFFER_SIZE];
 
                               /* The following are used to track the    */
                               /* Receive circular buffer.               */
@@ -30,7 +30,7 @@ static unsigned int  RxOutIndexGps;
 
 
 
-static unsigned char 	TransBufferGps[GPS_UART_TX_BUFFER_SIZE];
+static int 	TransBufferGps[GPS_UART_TX_BUFFER_SIZE];
 static unsigned int 	TxInIndexGps;
 static unsigned int 	TxOutIndexGps;
 
@@ -39,15 +39,15 @@ static const char VENUS_GGA_5SEC_REST_OFF[]		= {0xA0, 0xA1, 0x00, 0x09, 0x08, 0x
 #define  		  SIZE_VENUS_GGA_5SEC_REST_OFF 	sizeof(VENUS_GGA_5SEC_REST_OFF)
 // CS=Checksum: starting with 0 exclusive or all bytes from message ID to end of payload
 
-
-
+unsigned int GpsStateCountdown;//,TempCountdown;
+unsigned int GpsMsgOk;
 
 GpsInformation_t GpsInformation;
 
    /* Internal static function prototypes.                              */
 static unsigned int 		GetGpsIdx(unsigned int startIdx,signed int cnt);
 static void 				ResetGPSRxBuffer(void);
-static unsigned char		SendNMEACmd(void);
+static int					SendNMEACmd(void);
 
 
 
@@ -60,10 +60,52 @@ typedef enum {
 	gpsNmeaIncomplete
 } GpsNmeaDecodeState_t;
 
+//--------------------------------------------------------------------
+// INITIAL GPS
+void InitializeGPS()
+{
+	GpsStateCountdown = 50;
+	oldGPSStringsIndex = 0;
+	//TempCountdown = 100;
+    GpsMsgOk = 0;
+    P10DIR |= 0x01;
 
+    int dwdw;
+    while (GpsStateCountdown != 0)
+    {
+    	dwdw++;
+    }
 
+    	 // setup GPS module to only output the messages we want and at a reduced rate
+    if (ConfigureGPSNmeaOutput() == 0)
+    	while(1);
 
-  /* GPS UART Receive Interrupt Handler.                             	*/
+    GpsStateCountdown = 50;
+}
+
+//--------------------------------------------------------------------
+// INITIAL SETUP
+void handleGPSevent()
+{
+	if(GpsStateCountdown == 0)
+	{
+		 GpsStateCountdown = 50;
+		 if(GpsDecode() == 1)
+		 {
+			 GpsMsgOk++;
+			 _nop();
+		 }
+	}
+
+	if (GpsMsgOk == 5)
+	{
+
+	}
+
+}
+
+//--------------------------------------------------------------------
+// GPS UART Receive Interrupt Handler.
 #pragma vector=USCI_A0_VECTOR
 __interrupt void USCI_A0_ISR(void)
 {
@@ -83,7 +125,8 @@ __interrupt void USCI_A0_ISR(void)
 					// Place received character into receive buffer at index = RxInIndexZb
 					  // Note: RxInIndex starts at 1 while RxOutIndex starts at 0.
 					  //	   RxInIndex can equal but will never pass RxOutIndexZb
-					if(RxOutIndexGps != RxInIndexGps) {
+					if(RxOutIndexGps != RxInIndexGps)
+					{
 						   /* Save the character in the Receive Buffer.                   */
 					   RecvBufferGps[RxInIndexGps++] = ch;
 
@@ -97,11 +140,13 @@ __interrupt void USCI_A0_ISR(void)
 						   RxInIndexGps = GetGpsIdx(RxInIndexGps,-1);
 					   }
 					}
-					else {
+					else
+					{
 						// Buffer Overflow! We have not been able to keep up with decoding received GPS data
 
 						   // Are we actively decoding GPS
-					   if(GpsInformation.DecodingGps == FALSE) {
+					   if(GpsInformation.DecodingGps == 0)
+					   {
 						   // Not decoding so throw out old data and keep new
 						   RecvBufferGps[RxInIndexGps++] = ch;
 						   /* Wrap the buffer if neccessary.                              */
@@ -113,7 +158,7 @@ __interrupt void USCI_A0_ISR(void)
 					   else {
 						   // We are actively decoding Just throw-out what we receive
 						   // All received data is now being thrown out, set flag to reset buffer in GpsDecode()
-						   GpsInformation.BufferOverflow = TRUE;
+						   GpsInformation.BufferOverflow = 1;
 					   }
 					}
 					break;
@@ -139,13 +184,14 @@ __interrupt void USCI_A0_ISR(void)
 }
 
 
-unsigned char ConfigureGPSNmeaOutput(void) {
+int ConfigureGPSNmeaOutput(void)
+{
 
-	if( SendNMEACmd() == FALSE)
-		return(FALSE);
+	if( SendNMEACmd() == 0)
+		return(0);
 	// ADD!! could Wait for reply
 
-	return(TRUE);
+	return(1);
 }
 
 
@@ -154,21 +200,26 @@ unsigned char ConfigureGPSNmeaOutput(void) {
 // DESCRIPTION:
 //
 //
-// RETURN/UPDATES:		TRUE
+// RETURN/UPDATES:		1
 //---------------------------------------------------------------------------------------------
-static unsigned char SendNMEACmd(void) {
-unsigned int timeout;
-unsigned char idx,n,checksum;
+static int SendNMEACmd(void)
+{
+	unsigned int timeout;
+	unsigned char idx,n,checksum;
 
 		// Wait until the Transmit Interrrupt is disabled (done in Interrupts)
 	timeout = 0xffff;			// ~4-6instructions x 25MHz = ~10ms
-	while(UCA0IE &UCTXIE) {
-
-		if(--timeout == 0) {
+	while(UCA0IE &UCTXIE)
+	{
+		if(--timeout == 0)
+		{
 			__disable_interrupt();
+
 			UCA0IE &= ~UCTXIE;
 			TxOutIndexGps = TxInIndexGps = 0;
+
 			__enable_interrupt();
+
 			break;
 		}
 	}
@@ -189,9 +240,11 @@ unsigned char idx,n,checksum;
 	TransBufferGps[12] = 0x01;
 
 	idx = checksum = 0;
-	for(n=4;n<13;n++) {
+	for(n=4;n<13;n++)
+	{
 		checksum ^= TransBufferGps[idx];
 	}
+
 	TransBufferGps[13] = 0x09;//checksum;
 	TransBufferGps[14] = 0x0D;
 	TransBufferGps[15] = 0x0A;
@@ -206,7 +259,7 @@ unsigned char idx,n,checksum;
 
 	UCA0IE |= UCTXIE;
 
-	return(TRUE);
+	return(1);
 }
 
 
@@ -218,11 +271,11 @@ unsigned char idx,n,checksum;
 //								Currently negative cnts smaller than -5 not allowed
 // RETURN/UPDATES:		New index in the GPS Rx buffer = (startIdx +/- cnt)
 //---------------------------------------------------------------------------------------------
-static unsigned int GetGpsIdx(unsigned int startIdx,signed int cnt) {
-
+static unsigned int GetGpsIdx(unsigned int startIdx,signed int cnt)
+{
 	if( (startIdx >= GPS_UART_RX_BUFFER_SIZE) || (cnt >= GPS_UART_RX_BUFFER_SIZE) || (cnt < (-5)) ) {
 			// ADD!!
-		GpsInformation.BufferOverflow = TRUE;
+		GpsInformation.BufferOverflow = 1;
 		return(startIdx);
 	}
 
@@ -265,15 +318,16 @@ void ConfigureGPSSerialPort()
 
 
 
-static void ResetGPSRxBuffer(void) {
+static void ResetGPSRxBuffer(void)
+{
 	__disable_interrupt();
 	RxOutIndexGps = 0;
 	RxInIndexGps =  1;
 	RecvBufferGps[0] = 0;
 	RecvBufferGps[1] = 0;
-	GpsInformation.DecodingGps = FALSE;
-	GpsInformation.BufferOverflow = FALSE;
-	GpsInformation.ChecksumOk = FALSE;
+	GpsInformation.DecodingGps = 0;
+	GpsInformation.BufferOverflow = 0;
+	GpsInformation.ChecksumOk = 0;
 	__enable_interrupt();
 }
 
@@ -289,49 +343,51 @@ typedef enum {
 //
 //					-Checks to see if we have had a RX buffer overwrap/overflow and if so resets all buffer
 //					 parameters before exiting
-//					-Setting DecodingGPS=TRUE, tells Rx interrupt not to change RxOutIndexGps and
+//					-Setting DecodingGPS=1, tells Rx interrupt not to change RxOutIndexGps and
 //					 if the In index has wrapped to throw out new received data
 //
-// RETURN/UPDATES:	TRUE: At least one valid good GGA Fix has been decoded
-//					FALSE:No GGA decoded or one or more GGA have been decode but Fix is not good enough
+// RETURN/UPDATES:	1: At least one valid good GGA Fix has been decoded
+//					0:No GGA decoded or one or more GGA have been decode but Fix is not good enough
 //---------------------------------------------------------------------------------------------
-unsigned char  GpsDecode(void) {
-unsigned int outIndex,inIndex,endIdx,calcChecksum,checksum;
-unsigned char idx;
-GpsNmeaMessageFindState_t gpsDecodeState;
-
-
+int  GpsDecode(void)
+{
+	unsigned int outIndex,inIndex,endIdx,calcChecksum,checksum;
+	unsigned char idx;
+	GpsNmeaMessageFindState_t gpsDecodeState;
 
 	__disable_interrupt();
-		// Flag to tell interrupt not to overwite RxOutIndexGps
-	GpsInformation.DecodingGps = TRUE;
+	// Flag to tell interrupt not to overwite RxOutIndexGps
+	GpsInformation.DecodingGps = 1;
 	inIndex = RxInIndexGps;		// Copy Index to Receive buffer that have been received
 	outIndex = RxOutIndexGps;	// Copy Index to Receive buffer that we have yet to decode
 	__enable_interrupt();
 
-
-
 	idx = 0;
 	endIdx = 0;
 	gpsDecodeState = gpsFindStart;
-	while(outIndex != inIndex) {
 
-		switch(gpsDecodeState) {
-			case gpsFindStart:	if(RecvBufferGps[outIndex] == '$') {
+	while(outIndex != inIndex)
+	{
+		switch(gpsDecodeState)
+		{
+			case gpsFindStart:	if(RecvBufferGps[outIndex] == '$')
+								{
 									idx = 0;
 									GpsInformation.Message[idx] = RecvBufferGps[outIndex];
 									gpsDecodeState++;
 								}
 								break;
-			case gpsFindEnd:	if(RecvBufferGps[outIndex] == '$') {
+			case gpsFindEnd:	if(RecvBufferGps[outIndex] == '$')
+								{
 									idx = 0;
 									GpsInformation.Message[idx] = RecvBufferGps[outIndex];
 								}
-								else {
+								else
+								{
 									GpsInformation.Message[idx] = RecvBufferGps[outIndex];
 
-									if(RecvBufferGps[outIndex] == '*') {
-
+									if(RecvBufferGps[outIndex] == '*')
+									{
 										endIdx = idx - 1;
 										gpsDecodeState++;
 									}
@@ -339,24 +395,28 @@ GpsNmeaMessageFindState_t gpsDecodeState;
 								break;
 
 			case gpsGetChecksum1:
-								if(RecvBufferGps[outIndex] == '$') {
+								if(RecvBufferGps[outIndex] == '$')
+								{
 									idx = 0;
 									GpsInformation.Message[idx] = RecvBufferGps[outIndex];
 									gpsDecodeState = gpsFindEnd;
 								}
-								else {
+								else
+								{
 									GpsInformation.Message[idx] = RecvBufferGps[outIndex];
 									gpsDecodeState++;
 								}
 								break;
 
 			case gpsGetChecksum2:
-								if(RecvBufferGps[outIndex] == '$') {
+								if(RecvBufferGps[outIndex] == '$')
+								{
 									idx = 0;
 									GpsInformation.Message[idx] = RecvBufferGps[outIndex];
 									gpsDecodeState = gpsFindEnd;
 								}
-								else {
+								else
+								{
 									GpsInformation.Message[idx] = RecvBufferGps[outIndex];
 									GpsInformation.Message[++idx] = NULL;
 
@@ -365,7 +425,8 @@ GpsNmeaMessageFindState_t gpsDecodeState;
 									checksum += ( asctohex(GpsInformation.Message[idx-2]) ) << 4;
 
 									calcChecksum = 0;
-									for(idx=1; idx <= endIdx; idx++) {
+									for(idx=1; idx <= endIdx; idx++)
+									{
 										calcChecksum ^= GpsInformation.Message[idx];
 									}
 
@@ -373,12 +434,19 @@ GpsNmeaMessageFindState_t gpsDecodeState;
 									RxOutIndexGps = outIndex;	// regardless if crc matches update out buffer pointer
 									__enable_interrupt();
 
-									if(calcChecksum == checksum) {
+									if(calcChecksum == checksum)
+									{
+										oldGPSStrings[oldGPSStringsIndex] = GpsInformation;
+										oldGPSStringsIndex++;
 
-										GpsInformation.DecodingGps = FALSE;
-										return(TRUE);
+										if (oldGPSStringsIndex == 4)
+											oldGPSStringsIndex = 0;
+
+										GpsInformation.DecodingGps = 0;
+										return(1);
 									}
-									else {
+									else
+									{
 										idx = 0;
 										gpsDecodeState = gpsFindStart;
 									}
@@ -388,7 +456,8 @@ GpsNmeaMessageFindState_t gpsDecodeState;
 		} //end switch(gpsDecodeState
 
 		idx++;
-		if(idx > (GGA_MAX_EXAMPLE+6) ) {
+		if(idx > (GGA_MAX_EXAMPLE+6) )
+		{
 			// error start over
 			idx = 0;
 			gpsDecodeState = gpsFindStart;
@@ -400,13 +469,10 @@ GpsNmeaMessageFindState_t gpsDecodeState;
 			// Setup to check next byte in RecvBufferGps
 		outIndex = GetGpsIdx(outIndex,1);
 
-
 	}//end while(outIndex
 
-
-	GpsInformation.DecodingGps = FALSE;
-	return(FALSE);
-
+	GpsInformation.DecodingGps = 0;
+	return(0);
 }
 
 

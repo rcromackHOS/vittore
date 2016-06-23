@@ -21,7 +21,6 @@
 #include "Hardware.h"
 #include "msp430f5419A.h"
 #include "Common.h"
-#include "WatchdogTimerControl.h"
 #include "GPS.h"
 
 

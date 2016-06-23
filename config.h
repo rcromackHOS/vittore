@@ -43,7 +43,7 @@ extern unsigned int VALUE_12V;
 
 extern int _HIGH_SP_INTERNAL_TEMP;
 extern int _LOW_SP_INTERNAL_TEMP;
-extern float VALUE_INTERNAL_TEMP;
+extern int VALUE_INTERNAL_TEMP;
 
 //--------------------------------------------------------------------
 

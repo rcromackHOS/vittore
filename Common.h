@@ -26,22 +26,23 @@
 
 
 	// generic ASCII Hex conversions
-unsigned char 	IsAsciiDecNumber(unsigned char a);
-unsigned char 	IsAsciiNumber(unsigned char a);
-unsigned char 	asctohex(unsigned char a);
-unsigned char 	asctodec(unsigned char a);
-unsigned char 	hextoascii(unsigned char h);
+int 	IsAsciiDecNumber(unsigned char a);
+int 	IsAsciiNumber(unsigned char a);
+int 	asctohex(unsigned char a);
+int 	asctodec(unsigned char a);
+int 	hextoascii(unsigned char h);
 void 			HextoAscii(unsigned char* str, unsigned char len, unsigned char val);
+extern char *itoa(int num, char *str, int radix);
+extern void ftoa(float Value, char* Buffer);
 
-
-
-unsigned char	ConvertHexArrayToAscii(unsigned char *hexArray, unsigned int arrayLength, unsigned char *asciiString);
+int	ConvertHexArrayToAscii(unsigned char *hexArray, unsigned int arrayLength, unsigned char *asciiString);
 void 			copy_string(char *target, char *source);
 
 unsigned int 	crc(unsigned char *buf,unsigned int start, unsigned int cnt);
 
 int bcd2bin (int val);
 int bin2bcd (int val);
+
 extern int map_adc(unsigned int x, unsigned int in_min, unsigned int in_max, unsigned int out_min, unsigned int out_max);
 extern void setStateCode(int code);
 extern void clearStateCode(int code);

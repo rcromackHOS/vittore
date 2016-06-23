@@ -10,6 +10,8 @@ lcd.obj: C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include/intrinsics
 lcd.obj: ../config.h
 lcd.obj: ../timeDate.h
 lcd.obj: ../Hardware.h
+lcd.obj: ../Common.h
+lcd.obj: C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include/stdbool.h
 lcd.obj: C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include/string.h
 lcd.obj: C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include/linkage.h
 
@@ -23,5 +25,7 @@ C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include/intrinsics_legacy_u
 ../config.h: 
 ../timeDate.h: 
 ../Hardware.h: 
+../Common.h: 
+C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include/stdbool.h: 
 C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include/string.h: 
 C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include/linkage.h: 

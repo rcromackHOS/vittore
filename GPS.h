@@ -32,10 +32,10 @@
 
 typedef struct //_gpsInformation_t
 {
-	unsigned char			DecodingGps;
-	unsigned char			BufferOverflow;
-	unsigned char			ChecksumOk;
-	unsigned char			Message[127];
+	int			DecodingGps;
+	int			BufferOverflow;
+	int			ChecksumOk;
+	int			Message[127];
 	//Put rest of GPS variables here
 
 } GpsInformation_t;
@@ -45,16 +45,21 @@ typedef struct //_gpsInformation_t
 extern GpsInformation_t GpsInformation;
 //#endif
 
+extern unsigned int GpsStateCountdown;//,TempCountdown;
 
+GpsInformation_t oldGPSStrings[4];
+int oldGPSStringsIndex;
 
+extern void InitializeGPS();
+extern void handleGPSevent();
 
 extern void 		ConfigureGPSSerialPort();
 void 				GpsStateZero(void);
 void 				GpsStateMachine(void);
 
 
-extern unsigned char 		ConfigureGPSNmeaOutput(void);
-extern unsigned char 		GpsDecode(void);
+extern int 		ConfigureGPSNmeaOutput(void);
+extern int 		GpsDecode(void);
 
 #endif
 

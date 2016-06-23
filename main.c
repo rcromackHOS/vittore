@@ -21,7 +21,7 @@
 #include "Common.h"
 #include "WatchdogTimerControl.h"
 #include "AtoD.h"
-
+#include "GPS.h"
 #include "timeDate.h"
 #include "engineController.h"
 #include "lcd.h"
@@ -41,12 +41,11 @@ void handle_minuteEvents();
 
 int setLightsState(int s);
 
-void handle_failEvent();
+void handleSystemFailEvent();
 void handleLowFuelEvent();
 void handle_lighting();
 void resetControl();
 
-int RTC_init();
 void handle_unitModeIndicator();
 void handleCabinetHeating();
 
@@ -159,8 +158,6 @@ int main()
 
     InitializeHardware();
 
-    ConfigureA2D();
-
 	InitializeRTC();
 
     buildButtonStateMachine();
@@ -169,7 +166,9 @@ int main()
 
     InitializeEngine();
 
-	//InitializeSolar();
+    InitializeGPS();
+
+    //InitializeSolar();
 
     // -------------------------- default values
 
@@ -188,6 +187,7 @@ int main()
 	sunSet = solar_getSunset(now);
 	sunRise = solar_getSunrise(now);
 	*/
+
 	// --------------------------
 
 	_UNIT_MODE = MODE_AUTO;
@@ -206,7 +206,8 @@ int main()
 		BATTERY_STATUS,
 		ENGINE_ANALYSIS,
 		ENGINE_STATUS,
-		GENERAL_INDICATORS,
+		CHECK_GPS,
+		GENERAL_EVENTS,
 		HANDLE_UNITMODES,
 		UPDATE_SCREEN,
 		_SYS_FAILURE__RESET
@@ -300,12 +301,19 @@ int main()
 				state_system++;
 				break;
 
-			case GENERAL_INDICATORS:
+			case CHECK_GPS:
+
+				handleGPSevent();
+
+				state_system++;
+				break;
+
+			case GENERAL_EVENTS:
 
 				handleSystemFailEvent();
 				handleLowFuelEvent();
-				handle_oilchangeClear();
 
+				handle_oilchangeClear();
 				handleCabinetHeating();
 
 				state_system++;
@@ -327,7 +335,11 @@ int main()
 
 				if (_SCREEN_UPDATE_D == 0)
 				{
-					_SCREEN_UPDATE_D = 3;
+					if (_DIAGNOSTIC_MODE != 1)
+						_SCREEN_UPDATE_D = 3;
+					else
+						_SCREEN_UPDATE_D = 1;
+
 					updateDisplay();
 				}
 
@@ -358,6 +370,14 @@ __interrupt void Timer_A (void)
    if (tmrCnt % 100 == 0)
 	   checkMask |= 0x2;
 
+   // count GPS state
+   if (GpsStateCountdown != 0)
+	   GpsStateCountdown--;
+
+   // temp countdown
+   if (TempCountdown != 0)
+	   TempCountdown--;
+
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------
@@ -375,15 +395,6 @@ void handle_unitModeIndicator()
 			P4OUT &= ~buttonList[i].LEDpin;
 	}
 	P4OUT &= ~BIT0;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------
-// Initialize the GPS
-//
-int GPS_init(void)
-{
-
-	return 1;
 }
 
 //--------------------------------------------------------------------

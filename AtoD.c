@@ -19,19 +19,20 @@
 #include "Hardware.h"
 #include "AtoD.h"
 #include "config.h"
-#include "Common.h"
 
-#define CALADC12_15V_30C  *((unsigned int *)0x1A1A)   // Temperature Sensor Calibration-30 C
+#define CALADC12_15V_30C  *((unsigned int *)0x1A22)   // Temperature Sensor Calibration-30 C
                                                       //See device datasheet for TLV table memory mapping
-#define CALADC12_15V_85C  *((unsigned int *)0x1A1C)   // Temperature Sensor Calibration-85 C
+#define CALADC12_15V_85C  *((unsigned int *)0x1A24)   // Temperature Sensor Calibration-85 C
 
 AtoDInputs_t AtoDInput;
 unsigned int ADC[9];
-
+int TempCountdown = 0;
 
 #pragma vector = ADC12_VECTOR
-__interrupt void ADC12_ISR(void) {
-	switch(__even_in_range(ADC12IV,34)){
+__interrupt void ADC12_ISR(void)
+{
+	switch(__even_in_range(ADC12IV,34))
+	{
 		case  0: break;									// Vector  0:  No interrupt
 		case  2: break;									// Vector  2:  ADC overflow
 		case  4: break;									// Vector  4:  ADC timing overflow
@@ -68,7 +69,12 @@ __interrupt void ADC12_ISR(void) {
 }
 
 
-void ConfigureA2D(void) {
+void ConfigureA2D(void)
+{
+
+	TempCountdown = 100;
+
+	// --------------------------
 
 	P6SEL |= (AD_P_BATTERY_PIN + AD_N_BATTERY_PIN + AD_P_ENGINE_VER_PIN + AD_N_ENGINE_VER_PIN + AD_P_ENGINE_CUR_PIN + AD_N_ENGINE_CUR_PIN + AD_12V_MONITOR_PIN);
 	P7SEL |= AD_24V_MONITOR_PIN;
@@ -80,6 +86,7 @@ void ConfigureA2D(void) {
 	ADC12CTL0 = ADC12SHT0_10 + ADC12MSC + ADC12ON;		// sample&hold 512 cycles,Multiple sample/conversions,2.5V reference,Turn on ADC12_A
 	ADC12CTL1 = ADC12SHP + ADC12SSEL_1 + ADC12CONSEQ_3;		 							// start at MEM0,Use sampling timer, ACLK as source, repeated sequence
 
+
 	ADC12MCTL0 = ADC12SREF_1 + ADC12INCH_0;				// VREF+ to AVss, Input channel A0
 	ADC12MCTL1 = ADC12SREF_1 + ADC12INCH_1;
 	ADC12MCTL2 = ADC12SREF_1 + ADC12INCH_2;
@@ -90,20 +97,6 @@ void ConfigureA2D(void) {
 	ADC12MCTL7 = ADC12SREF_1 + ADC12INCH_15;
 	ADC12MCTL8 = ADC12SREF_1 + ADC12INCH_10 + ADC12EOS;	// Internal Temp Sensor, end of sequence of conversions
 
-/*
-		ADC12MCTL0 = ADC12INCH_0;				// VREF+ to AVss, Input channel A0
-		ADC12MCTL1 = ADC12INCH_1;
-		ADC12MCTL2 = ADC12INCH_2;
-		ADC12MCTL3 = ADC12INCH_3;
-		ADC12MCTL4 = ADC12INCH_4;
-		ADC12MCTL5 = ADC12INCH_5;
-		ADC12MCTL6 = ADC12INCH_6;
-		ADC12MCTL7 = ADC12INCH_15;
-		ADC12MCTL8 = ADC12INCH_10 + ADC12EOS;	// Internal Temp Sensor, end of sequence of conversions
-*/
-
-	//ADC12CTL2 = ADC12RES_2;								// Enable internal temperature sensor, 12bit ADC
-
 	ADC12IFG = 0;
 	ADC12IE |= ADC12IE8;								// Enable interrupt on last A/D reading of sequence
 
@@ -111,7 +104,7 @@ void ConfigureA2D(void) {
 	ADC12CTL0 |= ADC12SC;				   				// Start sampling/conversion
 }
 
-
+//--------------------------------------------------------------------
 float ConvertInternalTempToCelcius(unsigned int rawCount)
 {
 	float temperatureDegC;
@@ -130,41 +123,16 @@ float ConvertInternalTempToCelcius(unsigned int rawCount)
     return(temperatureDegC);
 }
 
+//--------------------------------------------------------------------
+//
 void loadAnalogData()
 {
+	 if	(TempCountdown == 0)
+	 {
+		 TempCountdown = 100;
 
-	//VALUE_24V = ADC[AD_P_BATTERY_VLT];
-	//VALUE_PCB_24V = ADC[AD_24V_POWER_VLT];
-
-	/*
-	v12_total = v12_total - v12_readings[v12_index];
-	v12_readings[v12_index] = ADC[AD_12V_BATTERY_VLT];
-	v12_total = v12_total + v12_readings[v12_index];
-	v12_index = v12_index + 1;
-
-	if (v12_index >= 20)
-		v12_index = 0;
-	*/
-	VALUE_12V = ADC[AD_12V_BATTERY_VLT];
-
-	//----------------------------------------------
-	/*
-	iT_total = iT_total - iT_readings[iT_index];
-	iT_readings[iT_index] = ADC[AD_INTERNAL_TEMP];
-	iT_total = iT_total + iT_readings[iT_index];
-	iT_index = iT_index + 1;
-
-	if (iT_index >= 20)
-		iT_index = 0;
-	*/
-	VALUE_INTERNAL_TEMP = ConvertInternalTempToCelcius(ADC[AD_INTERNAL_TEMP]);
-
-	//----------------------------------------------
-
-	// 24v Max = 253v. BAORD24V = map( (iT_total / 20), 0, 4095, 0, 253);
-
+		 VALUE_INTERNAL_TEMP = ConvertInternalTempToCelcius(ADC[AD_INTERNAL_TEMP]) * 100;
+	 }
 }
-
-
 
 #endif

@@ -10,8 +10,6 @@ AtoD.obj: ../Hardware.h
 AtoD.obj: ../AtoD.h
 AtoD.obj: ../config.h
 AtoD.obj: ../timeDate.h
-AtoD.obj: ../Common.h
-AtoD.obj: C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include/stdbool.h
 
 ../AtoD.c: 
 C:/ti/ccsv6/ccs_base/msp430/include/msp430.h: 
@@ -23,5 +21,3 @@ C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include/intrinsics_legacy_u
 ../AtoD.h: 
 ../config.h: 
 ../timeDate.h: 
-../Common.h: 
-C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include/stdbool.h: 

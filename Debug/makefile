@@ -12,6 +12,7 @@ GEN_CMDS__FLAG :=
 ORDERED_OBJS += \
 "./AtoD.obj" \
 "./Common.obj" \
+"./GPS.obj" \
 "./Hardware.obj" \
 "./MCP7940N.obj" \
 "./WatchdogTimerControl.obj" \
@@ -166,8 +167,8 @@ vittore.hex: $(EXE_OUTPUTS)
 # Other Targets
 clean:
 	-$(RM) $(EXE_OUTPUTS__QUOTED)$(BIN_OUTPUTS__QUOTED)
-	-$(RM) "AtoD.d" "Common.d" "Hardware.d" "MCP7940N.d" "WatchdogTimerControl.d" "bms.d" "button.d" "config.d" "engineController.d" "lcd.d" "main.d" "solar.d" "timeDate.d" 
-	-$(RM) "AtoD.obj" "Common.obj" "Hardware.obj" "MCP7940N.obj" "WatchdogTimerControl.obj" "bms.obj" "button.obj" "config.obj" "engineController.obj" "lcd.obj" "main.obj" "solar.obj" "timeDate.obj" 
+	-$(RM) "AtoD.d" "Common.d" "GPS.d" "Hardware.d" "MCP7940N.d" "WatchdogTimerControl.d" "bms.d" "button.d" "config.d" "engineController.d" "lcd.d" "main.d" "solar.d" "timeDate.d" 
+	-$(RM) "AtoD.obj" "Common.obj" "GPS.obj" "Hardware.obj" "MCP7940N.obj" "WatchdogTimerControl.obj" "bms.obj" "button.obj" "config.obj" "engineController.obj" "lcd.obj" "main.obj" "solar.obj" "timeDate.obj" 
 	-@echo 'Finished clean'
 	-@echo ' '
 

@@ -18,16 +18,28 @@
 #include <msp430.h>        /* Compiler specific Chip header.                  */
 #include "Hardware.h"
 #include "AtoD.h"
+#include "GPS.h"
 
-void InitializeHardware(void) {
+static void ConfigurePins(void);
+static void ConfigureCrystals(void);
+static void ConfigureTimerA1(void);
+static void StopTimerA1(void);
+static void SetVcoreUp (unsigned int level);
 
+
+void InitializeHardware(void)
+{
 	ConfigurePins();
 	ConfigureCrystals();
 	ConfigureA2D();
+	//ConfigureTimerA1();
+
+	ConfigureGPSSerialPort();
 
 	//Add I2C, UARTS, SPI, General Timer,
 
 }
+
 
 static void ConfigurePins(void) {
 	// unconnected pins should be set to Output with REN enabled
@@ -48,24 +60,21 @@ static void ConfigurePins(void) {
 	P2IES =  BUTTON_nOIL_RST;
 	P2IE = 0;
 
-	//P3DIR = BIT0 + BIT3 + OUT_LIGHTS_ON;
 	P3DIR = BIT0 + BIT3 + OUT_LIGHTS_ON + LCD_SPI_SIMO;
 	P3OUT = BIT0 + BIT3;
 	P3REN = BIT0 + BIT3;
 	P3DS = 0;
 	P3SEL = 0; 	//enable peripherals individually
 
-	P4DIR = RESET_LED_PIN + LIGHT1H_LED_PIN + AUTO_LED_PIN + STANDBY_LED_PIN + DOWN_LED_PIN + UP_LED_PIN;
+
+	P4DIR = OUT_RESET_LED + OUT_LIGHT_1H_LED + OUT_AUTO_LED + OUT_STANDBY_LED + OUT_DOWN_LED + OUT_UP_LED;
 	P4OUT = 0;
 	P4REN = 0;
 	P4DS = 0;
 	P4SEL = 0;
 
-	//P5DIR = BIT0 + BIT1 + LCD_SPI_RESET;
-	//P5OUT = BIT0 + BIT1;
 	P5DIR = BIT0 + BIT1 + LCD_SPI_RESET + LCD_SPI_SCK;
 	P5OUT = BIT0 + BIT1;
-
 	P5REN = BIT0 + BIT1;
 	P5DS = 0;
 	P5SEL = 0; //enable peripherals individually
@@ -115,17 +124,16 @@ static void ConfigurePins(void) {
 //
 // RETURN/UPDATES:	n/a
 //---------------------------------------------------------------------------------------------
+static void ConfigureCrystals(void) {
 
-static void ConfigureCrystals(void)
-{
 	// Verify!!
 	SetVcoreUp(PMMCOREV_1);
-	SetVcoreUp(PMMCOREV_2);                     // Set VCore to 1.8MHz for 20MHz
+	SetVcoreUp(PMMCOREV_2);                     	// Set VCore to 1.8MHz for 20MHz
 
 	P5SEL |= (XTAL_12MHZ_IN + XTAL_12MHZ_OUT);			// XT2 pins 12MHz
 	P7SEL |= XTAL_32kHZ_IN + XTAL_32kHZ_OUT;			// XT1 pins 32kHz
 
-	UCSCTL6 &= ~(XT1OFF + XT2OFF);            	// Set XT1 & XT2 ON
+	UCSCTL6 &= ~(XT1OFF + XT2OFF);            		// Set XT1 & XT2 ON
 
 	UCSCTL6 |= XCAP_3;
 
@@ -133,9 +141,9 @@ static void ConfigureCrystals(void)
 	do
 	{
 		UCSCTL7 &= ~(XT2OFFG + XT1LFOFFG + XT1HFOFFG + DCOFFG);
-											// Clear XT2,XT1,DCO fault flags
-		SFRIFG1 &= ~OFIFG;                      // Clear fault flags
-	}while (SFRIFG1&OFIFG);                   // Test oscillator fault flag
+													// Clear XT2,XT1,DCO fault flags
+		SFRIFG1 &= ~OFIFG;                    		// Clear fault flags
+	}while (SFRIFG1&OFIFG);                   		// Test oscillator fault flag
 
 	UCSCTL6 &= ~XT2DRIVE1;							// XT2 drive 1 (01)
 
@@ -145,6 +153,25 @@ static void ConfigureCrystals(void)
 }
 
 
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:		-Setup TimerA1 to continually count up to TA1CCR0, interrupt then start over
+//
+// RETURN/UPDATES:	n/a
+//---------------------------------------------------------------------------------------------
+void ConfigureTimerA1(void)
+{
+	StopTimerA1();
+	TA1CCTL0 = CCIE;									// CCR0 interrupt enabled
+	TA1CCR0 = 328;										// 10ms/32.768kHz = 328
+	TA1CTL = TASSEL_1 + MC_1 + TACLR;					// ACLK, upmode, clear TAR
+}
+
+static void StopTimerA1(void) {
+		TA1CTL = 0;
+}
+
+//--------------------------------------------------------------------
+// INITIAL GPS
 static void SetVcoreUp (unsigned int level)
 {
   // Open PMM registers for write
@@ -170,64 +197,6 @@ static void SetVcoreUp (unsigned int level)
 
 
 
-
-
-
-
-/*
-void ConfigureRTC(void) {
-
-	RTCCTL01 = RTCTEV_3;
-	RTCPS0CTL = RT0PSDIV_7;								// Set RTPS0 to /256
-	RTCPS1CTL = RT1IP_6 + RT1PSIE + RT1SSEL_3;			// Set RT1IP to /4, enable
-
-}
-*/
-
-
-/*
-void startTimerA1 (void) {
-	TA1CCTL0 = CCIE;									// CCR0 interrupt enabled
-	TA1CCR0 = 1640;
-	TA1CTL = TASSEL_1 + MC_2 + TACLR;					// ACLK, contmode, clear TAR
-}
-
-void stopTimerA1 (void) {
-		TA1CTL = 0;
-}
-
-
-void initSerialComProtocol()
-{
-	queueInit(&inputQueue, MAX_SERIAL_INPUT_BUFFER, inputSerialBuffer);
-
-	UCA1CTL1 |= UCSWRST;					  			// **Put state machine in reset**
-
-	UCA1CTL1 |= UCSSEL_1;					 			// CLK = ACLK
-	UCA1BR0 = 0x03;						   				// 32kHz/9600=3.41 (see User's Guide)
-	UCA1BR1 = 0x00;						   				//
-	UCA1MCTL = UCBRS_3+UCBRF_0;			   				// Modulation UCBRSx=3, UCBRFx=0
-
-	UCA1CTL1 &= ~UCSWRST;					 			// **Initialize USCI state machine**
-	UCA1IE |= UCRXIE;						 			// Enable USCI_A0 RX interrupt
-}
-
-
-#pragma vector=USCI_A1_VECTOR
-__interrupt void USCI_A1_ISR(void)
-{
-	switch(__even_in_range(UCA1IV,4))
-	{
-		case 0:break;									// Vector 0 - no interrupt
-		case 2:								   			// Vector 2 - RXIFG
-			enQueue(&inputQueue, UCA1RXBUF);
-		break;
-		case 4:break;									// Vector 4 - TXIFG
-		default: break;
-	}
-}
-
-*/
 
 
 

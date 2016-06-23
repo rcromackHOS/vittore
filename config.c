@@ -29,7 +29,7 @@ int _ADCs_UPDATED_	=			0;
 
 int _HIGH_SP_INTERNAL_TEMP = 	1000;
 int _LOW_SP_INTERNAL_TEMP = 	100;
-float VALUE_INTERNAL_TEMP = 	0;
+int VALUE_INTERNAL_TEMP = 		0;
 
  int _HIGH_SP_RPM = 			3900;
  int _LOW_SP_RPM = 	 			1000;
