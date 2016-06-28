@@ -291,23 +291,8 @@ void set_Engine_State(int mode)
 				engine.lastRunEnd = datetime( 0, 0, 0, 0, 0, 0 );
 
 				setStateCode(41);
-			}
-		   	else
-			{
-				engine.runTime++;					    // increment seconds of running
-				if (engine.runTime % 60 == 0)			// every 60 seconds, increment minutes
-				{
-					engine.engineMins++;
 
-					if (engine.engineMins == 60)		// every 60 minutes increment hours
-					{
-						engine.engineHours++;
-						engine.engineMins = 0;
-						// write hours to EEPROM
-					}
-
-					// write minutes to EEPROM
-				}
+				engine.runTime=1;
 			}
 
 			P2OUT |= OUT_ENGINE_ACC;
@@ -337,6 +322,26 @@ void set_Engine_State(int mode)
 		   break;
 
 
+	}
+}
+
+//--------------------------------------------------------------------
+//
+void runTime()
+{
+	// increment seconds of running
+	if (engine.runTime % 60 == 0)			// every 60 seconds, increment minutes
+	{
+		engine.engineMins++;
+
+		if (engine.engineMins == 60)		// every 60 minutes increment hours
+		{
+			engine.engineHours++;
+			engine.engineMins = 0;
+			// write hours to EEPROM
+		}
+
+		// write minutes to EEPROM
 	}
 }
 

@@ -34,6 +34,7 @@ int 	hextoascii(unsigned char h);
 void 			HextoAscii(unsigned char* str, unsigned char len, unsigned char val);
 extern char *itoa(int num, char *str, int radix);
 extern void ftoa(float Value, char* Buffer);
+extern char *dtostrf (double val, signed char width, unsigned char prec, char *sout);
 
 int	ConvertHexArrayToAscii(unsigned char *hexArray, unsigned int arrayLength, unsigned char *asciiString);
 void 			copy_string(char *target, char *source);

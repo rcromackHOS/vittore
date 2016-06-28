@@ -45,7 +45,7 @@ void handle_oilchangeClear();
 int checkOilPressure();
 int checkEngineRPMs();
 int checkEngineTemp();
-
+void runTime();
 int store_idleTime();
 
 //--------------------------------------------------------------------

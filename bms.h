@@ -13,7 +13,7 @@
 
 //--------------------------------------------------------------------
 
-void check_BatteryBox_Status();
+extern void check_BatteryBox_Status(void);
 
 int setContactor(int s);
 int setBatteryHeater(int s);

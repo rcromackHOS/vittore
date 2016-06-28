@@ -10,6 +10,7 @@
 #include "Hardware.h"
 #include "Common.h"
 #include "string.h"
+#include "stdio.h"
 
 //--------------------------------------------------------------------
 
@@ -42,37 +43,48 @@ const char msg21[] = {"Sunrise:    "};
 const char msg22[] = {"Sunset:     "};
 const char msg23[] = {"Lat:         "};
 const char msg24[] = {"Lng:         "};
-const char empty_char[] = {"                    "};
+const char emptyLine_char[] = {"                    "};
+const char empty_char[] = {""};
 const char slash_char[] = {"/"};
 const char space_char[] = {" "};
 const char zero_char[] = {"0"};
-const char bt_tmp_string[] = {"Battery Temp:  "};
-						    // {"    Bank Charging   "};
-const char* const messages[] = {
-msg1,
-msg2,
-msg3,
-msg4,
-msg5,
-msg6,
-msg7,
-msg8,
-msg9,
-msg10,
-msg11,
-msg12,
-msg13,
-msg14,
-msg15,
-msg16,
-msg17,
-msg18,
-msg19,
-msg20,
-msg21,
-msg22,
-msg23,
-msg24
+const char colon_char[] = {":"};
+const char VOLT_char[] = {" V"};
+const char bt_tmp_string[] =  {"Battery Temp:  "};
+const char int_tmp_string[] = {"Internal Temp: "};
+
+const char enghrs_string[] = {"Engine Hours: "};
+const char oilchange_string[] = {"Oil Change Due:  "};
+const char RPM_string[] =     {"Engine RPMs:    "};
+const char runtime_string[] = {"Engine Runtime: "};
+
+//                            {"    Bank Charging   "};
+const char* const messages[] =
+{
+	msg1,
+	msg2,
+	msg3,
+	msg4,
+	msg5,
+	msg6,
+	msg7,
+	msg8,
+	msg9,
+	msg10,
+	msg11,
+	msg12,
+	msg13,
+	msg14,
+	msg15,
+	msg16,
+	msg17,
+	msg18,
+	msg19,
+	msg20,
+	msg21,
+	msg22,
+	msg23,
+	msg24
 };
 
 const char li0[] = "  HORIZON OILFIELD  ";
@@ -103,33 +115,36 @@ void updateDisplay()
 			DIAG_showDate();
 			DIAG_showVoltage();
 			DIAG_showBatteryTemp();
-			DIAG_showRPM();
+			DIAG_showInternalTemp();
 		}
 		else if (_DIAGNOSTIC_PAGE == 1)
 		{
-
+			DIAG_showEngineHours();
+			DIAG_showRPM();
+			DIAG_showRuntime();
 		}
 		else if (_DIAGNOSTIC_PAGE == 2)
 		{
-
+			DIAG_showSunRiseSet();
+			DIAG_showLatLong();
 		}
 		else if (_DIAGNOSTIC_PAGE == 3)
 		{
-
+			OLED_clearDisplay();
 		}
 	}
 	else
 	{
 		Norm_showCompanyName();
+		clearLine(2);
 
 		toggle_screen_msg = ~toggle_screen_msg;
 
-		if (toggle_screen_msg == 0)
+		if (toggle_screen_msg == 0 || _STATE_CODE == 0)
 			Norm_showMode();
 
 		if (toggle_screen_msg != 0 && _STATE_CODE > 0)
 			Norm_showStateCode();
-
 
 	}
 
@@ -256,12 +271,10 @@ const char msg11[] = {"Aquiring Satellites "};
 //
 void DIAG_showDate()
 {
-	strcpy(__screenbuffer, space_char);
+	strcpy(__screenbuffer, "");
 
 	// date
-	if (now.day < 10)
-		strcat(__screenbuffer, zero_char);
-	itoa(now.day, __screenbuffer2, 10);
+	itoa(now.year, __screenbuffer2, 10);
 	strcat(__screenbuffer, __screenbuffer2);
 
 	strcat(__screenbuffer, slash_char); 	//-
@@ -273,12 +286,14 @@ void DIAG_showDate()
 
 	strcat(__screenbuffer, slash_char); 	//-
 
-	itoa(now.year - 2000, __screenbuffer2, 10);
+	if (now.day < 10)
+		strcat(__screenbuffer, zero_char);
+	itoa(now.day, __screenbuffer2, 10);
 	strcat(__screenbuffer, __screenbuffer2);
 
 	// space
 	int i;
-	for (i = 0; i < 3; i++)
+	for (i = 0; i < 2; i++)
 		strcat(__screenbuffer, space_char);
 
 	// time
@@ -287,14 +302,14 @@ void DIAG_showDate()
 	itoa(now.second, __screenbuffer2, 10);
 	strcat(__screenbuffer, __screenbuffer2);
 
-	strcat(__screenbuffer, slash_char); 	//-
+	strcat(__screenbuffer, colon_char); 	//-
 
 	if (now.minute < 10)
 		strcat(__screenbuffer, zero_char);
 	itoa(now.minute, __screenbuffer2, 10);
 	strcat(__screenbuffer, __screenbuffer2);
 
-	strcat(__screenbuffer, slash_char); 	//-
+	strcat(__screenbuffer, colon_char); 	//-
 
 	if (now.hour < 10)
 		strcat(__screenbuffer, zero_char);
@@ -308,31 +323,41 @@ void DIAG_showDate()
 //
 void DIAG_showVoltage()
 {
-	strcpy(__screenbuffer, space_char);
-	strcpy(__screenbuffer2, space_char);
+	strcpy(__screenbuffer, empty_char);
+	strcpy(__screenbuffer2, empty_char);
+	int i = 0;
 
 	// date
 	if (VALUE_12V < 1000)
 		strcat(__screenbuffer, zero_char);
 	if (VALUE_12V < 100)
 		strcat(__screenbuffer, zero_char);
-	itoa(VALUE_12V, __screenbuffer2, 10);
+
+	float d12 = (double)VALUE_12V / 100;
+	sprintf(__screenbuffer2, "%f", d12);
+	__screenbuffer2[5] = '\0';
 	strcat(__screenbuffer, __screenbuffer2);
 
-	int i;
-	for (i = 0; i < 4; i++)
-		strcat(__screenbuffer, space_char);
-	strcat(__screenbuffer, slash_char); 	//-
+	strcat(__screenbuffer, VOLT_char); 	// V
 
-	for (i = 0; i < 4; i++)
+	for (i = 0; i < 3; i++)
+		strcat(__screenbuffer, space_char);
+	strcat(__screenbuffer, slash_char); 	// -
+
+	for (i = 0; i < 2; i++)
 		strcat(__screenbuffer, space_char);
 
 	if (VALUE_24V < 1000)
 		strcat(__screenbuffer, zero_char);
 	if (VALUE_24V < 100)
 		strcat(__screenbuffer, zero_char);
-	itoa(VALUE_24V, __screenbuffer2, 10);
+
+	d12 = (double)VALUE_24V / 100;
+	sprintf(__screenbuffer2, "%f", d12);
+	__screenbuffer2[5] = '\0';
 	strcat(__screenbuffer, __screenbuffer2);
+
+	strcat(__screenbuffer, VOLT_char); 	// V
 
 	OLED_writeLine(__screenbuffer, 1);
 }
@@ -342,11 +367,45 @@ void DIAG_showVoltage()
 void DIAG_showBatteryTemp()
 {
 	strcpy(__screenbuffer, bt_tmp_string);
+	strcpy(__screenbuffer2, "");
 
-	//float temp = VALUE_BAT_TEMP / 100;
-	float temp = VALUE_INTERNAL_TEMP / 100;
-	ftoa(temp, __screenbuffer2);
+	float dtemp = (double)VALUE_BAT_TEMP / 100;
+	sprintf(__screenbuffer2, "%f", dtemp);
 
+	strcat(__screenbuffer, __screenbuffer2);
+
+	OLED_writeLine(__screenbuffer, 2);
+}
+
+
+//--------------------------------------------------------------------
+//
+void DIAG_showInternalTemp()
+{
+	strcpy(__screenbuffer, int_tmp_string);
+
+	float dtemp = (double)VALUE_INTERNAL_TEMP / 100;
+	sprintf(__screenbuffer2, "%f", dtemp);
+
+	strcat(__screenbuffer, __screenbuffer2);
+
+	OLED_writeLine(__screenbuffer, 3);
+}
+
+//--------------------------------------------------------------------
+//
+void DIAG_showRPM()
+{
+	strcpy(__screenbuffer, RPM_string);
+
+	if (VALUE_RPM < 1000)
+		strcat(__screenbuffer, space_char);
+	if (VALUE_RPM < 100)
+		strcat(__screenbuffer, space_char);
+	if (VALUE_RPM < 10)
+		strcat(__screenbuffer, space_char);
+
+	itoa(VALUE_RPM, __screenbuffer2, 10);
 	strcat(__screenbuffer, __screenbuffer2);
 
 	OLED_writeLine(__screenbuffer, 2);
@@ -354,20 +413,140 @@ void DIAG_showBatteryTemp()
 
 //--------------------------------------------------------------------
 //
-void DIAG_showRPM()
+void DIAG_showEngineHours()
 {
-	strcpy(__screenbuffer, "");
+	strcpy(__screenbuffer, enghrs_string);
+
+	if (engine.engineHours < 1000)
+		strcat(__screenbuffer, space_char);
+	if (engine.engineHours < 100)
+		strcat(__screenbuffer, space_char);
+//	if (engine.engineHours < 10)
+//		strcat(__screenbuffer, space_char);
+
+	itoa(engine.engineHours, __screenbuffer2, 10);
+	strcat(__screenbuffer, __screenbuffer2);
+
+	strcat(__screenbuffer, colon_char);
+
+	if (engine.engineMins < 10)
+		strcat(__screenbuffer, zero_char);
+
+	strcpy(__screenbuffer2, "");
+	itoa(engine.engineMins, __screenbuffer2, 10);
+	strcat(__screenbuffer, __screenbuffer2);
+
+	OLED_writeLine(__screenbuffer, 0);
+
+	strcpy(__screenbuffer, oilchange_string);
+
+	itoa(_OILCHANGE_DUE, __screenbuffer2, 10);
+	strcat(__screenbuffer, __screenbuffer2);
+
+	OLED_writeLine(__screenbuffer, 1);
+
+}
+
+//--------------------------------------------------------------------
+//
+void DIAG_showRuntime()
+{
+	strcpy(__screenbuffer, runtime_string);
+
+	int fuck;
+	fuck = (int)engine.runTime / 60;
+
+	if (fuck < 1000)
+		strcat(__screenbuffer, space_char);
+	if (fuck < 100)
+		strcat(__screenbuffer, space_char);
+	if (fuck < 10)
+		strcat(__screenbuffer, space_char);
+
+	itoa(fuck, __screenbuffer2, 10);
+	strcat(__screenbuffer, __screenbuffer2);
+
 	OLED_writeLine(__screenbuffer, 3);
 }
 
 //--------------------------------------------------------------------
 //
-//void DIAG_show12v()
-//{
+void DIAG_showSunRiseSet()
+{
+	timeStruct ss = sunSet;
+	timeStruct sr = sunRise;
 
+	strcpy(__screenbuffer, msg22);
 
+	if (ss.hour < 10)
+		strcat(__screenbuffer, zero_char);
+	itoa(ss.hour, __screenbuffer2, 10);
+	strcat(__screenbuffer, __screenbuffer2);
 
-//}
+	strcat(__screenbuffer, colon_char); 	//-
+
+	if (ss.minute < 10)
+		strcat(__screenbuffer, zero_char);
+	itoa(ss.minute, __screenbuffer2, 10);
+	strcat(__screenbuffer, __screenbuffer2);
+
+	strcat(__screenbuffer, colon_char); 	//-
+
+	strcat(__screenbuffer, zero_char);
+	strcat(__screenbuffer, zero_char);
+
+	OLED_writeLine(__screenbuffer, 1);
+
+	//
+
+	strcpy(__screenbuffer, msg21);
+
+	if (sr.hour < 10)
+		strcat(__screenbuffer, zero_char);
+	itoa(sr.hour, __screenbuffer2, 10);
+	strcat(__screenbuffer, __screenbuffer2);
+
+	strcat(__screenbuffer, colon_char); 	//-
+
+	if (sr.minute < 10)
+		strcat(__screenbuffer, zero_char);
+	itoa(sr.minute, __screenbuffer2, 10);
+	strcat(__screenbuffer, __screenbuffer2);
+
+	strcat(__screenbuffer, colon_char); 	//-
+
+	strcat(__screenbuffer, zero_char);
+	strcat(__screenbuffer, zero_char);
+
+	OLED_writeLine(__screenbuffer, 0);
+
+}
+
+//--------------------------------------------------------------------
+//
+void DIAG_showLatLong()
+{
+	strcpy(__screenbuffer, msg23);
+
+	float l = lat;
+	sprintf(__screenbuffer2, "%f", l);
+
+	strcat(__screenbuffer, __screenbuffer2);
+
+	OLED_writeLine(__screenbuffer, 2);
+
+	//
+
+	strcpy(__screenbuffer, msg24);
+
+	l = lng;
+	sprintf(__screenbuffer2, "%f", l);
+
+	strcat(__screenbuffer, __screenbuffer2);
+
+	OLED_writeLine(__screenbuffer, 3);
+}
+
 
 //====================================================================
 //
@@ -386,7 +565,7 @@ void OLED_writeLine(char* chars, int line)
 //
 void clearLine(int line)
 {
-	strcpy(__screenbuffer, empty_char);
+	strcpy(__screenbuffer, emptyLine_char);
 	OLED_writeLine(__screenbuffer, line);
 }
 

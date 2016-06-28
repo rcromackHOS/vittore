@@ -14,18 +14,18 @@
 //--------------------------------------------------------------------
 
 #define	M_PI		3.14159265358979323846	/* pi */
-#define	M_PI_2		1.57079632679489661923	/* pi/2 */
+//#define	M_PI_2		1.57079632679489661923	/* pi/2 */
 
 //--------------------------------------------------------------------
 
 double radians(double d)
 {
-	return d * (M_PI / 180);
+	return (double)d * (M_PI / 180);
 }
 
 double degrees(double r)
 {
-	return r * (180 / M_PI);
+	return (double)r * (180 / M_PI);
 }
 
 //------------------------------------------------------------------
@@ -62,7 +62,7 @@ timeStruct solar_getSunrise(dateTimeStruct ds)
 
 	  if (lastCalculated.day == ds.day && lastCalculated.month == ds.month)
 	  {
-		  ts = solar_timeFromDayDec(_sunrise_d);//, ts);
+		  ts = solar_timeFromDayDec((float)_sunrise_d);//, ts);
 		  return ts;
 	  }
 
@@ -73,7 +73,7 @@ timeStruct solar_getSunrise(dateTimeStruct ds)
 		  lastCalculated = date(ds.day, ds.month, ds.year);
 		  validCalc = 1;
 
-		  ts = solar_timeFromDayDec(_sunrise_d);//, ts);
+		  ts = solar_timeFromDayDec((float)_sunrise_d);//, ts);
 		  return ts;
 	  }
 
@@ -89,7 +89,7 @@ timeStruct solar_getSunset(dateTimeStruct ds)
 
 	  if (lastCalculated.day == ds.day && lastCalculated.month == ds.month)
 	  {
-		  ts = solar_timeFromDayDec(_sunset_d);//, ts);
+		  ts = solar_timeFromDayDec((float)_sunset_d);//, ts);
 		  return ts;
 	  }
 
@@ -100,7 +100,7 @@ timeStruct solar_getSunset(dateTimeStruct ds)
 		  lastCalculated = date(ds.day, ds.month, ds.year);
 		  validCalc = 1;
 
-		  ts = solar_timeFromDayDec(_sunset_d);//, ts);
+		  ts = solar_timeFromDayDec((float)_sunset_d);//, ts);
 		  return ts;
 	  }
 

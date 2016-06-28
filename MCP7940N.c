@@ -22,7 +22,8 @@ static int i = 0;
 // Check for lost tme or errors
 void InitializeRTC()
 {
-	now = datetime(0, 0, 12, 1, 1, 2010);
+	/*
+	now = datetime(0, 0, 12, 27, 6, 2015);
 
 	if (RTC_isRunning() == 99)	// 99 = no I2C response
 	{
@@ -39,8 +40,8 @@ void InitializeRTC()
 		else
 			now = RTC_now();
     }
-
-
+	*/
+	now = datetime(0, 0, 12, 27, 6, 2015); //
 
 	return 1;
 }

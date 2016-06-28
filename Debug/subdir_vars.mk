@@ -22,6 +22,7 @@ C_SRCS += \
 ../engineController.c \
 ../lcd.c \
 ../main.c \
+../mast.c \
 ../solar.c \
 ../timeDate.c 
 
@@ -38,6 +39,7 @@ OBJS += \
 ./engineController.obj \
 ./lcd.obj \
 ./main.obj \
+./mast.obj \
 ./solar.obj \
 ./timeDate.obj 
 
@@ -54,6 +56,7 @@ C_DEPS += \
 ./engineController.d \
 ./lcd.d \
 ./main.d \
+./mast.d \
 ./solar.d \
 ./timeDate.d 
 
@@ -70,6 +73,7 @@ C_DEPS__QUOTED += \
 "engineController.d" \
 "lcd.d" \
 "main.d" \
+"mast.d" \
 "solar.d" \
 "timeDate.d" 
 
@@ -86,6 +90,7 @@ OBJS__QUOTED += \
 "engineController.obj" \
 "lcd.obj" \
 "main.obj" \
+"mast.obj" \
 "solar.obj" \
 "timeDate.obj" 
 
@@ -102,6 +107,7 @@ C_SRCS__QUOTED += \
 "../engineController.c" \
 "../lcd.c" \
 "../main.c" \
+"../mast.c" \
 "../solar.c" \
 "../timeDate.c" 
 

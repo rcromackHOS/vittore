@@ -61,8 +61,6 @@ extern int LIGHTS1HOUR_TMR;
 
 extern int _STATE_CODE;
 
-extern int _MAST_STATUS;
-
 extern int _RESETTING_;
 extern int RESET_TMR;
 extern int OILCHANGE_PRESS_TMR;
@@ -143,13 +141,24 @@ extern int idleCount;
 
 //--------------------------------------------------------------------
 
+typedef enum
+{
+	STATE_NOMINAL = 0,
+	STATE_PRESSING,
+	STATE_PRESSED,
+	STATE_RELEASED
+
+} button_States_t;
+
+//--------------------------------------------------------------------
+
 typedef struct
 {
 	int pin;
 	int LEDpin;
 
 	int mode;
-	int state;
+	button_States_t state;
 	int Oncounts;
 	int Offcounts;
 
@@ -159,13 +168,27 @@ button buttonList[6];
 
 //--------------------------------------------------------------------
 
+typedef enum
+{
+	MAST_MAXDOWN = 0,
+	MAST_LOWERING,
+	MAST_NOMINAL,
+	MAST_RISING,
+	MAST_MAXUP
+
+} mast_States_t;
+
+extern mast_States_t _MAST_STATUS;
+
+//--------------------------------------------------------------------
+
 extern double lat;
 extern double lng;
 
-dateTimeStruct now;
+extern dateTimeStruct now;
 
-timeStruct sunSet;
-timeStruct sunRise;
+extern timeStruct sunSet;
+extern timeStruct sunRise;
 
 //--------------------------------------------------------------------
 

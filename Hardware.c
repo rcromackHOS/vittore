@@ -9,6 +9,8 @@
 /*   mm/dd/yy  F. Lastname    Description of Modification                     */
 /*   --------  -----------    ------------------------------------------------*/
 /*   06/13/16  Tom Nixon       Initial creation.                              */
+/*   06/17/16  R Cromack       Added port DIR for LCD                         */
+/*   06/23/16  R Cromack       Added Timer A0 config                          */
 /******************************************************************************/
 
 
@@ -22,18 +24,23 @@
 
 static void ConfigurePins(void);
 static void ConfigureCrystals(void);
+static void ConfigureTimerA0(void);
+static void StopTimerA0(void);
 static void ConfigureTimerA1(void);
 static void StopTimerA1(void);
 static void SetVcoreUp (unsigned int level);
 
 
 void InitializeHardware(void)
+
 {
 	ConfigurePins();
 	ConfigureCrystals();
-	ConfigureA2D();
+
+	ConfigureTimerA0();
 	//ConfigureTimerA1();
 
+	ConfigureA2D();
 	ConfigureGPSSerialPort();
 
 	//Add I2C, UARTS, SPI, General Timer,
@@ -41,7 +48,8 @@ void InitializeHardware(void)
 }
 
 
-static void ConfigurePins(void) {
+static void ConfigurePins(void)
+{
 	// unconnected pins should be set to Output with REN enabled
 
 	P1DIR = 0;						// 1= Output, 0= Input
@@ -57,15 +65,15 @@ static void ConfigurePins(void) {
 	P2REN = BUTTON_nOIL_RST + IN_MAST_CUT_OUT + IN_BAT_CELL_FAIL + BIT4 + IN_nLOW_FUEL;
 	P2SEL = 0;
 	P2DS = 0;
-	P2IES =  BUTTON_nOIL_RST;
-	P2IE = 0;
+	P2IES = IN_MAST_CUT_OUT;
+	P2IE = IN_MAST_CUT_OUT;						// falling edge
+	P2IFG &= ~IN_MAST_CUT_OUT;
 
 	P3DIR = BIT0 + BIT3 + OUT_LIGHTS_ON + LCD_SPI_SIMO;
 	P3OUT = BIT0 + BIT3;
 	P3REN = BIT0 + BIT3;
 	P3DS = 0;
 	P3SEL = 0; 	//enable peripherals individually
-
 
 	P4DIR = OUT_RESET_LED + OUT_LIGHT_1H_LED + OUT_AUTO_LED + OUT_STANDBY_LED + OUT_DOWN_LED + OUT_UP_LED;
 	P4OUT = 0;
@@ -124,8 +132,8 @@ static void ConfigurePins(void) {
 //
 // RETURN/UPDATES:	n/a
 //---------------------------------------------------------------------------------------------
-static void ConfigureCrystals(void) {
-
+static void ConfigureCrystals(void)
+{
 	// Verify!!
 	SetVcoreUp(PMMCOREV_1);
 	SetVcoreUp(PMMCOREV_2);                     	// Set VCore to 1.8MHz for 20MHz
@@ -154,6 +162,27 @@ static void ConfigureCrystals(void) {
 
 
 //---------------------------------------------------------------------------------------------
+// DESCRIPTION:		-Setup TimerA0 to continually count up to TA0CCR0, interrupt then start over
+//
+// RETURN/UPDATES:	n/a
+//---------------------------------------------------------------------------------------------
+void ConfigureTimerA0(void)
+{
+	StopTimerA0();
+	// ACLK/countup/divby 1
+	TA0CTL = TASSEL__ACLK + MC_1 + ID_2;
+	//TA0CCR0 = ACLK / ID_2 / 100 - 1;
+	TA0CCR0 = ((32768 / 4) / 100) - 1;
+	// CCR0 interrupt enabled
+	TA0CCTL0 = CCIE;
+}
+
+static void StopTimerA0(void)
+{
+	TA0CTL = 0;
+}
+
+//---------------------------------------------------------------------------------------------
 // DESCRIPTION:		-Setup TimerA1 to continually count up to TA1CCR0, interrupt then start over
 //
 // RETURN/UPDATES:	n/a
@@ -166,8 +195,9 @@ void ConfigureTimerA1(void)
 	TA1CTL = TASSEL_1 + MC_1 + TACLR;					// ACLK, upmode, clear TAR
 }
 
-static void StopTimerA1(void) {
-		TA1CTL = 0;
+static void StopTimerA1(void)
+{
+	TA1CTL = 0;
 }
 
 //--------------------------------------------------------------------

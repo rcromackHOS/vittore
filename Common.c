@@ -13,6 +13,8 @@
 #include <stdbool.h>
 #include "Common.h"
 #include "config.h"
+#include <math.h>
+#include <stdint.h>
 
 //--------------------------------------------------------------------
 //
@@ -146,6 +148,25 @@ void ftoa(float Value, char* Buffer)
      //make sure the output is terminated
      Buffer[count] = '\0';
  }
+
+
+
+char *dtostrf (double val, signed char width, unsigned char prec, char *sout)
+{
+  char fmt[20];
+
+  int whole = val;
+  float mantissa = val - whole;
+
+  unsigned int frac = mantissa * powf(10, prec);
+  if  (frac < 0)
+	  frac = -frac;
+
+  sprintf(fmt, "%%0%dd.%%0%dd", width, prec);
+  sprintf(sout, fmt, whole, frac);
+  return sout;
+}
+
 
 //--------------------------------------------------------------------
 //

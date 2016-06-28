@@ -29,7 +29,6 @@ static unsigned int  RxInIndexGps;
 static unsigned int  RxOutIndexGps;
 
 
-
 static int 	TransBufferGps[GPS_UART_TX_BUFFER_SIZE];
 static unsigned int 	TxInIndexGps;
 static unsigned int 	TxOutIndexGps;
@@ -66,17 +65,13 @@ void InitializeGPS()
 {
 	GpsStateCountdown = 50;
 	oldGPSStringsIndex = 0;
-	//TempCountdown = 100;
+
     GpsMsgOk = 0;
     P10DIR |= 0x01;
 
-    int dwdw;
-    while (GpsStateCountdown != 0)
-    {
-    	dwdw++;
-    }
+    while (GpsStateCountdown != 0)    {  }
 
-    	 // setup GPS module to only output the messages we want and at a reduced rate
+    // setup GPS module to only output the messages we want and at a reduced rate
     if (ConfigureGPSNmeaOutput() == 0)
     	while(1);
 
@@ -186,14 +181,12 @@ __interrupt void USCI_A0_ISR(void)
 
 int ConfigureGPSNmeaOutput(void)
 {
-
 	if( SendNMEACmd() == 0)
 		return(0);
 	// ADD!! could Wait for reply
 
 	return(1);
 }
-
 
 
 //---------------------------------------------------------------------------------------------
@@ -273,20 +266,24 @@ static int SendNMEACmd(void)
 //---------------------------------------------------------------------------------------------
 static unsigned int GetGpsIdx(unsigned int startIdx,signed int cnt)
 {
-	if( (startIdx >= GPS_UART_RX_BUFFER_SIZE) || (cnt >= GPS_UART_RX_BUFFER_SIZE) || (cnt < (-5)) ) {
+	if( (startIdx >= GPS_UART_RX_BUFFER_SIZE) || (cnt >= GPS_UART_RX_BUFFER_SIZE) || (cnt < (-5)) )
+	{
 			// ADD!!
 		GpsInformation.BufferOverflow = 1;
 		return(startIdx);
 	}
 
-	if(cnt < 0) {	// Negative
+	if(cnt < 0)
+	{	// Negative
 		if(((signed int)startIdx + cnt) < 0) {
 			return((unsigned int)( (GPS_UART_RX_BUFFER_SIZE) + (cnt + startIdx) ));
 		}
 		else return((unsigned int)(startIdx + cnt));
 	}
-	else {			// Positive
-		if( (startIdx + cnt) >= GPS_UART_RX_BUFFER_SIZE) {
+	else
+	{			// Positive
+		if( (startIdx + cnt) >= GPS_UART_RX_BUFFER_SIZE)
+		{
 					// Wrap buffer
 			 return(unsigned int)( (cnt - 1) - ((GPS_UART_RX_BUFFER_SIZE - 1)-startIdx) );
 		}
@@ -332,12 +329,14 @@ static void ResetGPSRxBuffer(void)
 }
 
 
-typedef enum {
+typedef enum
+{
 	gpsFindStart = 0,
 	gpsFindEnd,
 	gpsGetChecksum1,
 	gpsGetChecksum2
 } GpsNmeaMessageFindState_t;
+
 //---------------------------------------------------------------------------------------------
 // DESCRIPTION:		-Decodes GPS Receive buffer for NMEA GGA messages/
 //

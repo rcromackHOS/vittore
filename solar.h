@@ -27,14 +27,14 @@ dateStruct lastCalculated;
 
 //--------------------------------------------------------------------
 
-void solar_setCoords(double lat, double lng);
+extern void solar_setCoords(double lat, double lng);
 
-timeStruct solar_getSunset(dateTimeStruct ds);
-timeStruct solar_getSunrise(dateTimeStruct ds);
+extern timeStruct solar_getSunset(dateTimeStruct ds);
+extern timeStruct solar_getSunrise(dateTimeStruct ds);
 
-int solar_calculate(float y, float m, float d);
-float solar_toJulian(float y, float m, float d);
-timeStruct solar_timeFromDayDec(float dec);//, timeStruct dt);
+static int solar_calculate(float y, float m, float d);
+static float solar_toJulian(float y, float m, float d);
+static timeStruct solar_timeFromDayDec(float dec);//, timeStruct dt);
 
 double degrees(double r);
 double radians(double d);

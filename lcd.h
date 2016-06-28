@@ -27,6 +27,12 @@ void DIAG_showDate();
 void DIAG_showVoltage();
 void DIAG_showRPM();
 void DIAG_showBatteryTemp();
+void DIAG_showInternalTemp();
+void DIAG_showEngineHours();
+void DIAG_showRPM();
+void DIAG_showRuntime();
+void DIAG_showSunRiseSet();
+void DIAG_showLatLong();
 
 void clearLine(int line);
 void OLED_writeLine(char* chars, int line);

@@ -14,7 +14,7 @@ int _ADCs_UPDATED_	=			0;
 //--------------------------------------------------------------------
 
  int _HIGH_SP_24V = 			2810;
- int _LOW_SP_24V = 	    		2560;
+ int _LOW_SP_24V = 	    		2300;
  int VALUE_24V = 	    		2600;
 
  int VALUE_PCB_24V = 	    	2600;
@@ -44,8 +44,8 @@ int LIGHTS1HOUR_TMR =			0;
 
 int BMS_EVENT =					0;
 
-int _HIGH_SP_BMS = 				2850;
-int _LOW_SP_BMS = 				2300;
+int _HIGH_SP_BMS = 				2860;
+int _LOW_SP_BMS = 				2200;
 
 int _BANK_BMS_TMR_SP = 			5;
 int _BANK_BMS_TMR_D = 			0;
@@ -55,7 +55,7 @@ int _CELLMONITOR_TMR_D = 		0;
 
 //--------------------------------------------------------------------
 
- int _MAST_STATUS =     		0;
+mast_States_t _MAST_STATUS =    MAST_NOMINAL;
 
 int _RESETTING_ =      			0;
 int RESET_TMR =      			0;
@@ -69,7 +69,7 @@ int _ADCs_UPDATED =				0;
 int _DIAGNOSTIC_MODE =   		0;
 int _DIAGNOSTIC_MODE_TMR =   	0;
 int _DIAGNOSTIC_PAGE = 			0;
-int _DIAGNOSTIC_PAGES = 		1;
+int _DIAGNOSTIC_PAGES = 		2;
 
 int _OILCHANGE_DUE =     		0;
 
@@ -107,8 +107,10 @@ int idleCount = 				0;
 
 //--------------------------------------------------------------------
 
-double lat =					0.0;
-double lng = 					0.0;
+double lat =					51.90;
+double lng = 					-131.21;
 
-
+dateTimeStruct now;
+timeStruct sunSet;
+timeStruct sunRise;
 

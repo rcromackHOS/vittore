@@ -10,7 +10,7 @@
 #include "config.h"
 #include "Hardware.h"
 #include "Common.h"
-
+#include "mast.h"
 
 //--------------------------------------------------------------------
 
@@ -117,8 +117,8 @@ void button_stateMachine()
 		}
 	}
 
-	if (//(buttonList[0].state == STATE_RELEASED && buttonList[0].Oncounts >= 50) &&
-		//(buttonList[1].state == STATE_RELEASED && buttonList[1].Oncounts >= 50) &&
+	if ((buttonList[0].state == STATE_RELEASED && buttonList[0].Oncounts >= 50) &&
+		(buttonList[1].state == STATE_RELEASED && buttonList[1].Oncounts >= 50) &&
 		(buttonList[2].state == STATE_RELEASED && buttonList[2].Oncounts >= 50))
 	{
 		_DIAGNOSTIC_MODE = 1;
@@ -130,154 +130,18 @@ void button_stateMachine()
 		for (i = 2; i >= 0; i--)
 		{
 			if (buttonList[i].state == STATE_RELEASED)
-			    _UNIT_MODE = buttonList[i].mode;
+			{
+			    if (_UNIT_MODE != buttonList[i].mode)
+			    {
+			    	_UNIT_MODE = buttonList[i].mode;
+			    	updateDisplay();
+			    }
+			    else
+			    	_UNIT_MODE = buttonList[i].mode;
 
+			}
 		}
 	}
 
-	mastUpDown();
 }
-
-//--------------------------------------------------------------------
-//
-void mastUpDown()
-{
-	if (_DIAGNOSTIC_MODE == 1)
-	{
-		if (buttonList[5].state == STATE_PRESSED && buttonList[4].state != STATE_PRESSED)
-		{
-			_DIAGNOSTIC_PAGE++;
-		    if (_DIAGNOSTIC_PAGE > _DIAGNOSTIC_PAGES)
-		    	_DIAGNOSTIC_PAGE = 0;
-		}
-
-		else if (buttonList[5].state != STATE_PRESSED && buttonList[4].state == STATE_PRESSED)
-		{
-			_DIAGNOSTIC_PAGE--;
-		    if (_DIAGNOSTIC_PAGE < 0)
-		    	_DIAGNOSTIC_PAGE = _DIAGNOSTIC_PAGES;
-		}
-    }
-
-	else
-	{
-		if (buttonList[5].state == STATE_PRESSED && buttonList[4].state != STATE_PRESSED)
-			mast_stateMachine( MAST_RISING );
-
-		else if (buttonList[5].state != STATE_PRESSED && buttonList[4].state == STATE_PRESSED)
-			mast_stateMachine( MAST_LOWERING );
-
-		else
-			mast_stateMachine( 0 );
-	}
-}
-
-//--------------------------------------------------------------------
-//
-void mast_stateMachine(int deltastate)
-{
-    if (deltastate == MAST_RISING)
-    {
-    	switch (_MAST_STATUS)
-    	{
-			case MAST_MAXDOWN: 		// raise mast passed the lower extent
-
-				if (P2IN & IN_MAST_CUT_OUT != 0)
-					P7OUT |= OUT_UP_MAST;
-				else
-					P7OUT &= ~OUT_UP_MAST;
-
-				if (P8IN & IN_MAST_DOWN_EXTENT != 0)
-					_MAST_STATUS = MAST_NOMINAL;
-
-				break;
-
-			case MAST_NOMINAL: 	// raise mast as normal, watch for upper threshold
-
-				if (P8IN & IN_MAST_UP_EXTENT == 0)
-				{
-					_MAST_STATUS = MAST_MAXUP;
-					P7OUT &= ~OUT_UP_MAST;
-				}
-
-				else if (P8IN & IN_MAST_UP_EXTENT != 0)
-					P7OUT |= OUT_UP_MAST;
-
-				break;
-
-			case MAST_MAXUP: 		// don't let the mast keep rising if we're maxed
-
-				P7OUT &= ~OUT_UP_MAST;
-				break;
-    	}
-    }
-
-    if (deltastate == MAST_LOWERING)
-    {
-    	switch (_MAST_STATUS)
-    	{
-			case MAST_MAXDOWN: 		// raise mast passed the lower extent
-
-				P7OUT &= ~OUT_DOWN_MAST;
-				break;
-
-			case MAST_NOMINAL: 	// lower mast as normal, watch for lower threshold
-
-				if (P8IN & IN_MAST_DOWN_EXTENT == 0)
-				{
-					_MAST_STATUS = MAST_MAXDOWN;
-					P7OUT &= ~OUT_DOWN_MAST;
-				}
-
-				else if (P8IN & IN_MAST_DOWN_EXTENT != 0)
-					P7OUT |= OUT_DOWN_MAST;
-
-				break;
-
-			case MAST_MAXUP: 		// No restrictions if the mast is coming down from max up
-
-				P7OUT |= OUT_DOWN_MAST;
-
-				if (P8IN & IN_MAST_UP_EXTENT != 0)
-					_MAST_STATUS = MAST_NOMINAL;
-				break;
-
-    	}
-    }
-
-    if (deltastate == 0)
-    {
-		P7OUT &= ~OUT_DOWN_MAST;
-		P7OUT &= ~OUT_UP_MAST;
-    }
-}
-
-//--------------------------------------------------------------------
-// Handle the reset button functionality
-void handle_reset()
-{
-	// Implimentation of reset functionality
-	// hold reset button 5 seconds, apply the reset
-	// then clear, reset flag a second after
-	if (buttonList[3].state == STATE_NOMINAL)
-	{
-	   if (_DIAGNOSTIC_MODE == 1)
-	   {
-		   _DIAGNOSTIC_MODE = 0;
-		   _DIAGNOSTIC_MODE_TMR = 0;
-	   }
-	   else if (_DIAGNOSTIC_MODE == 0)
-	   {
-		   _SYS_FAILURE_ = 0;
-		   BMS_EVENT = 0;
-
-		   clearStateCode(_STATE_CODE);
-
-		   _RESETTING_ = 0;
-	   }
-	}
-}
-
-
-
 

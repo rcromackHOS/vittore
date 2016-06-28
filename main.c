@@ -8,14 +8,13 @@
 /*                                                                            */
 /*   mm/dd/yy  F. Lastname    Description of Modification                     */
 /*   --------  -----------    ------------------------------------------------*/
-/*   06/13/16  Tom Nixon       Initial creation.							  */
-/*   06/14/16  R Cromack	   Integration with program main				  */
+/*   05/20/16  R Cromack       Initial creation.							  */
+/*   06/14/16  R Cromack	   Integration of firmware with program main	  */
 /******************************************************************************/
 
-#include <msp430.h>
+//#include <msp430.h>
 #include "config.h"
 
-// toms includes
 #include "Hardware.h"
 #include "msp430f5419A.h"
 #include "Common.h"
@@ -29,10 +28,10 @@
 #include "MCP7940N.h"
 #include "bms.h"
 #include "solar.h"
+#include "mast.h"
+#include "MAX31855.h"
 
 //--------------------------------------------------------------------
-
-void InitializeClocks();
 
 int isQuietTime(dateTimeStruct now);
 
@@ -49,6 +48,9 @@ void resetControl();
 void handle_unitModeIndicator();
 void handleCabinetHeating();
 
+void enterLowPowerMode();
+void exitLowPowerMode();
+
 //--------------------------------------------------------------------
 
 timeStruct defaultSunset;
@@ -59,6 +61,7 @@ timeStruct defaultSunrise;
 static unsigned int tmrCnt = 0;
 static int checkMask = 0;
 static int secondCount = 0;
+static int prime_adcs = 2;
 
 //--------------------------------------------------------------------
 //
@@ -77,8 +80,11 @@ void inc_secondCounts()
 	//---------------------------------------------
 	// Engine centric timers
 
-	if (count_run > 0)
-		count_run++;
+	if (engine.runTime > 0)
+	{
+		engine.runTime++;
+		runTime();
+	}
 
 	if (count_RPM_fail > 0)
 		count_RPM_fail++;
@@ -122,6 +128,19 @@ void inc_secondCounts()
 	if (_SCREEN_UPDATE_D != 0)
 		_SCREEN_UPDATE_D--;
 
+	if (prime_adcs != 0)
+		prime_adcs--;
+}
+
+//--------------------------------------------------------------------
+//
+void enterLowPowerMode()
+{
+	P4OUT = 0;
+	OLED_clearDisplay();
+
+	WdtDisable();
+	_BIS_SR(LPM3_bits + GIE); // LPM3_bits (SCG1+SCG0+CPUOFF) disabled & interrupts enabled
 }
 
 //--------------------------------------------------------------------
@@ -133,28 +152,12 @@ void handle_minuteEvents()
 
 //--------------------------------------------------------------------
 //
-void InitializeClocks()
-{
-	// ACLK/countup/divby 1
-	TA0CTL = TASSEL__ACLK + MC_1 + ID_2;
-
-	//TA0CCR0 = ACLK / ID_2 / 100 - 1;
-	TA0CCR0 = ((32768 / 4) / 100) - 1;
-
-	// CCR0 interrupt enabled
-	TA0CCTL0 = CCIE;
-}
-
-//--------------------------------------------------------------------
-//
 int main()
 {
     WdtDisable();
     __disable_interrupt();
 
     // -------------------------- initization
-
-    InitializeClocks();
 
     InitializeHardware();
 
@@ -170,23 +173,25 @@ int main()
 
     //InitializeSolar();
 
+	// --------------------------
+
+	mast_stateMachine( MAST_NOMINAL );
+
     // -------------------------- default values
 
 	defaultSunset = time(0, 0, 19);
 	defaultSunrise = time(0, 0, 7);
+	sunSet = time(0, 0, 19);
+	sunRise = time(0, 0, 7);
 
 	// pull coorindates from memory
-	//lat = 51.2;
-	//lng = -113.9;
-	/*
-	lat = 40.00000;
-	lng = -105.00000;
+	lat = 51.12;
+	lng = -113.5;
 
 	solar_setCoords(lat, lng);
 
 	sunSet = solar_getSunset(now);
 	sunRise = solar_getSunrise(now);
-	*/
 
 	// --------------------------
 
@@ -201,7 +206,6 @@ int main()
 
     typedef enum
 	{
-		INIT,
 		ADCs_UPDATED,
 		BATTERY_STATUS,
 		ENGINE_ANALYSIS,
@@ -216,12 +220,16 @@ int main()
 
 	state_types state_system = ADCs_UPDATED;
 
-	int done = 0;
-
 	// --------------------------
 
-	WdtEnable();  // enable Watch dog
-	_BIS_SR(GIE); // interrupts enabled
+	if (_MAST_STATUS == MAST_MAXDOWN)
+		enterLowPowerMode();
+
+	else
+	{
+		_BIS_SR(GIE); // interrupts enabled
+		WdtEnable();  // enable Watch dog
+	}
 
 	// --------------------------
 
@@ -251,18 +259,6 @@ int main()
 	   switch (state_system)
 	   {
 
-			case INIT:
-					if (done == 1)
-						state_system++;
-					else
-					{
-						//RTC_begin();
-
-						done = 1;
-					}
-
-					break;
-
 			case ADCs_UPDATED:
 
 				if (_ADCs_UPDATED_ == 1)
@@ -275,6 +271,10 @@ int main()
 				}
 
 				state_system++;
+
+				if (prime_adcs != 0)
+					state_system = CHECK_GPS;
+
 				break;
 
 			case BATTERY_STATUS:		// Check the battery box sensor data, also impliments BMS protection
@@ -285,9 +285,6 @@ int main()
 				break;
 
 			case ENGINE_ANALYSIS:
-
-				if (_UNIT_MODE == MODE_LIGHT1H)
-					_FORCE_ENGINE_RUN = 1;
 
 				newMode = check_Engine_Status();
 
@@ -309,6 +306,9 @@ int main()
 				break;
 
 			case GENERAL_EVENTS:
+
+				if (_MAST_STATUS == MAST_MAXDOWN)
+					enterLowPowerMode();
 
 				handleSystemFailEvent();
 				handleLowFuelEvent();
@@ -360,8 +360,10 @@ __interrupt void Timer_A (void)
    tmrCnt++;
    // ten millis events
    if (tmrCnt % 2 == 0)
+   {
    	   button_stateMachine();
-
+   	   mastUpDown();
+   }
    // half-second based events
    if (tmrCnt % 50 == 0)
 	   checkMask |= 0x1;
@@ -381,11 +383,28 @@ __interrupt void Timer_A (void)
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------
+// Port 2 interrupt service routine
+#pragma vector = PORT2_VECTOR
+__interrupt void Port_2(void)
+{
+	sleepModeProcess();
+
+	if (_MAST_STATUS != MAST_MAXDOWN)
+	{
+		//__disable_interrupt();
+
+		//_BIS_SR(GIE);
+		WdtEnable();  // enable Watch dog
+		_BIC_SR(LPM3_EXIT); // wake up from low power mode
+		P2IFG &= ~IN_MAST_CUT_OUT;
+	}
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------
 //
 void handle_unitModeIndicator()
 {
 	int i;
-
 	for (i = 2; i >= 0; i--)
 	{
 		if (_UNIT_MODE == buttonList[i].mode)

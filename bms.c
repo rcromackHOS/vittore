@@ -57,12 +57,14 @@ void check_BatteryBox_Status()
 	//---------------------------------------------- BMS
 
 	// BMS cell monitors. Give them a grace period
-	if ((P2IN & IN_BAT_CELL_FAIL) == 0 && _BANK_BMS_TMR_D == 0 && BMS_EVENT == 0)
+	if ((P2IN & IN_BAT_CELL_FAIL) != 0 && _BANK_BMS_TMR_D == 0 && BMS_EVENT == 0)
 	{
 		// if this is a newly detected problem
 		if (_CELLMONITOR_TMR_D == 0 && BMS_EVENT == 0)
 			_CELLMONITOR_TMR_D = _CELLMONITOR_TMR_SP;
 	}
+	else if ((P2IN & IN_BAT_CELL_FAIL) == 0 && _CELLMONITOR_TMR_D != 0)
+		_CELLMONITOR_TMR_D = 0;
 
 	// BMS _SYS_FAILURE_ DETECTED
 	// If our cell monitors detect a problem for 30 seconds, and
@@ -109,13 +111,13 @@ int setContactor(int s)
 	  {
 		clearStateCode(1);
 		P10OUT |= OUT_nCONTACTOR_ON;
-	    P10OUT |= OUT_ASSET_I2;
+	    P10OUT &= ~OUT_ASSET_I2;
 	  }
 	  else
 	  {
 		setStateCode(1);
 		P10OUT &= ~OUT_nCONTACTOR_ON;
-	    P10OUT &= ~OUT_ASSET_I2;
+	    P10OUT |= OUT_ASSET_I2;
 	  }
 	  return 1;
 }
