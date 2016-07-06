@@ -13,39 +13,42 @@ int _ADCs_UPDATED_	=			0;
 
 //--------------------------------------------------------------------
 
- int _HIGH_SP_24V = 			2810;
- int _LOW_SP_24V = 	    		2300;
- int VALUE_24V = 	    		2600;
+float _HIGH_SP_24V = 			28.10;
+float _LOW_SP_24V = 	    	23.00;
+float VALUE_24V = 	    		26.00;
 
- int VALUE_PCB_24V = 	    	2600;
+float VALUE_PCB_24V = 	    	26.00;
 
- int _LOW_SP_12V = 	    		1100;
- unsigned int VALUE_12V = 	    1250;
+float _LOW_SP_12V = 	    	11.00;
+float VALUE_12V = 	    		12.50;
 
- int _HIGH_SP_TEMP = 			4000;
- int _NOMINAL_SP_TEMP = 		2000;
- int _LOW_SP_TEMP =	   	  		500;
- int VALUE_BAT_TEMP = 			600;
+float _HIGH_SP_TEMP = 			40.00;
+float _NOMINAL_SP_TEMP = 		20.00;
+float _LOW_SP_TEMP =	   	  	5.00;
+float VALUE_BAT_TEMP = 			6.00;
 
-int _HIGH_SP_INTERNAL_TEMP = 	1000;
-int _LOW_SP_INTERNAL_TEMP = 	100;
-int VALUE_INTERNAL_TEMP = 		0;
+float _HIGH_SP_INTERNAL_TEMP = 	10.00;
+float _LOW_SP_INTERNAL_TEMP = 	1.00;
+float VALUE_INTERNAL_TEMP = 	6.00;
+float VALUE_INTERNAL2_TEMP =	6.00;
 
- int _HIGH_SP_RPM = 			3900;
- int _LOW_SP_RPM = 	 			1000;
- int VALUE_RPM = 	   		    0;
+//--------------------------------------------------------------------
+
+int _HIGH_SP_RPM = 				3900;
+int _LOW_SP_RPM = 	 			1000;
+int VALUE_RPM = 	   		    0;
 
 int _UNIT_MODE =				0;
 int LIGHTS1HOUR_TMR =			0;
 
- int _STATE_CODE =				0;
+int _STATE_CODE =				0;
 
 //--------------------------------------------------------------------
 
 int BMS_EVENT =					0;
 
-int _HIGH_SP_BMS = 				2860;
-int _LOW_SP_BMS = 				2200;
+float _HIGH_SP_BMS = 				28.60;
+float _LOW_SP_BMS = 				22.00;
 
 int _BANK_BMS_TMR_SP = 			5;
 int _BANK_BMS_TMR_D = 			0;
@@ -100,10 +103,12 @@ int count_temp_fail =			0;
  //--------------------------------------------------------------------
 
 int _SCREEN_UPDATE_D =  		0;
+int _UPDATE_SCREEN_ =  			1;
 
  //--------------------------------------------------------------------
 
 int idleCount = 				0;
+int diagBackButton =			0;
 
 //--------------------------------------------------------------------
 

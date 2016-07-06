@@ -50,6 +50,7 @@ const char space_char[] = {" "};
 const char zero_char[] = {"0"};
 const char colon_char[] = {":"};
 const char VOLT_char[] = {" V"};
+const char tcOPEN_string[] =  {" OPEN"};
 const char bt_tmp_string[] =  {"Battery Temp:  "};
 const char int_tmp_string[] = {"Internal Temp: "};
 
@@ -103,49 +104,64 @@ char __screenbuffer2[20];
 //
 void updateDisplay()
 {
-	static int toggle_screen_msg = 0;
-
-	if (_DIAGNOSTIC_MODE_TMR == 0)
-		_DIAGNOSTIC_MODE = 0;
-
-	if (_DIAGNOSTIC_MODE == 1)
+	if (_SCREEN_UPDATE_D == 0 || _UPDATE_SCREEN_ == 1)
 	{
-		if (_DIAGNOSTIC_PAGE == 0)
-		{
-			DIAG_showDate();
-			DIAG_showVoltage();
-			DIAG_showBatteryTemp();
-			DIAG_showInternalTemp();
-		}
-		else if (_DIAGNOSTIC_PAGE == 1)
-		{
-			DIAG_showEngineHours();
-			DIAG_showRPM();
-			DIAG_showRuntime();
-		}
-		else if (_DIAGNOSTIC_PAGE == 2)
-		{
-			DIAG_showSunRiseSet();
-			DIAG_showLatLong();
-		}
-		else if (_DIAGNOSTIC_PAGE == 3)
-		{
-			OLED_clearDisplay();
-		}
-	}
-	else
-	{
-		Norm_showCompanyName();
-		clearLine(2);
+		static int toggle_screen_msg = 0;
 
-		toggle_screen_msg = ~toggle_screen_msg;
+		if (_SCREEN_UPDATE_D == 0)
+		{
+			if (_DIAGNOSTIC_MODE != 1)
+			{
+				_SCREEN_UPDATE_D = 3;
+				toggle_screen_msg = ~toggle_screen_msg;
+			}
+			else
+				_SCREEN_UPDATE_D = 1;
+		}
 
-		if (toggle_screen_msg == 0 || _STATE_CODE == 0)
-			Norm_showMode();
 
-		if (toggle_screen_msg != 0 && _STATE_CODE > 0)
-			Norm_showStateCode();
+		if (_DIAGNOSTIC_MODE_TMR == 0)
+			_DIAGNOSTIC_MODE = 0;
 
+		if (_DIAGNOSTIC_MODE == 1)
+		{
+			if (_DIAGNOSTIC_PAGE == 0)
+			{
+				DIAG_showDate();
+				DIAG_showVoltage();
+				DIAG_showBatteryTemp();
+				DIAG_showInternalTemp();
+			}
+			else if (_DIAGNOSTIC_PAGE == 1)
+			{
+				DIAG_showEngineHours();
+				DIAG_showRPM();
+				DIAG_showRuntime();
+			}
+			else if (_DIAGNOSTIC_PAGE == 2)
+			{
+				DIAG_showSunRiseSet();
+				DIAG_showLatLong();
+			}
+			else if (_DIAGNOSTIC_PAGE == 3)
+			{
+				OLED_clearDisplay();
+			}
+		}
+		else
+		{
+			Norm_showCompanyName();
+			clearLine(2);
+
+			if (toggle_screen_msg == 0 || _STATE_CODE == 0)
+				Norm_showMode();
+
+			if (toggle_screen_msg != 0 && _STATE_CODE > 0)
+				Norm_showStateCode();
+
+		}
+
+		_UPDATE_SCREEN_ = 0;
 	}
 
 }
@@ -328,13 +344,11 @@ void DIAG_showVoltage()
 	int i = 0;
 
 	// date
-	if (VALUE_12V < 1000)
-		strcat(__screenbuffer, zero_char);
-	if (VALUE_12V < 100)
+	if (VALUE_12V < 10)
 		strcat(__screenbuffer, zero_char);
 
-	float d12 = (double)VALUE_12V / 100;
-	sprintf(__screenbuffer2, "%f", d12);
+	//float d12 = (double)VALUE_12V / 100;
+	sprintf(__screenbuffer2, "%f", VALUE_12V);
 	__screenbuffer2[5] = '\0';
 	strcat(__screenbuffer, __screenbuffer2);
 
@@ -347,14 +361,19 @@ void DIAG_showVoltage()
 	for (i = 0; i < 2; i++)
 		strcat(__screenbuffer, space_char);
 
-	if (VALUE_24V < 1000)
-		strcat(__screenbuffer, zero_char);
-	if (VALUE_24V < 100)
-		strcat(__screenbuffer, zero_char);
+	//d12 = (double)VALUE_24V / 100;
+	sprintf(__screenbuffer2, "%f", VALUE_24V);
 
-	d12 = (double)VALUE_24V / 100;
-	sprintf(__screenbuffer2, "%f", d12);
-	__screenbuffer2[5] = '\0';
+	if (VALUE_24V < 10)
+	{
+		strcat(__screenbuffer, zero_char);
+		__screenbuffer2[4] = '\0';
+	}
+	else
+		__screenbuffer2[5] = '\0';
+
+	//strcat(__screenbuffer2, VOLT_char);
+
 	strcat(__screenbuffer, __screenbuffer2);
 
 	strcat(__screenbuffer, VOLT_char); 	// V
@@ -369,8 +388,14 @@ void DIAG_showBatteryTemp()
 	strcpy(__screenbuffer, bt_tmp_string);
 	strcpy(__screenbuffer2, "");
 
-	float dtemp = (double)VALUE_BAT_TEMP / 100;
-	sprintf(__screenbuffer2, "%f", dtemp);
+	if (VALUE_BAT_TEMP == -300)
+		strcpy(__screenbuffer2, tcOPEN_string);
+
+	else
+	{
+		//float dtemp = (double)VALUE_BAT_TEMP / 100;
+		sprintf(__screenbuffer2, "%f", VALUE_BAT_TEMP);
+	}
 
 	strcat(__screenbuffer, __screenbuffer2);
 
@@ -384,8 +409,8 @@ void DIAG_showInternalTemp()
 {
 	strcpy(__screenbuffer, int_tmp_string);
 
-	float dtemp = (double)VALUE_INTERNAL_TEMP / 100;
-	sprintf(__screenbuffer2, "%f", dtemp);
+	//float dtemp = (double)VALUE_INTERNAL_TEMP / 100;
+	sprintf(__screenbuffer2, "%f", VALUE_INTERNAL_TEMP);
 
 	strcat(__screenbuffer, __screenbuffer2);
 

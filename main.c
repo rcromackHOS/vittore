@@ -33,23 +33,23 @@
 
 //--------------------------------------------------------------------
 
-int isQuietTime(dateTimeStruct now);
 
-int handle_secondEvents();
-void handle_minuteEvents();
+void enterLowPowerMode();
+void exitLowPowerMode();
 
 int setLightsState(int s);
+int isQuietTime(dateTimeStruct now);
+
+void handleIndicators();
 
 void handleSystemFailEvent();
 void handleLowFuelEvent();
 void handle_lighting();
-void resetControl();
+void handleButtonLight();
 
-void handle_unitModeIndicator();
 void handleCabinetHeating();
 
-void enterLowPowerMode();
-void exitLowPowerMode();
+void incrementSecondCounts();
 
 //--------------------------------------------------------------------
 
@@ -59,78 +59,8 @@ timeStruct defaultSunrise;
 //--------------------------------------------------------------------
 
 static unsigned int tmrCnt = 0;
-static int checkMask = 0;
 static int secondCount = 0;
-static int prime_adcs = 2;
-
-//--------------------------------------------------------------------
-//
-void inc_secondCounts()
-{
-	secondCount++;
-
-	//---------------------------------------------
-	// BMS centric timers
-	if (_CELLMONITOR_TMR_D != 0)
-		_CELLMONITOR_TMR_D--;
-
-	if (_BANK_BMS_TMR_D != 0)
-		_BANK_BMS_TMR_D++;
-
-	//---------------------------------------------
-	// Engine centric timers
-
-	if (engine.runTime > 0)
-	{
-		engine.runTime++;
-		runTime();
-	}
-
-	if (count_RPM_fail > 0)
-		count_RPM_fail++;
-
-	if (count_oil_fail > 0)
-		count_oil_fail++;
-
-	if (count_temp_fail > 0)
-		count_temp_fail++;
-
-	//
-
-	if (PREHEAT_D != 0)
-		PREHEAT_D--;
-
-	if (CRANK_D != 0)
-		CRANK_D--;
-
-	if (POST_D != 0)
-		POST_D--;
-
-	if (ATTEMPT_D != 0)
-		ATTEMPT_D--;
-
-
-	//---------------------------------------------
-	// Lights centric timers
-
-	if (LIGHTS1HOUR_TMR != 0)
-		LIGHTS1HOUR_TMR--;
-
-	if (OILCHANGE_PRESS_TMR != 0)
-		OILCHANGE_PRESS_TMR++;
-
-	//---------------------------------------------
-	// screen centric timers
-
-	if (_DIAGNOSTIC_MODE_TMR != 0)
-		_DIAGNOSTIC_MODE_TMR--;
-
-	if (_SCREEN_UPDATE_D != 0)
-		_SCREEN_UPDATE_D--;
-
-	if (prime_adcs != 0)
-		prime_adcs--;
-}
+static int preLoadADCs = 2;
 
 //--------------------------------------------------------------------
 //
@@ -162,6 +92,7 @@ int main()
     InitializeHardware();
 
 	InitializeRTC();
+	// pull time/date from RTC
 
     buildButtonStateMachine();
 
@@ -169,11 +100,7 @@ int main()
 
     InitializeEngine();
 
-    InitializeGPS();
-
-    //InitializeSolar();
-
-	// --------------------------
+    // --------------------------
 
 	mast_stateMachine( MAST_NOMINAL );
 
@@ -198,164 +125,71 @@ int main()
 	_UNIT_MODE = MODE_AUTO;
     _SYS_FAILURE_ = 0;
 
-    updateDisplay();
-
     // --------------------------
 
     static int newMode;
 
-    typedef enum
-	{
-		ADCs_UPDATED,
-		BATTERY_STATUS,
-		ENGINE_ANALYSIS,
-		ENGINE_STATUS,
-		CHECK_GPS,
-		GENERAL_EVENTS,
-		HANDLE_UNITMODES,
-		UPDATE_SCREEN,
-		_SYS_FAILURE__RESET
-
-	} state_types;
-
-	state_types state_system = ADCs_UPDATED;
-
 	// --------------------------
 
-	if (_MAST_STATUS == MAST_MAXDOWN)
-		enterLowPowerMode();
+	//if (_MAST_STATUS == MAST_MAXDOWN)
+	//	enterLowPowerMode();
 
-	else
-	{
+	//else
+	//{
 		_BIS_SR(GIE); // interrupts enabled
 		WdtEnable();  // enable Watch dog
-	}
+	//}
 
 	// --------------------------
 
 	while(1)
     {
-	   // ---------------------------------------
-	   // half-second based events
-	   if ((checkMask & 0x1) == 1)
-	   {
-			checkMask &= ~0x1;
-	   }
 
-	   // ---------------------------------------
-	   // Increment second counts
-	   if ((checkMask & 0x2) == 2)
-	   {
-		    checkMask &= ~0x2;
+		if (_ADCs_UPDATED_ == 1)
+		{
+			loadAnalogData();
 
-			inc_secondCounts();
+			_ADCs_UPDATED_ = 0;
+		}
 
-			// pulse heatbeat
-		    P8OUT ^= OUT_HEARTBEAT_LED;
-	   }
+		if (preLoadADCs == 0)
+		{
+			check_BatteryBox_Status();
 
-	   // ---------------------------------------
-	   // State machine
-	   switch (state_system)
-	   {
+			newMode = check_Engine_Status();
+			set_Engine_State(newMode);
+		}
 
-			case ADCs_UPDATED:
+		pollGPS();
 
-				if (_ADCs_UPDATED_ == 1)
-				{
-					loadAnalogData();
+		handleIndicators();
 
-					//get thermocouple data over SPI
+		handleCabinetHeating();
 
-					_ADCs_UPDATED_ = 0;
-				}
+		handle_pressDiagButton();
 
-				state_system++;
+		handle_reset();
 
-				if (prime_adcs != 0)
-					state_system = CHECK_GPS;
+		handle_lighting();
 
-				break;
+		updateDisplay();
 
-			case BATTERY_STATUS:		// Check the battery box sensor data, also impliments BMS protection
-
-				check_BatteryBox_Status();
-
-				state_system++;
-				break;
-
-			case ENGINE_ANALYSIS:
-
-				newMode = check_Engine_Status();
-
-				state_system++;
-				break;
-
-			case ENGINE_STATUS:
-
-				set_Engine_State(newMode);
-
-				state_system++;
-				break;
-
-			case CHECK_GPS:
-
-				handleGPSevent();
-
-				state_system++;
-				break;
-
-			case GENERAL_EVENTS:
-
-				if (_MAST_STATUS == MAST_MAXDOWN)
-					enterLowPowerMode();
-
-				handleSystemFailEvent();
-				handleLowFuelEvent();
-
-				handle_oilchangeClear();
-				handleCabinetHeating();
-
-				state_system++;
-				break;
-
-			case HANDLE_UNITMODES:
-
-				handle_unitModeIndicator();
-
-				if (_RESETTING_ == 1)
-					handle_reset();
-
-				handle_lighting();
-
-				state_system++;
-				break;
-
-			case UPDATE_SCREEN:
-
-				if (_SCREEN_UPDATE_D == 0)
-				{
-					if (_DIAGNOSTIC_MODE != 1)
-						_SCREEN_UPDATE_D = 3;
-					else
-						_SCREEN_UPDATE_D = 1;
-
-					updateDisplay();
-				}
-
-				state_system = ADCs_UPDATED;
-				break;
-	   }
-
-
-	   WdtKeepAlive();  // reset Watch dog
+	    WdtKeepAlive();  // reset Watch dog
     }
+
 }
 
 //--------------------------------------------------------------------
-// Timer A0 interrupt service routine
-#pragma vector = TIMER0_A0_VECTOR
-__interrupt void Timer_A (void)
+// Timer A1 interrupt service routine
+//#pragma vector = TIMER0_A0_VECTOR
+//__interrupt void TIMER0_A0_ISR (void)
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:		-TimerA1 Interrupt
+//
+// RETURN/UPDATES:	n/a
+//---------------------------------------------------------------------------------------------
+#pragma vector=TIMER1_A0_VECTOR
+__interrupt void TIMER1_A0_ISR(void)
 {
    tmrCnt++;
    // ten millis events
@@ -364,13 +198,14 @@ __interrupt void Timer_A (void)
    	   button_stateMachine();
    	   mastUpDown();
    }
-   // half-second based events
-   if (tmrCnt % 50 == 0)
-	   checkMask |= 0x1;
 
    // second based events
    if (tmrCnt % 100 == 0)
-	   checkMask |= 0x2;
+   {
+	   P8OUT ^= OUT_HEARTBEAT_LED;
+
+	   incrementSecondCounts();
+   }
 
    // count GPS state
    if (GpsStateCountdown != 0)
@@ -379,6 +214,12 @@ __interrupt void Timer_A (void)
    // temp countdown
    if (TempCountdown != 0)
 	   TempCountdown--;
+
+   // count presses of the diagnostic button
+   if ((P9IN & BUTTON_nDIAGNOSTIC) == 0)
+	   diagBackButton++;
+   else
+	   diagBackButton = 0;
 
 }
 
@@ -400,9 +241,23 @@ __interrupt void Port_2(void)
 	}
 }
 
+
 //------------------------------------------------------------------------------------------------------------------------------------
 //
-void handle_unitModeIndicator()
+void handleIndicators()
+{
+	handleSystemFailEvent();
+
+	handleLowFuelEvent();
+
+	handle_oilchangeClear();
+
+	handleButtonLight();
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------
+//
+void handleButtonLight()
 {
 	int i;
 	for (i = 2; i >= 0; i--)
@@ -537,6 +392,74 @@ void handleCabinetHeating()
 		P10OUT &= ~OUT_nCABINET_HEATER_ON;
 }
 
+//--------------------------------------------------------------------
+//
+void incrementSecondCounts()
+{
+	secondCount++;
+
+	//---------------------------------------------
+	// BMS centric timers
+	if (_CELLMONITOR_TMR_D != 0)
+		_CELLMONITOR_TMR_D--;
+
+	if (_BANK_BMS_TMR_D != 0)
+		_BANK_BMS_TMR_D++;
+
+	//---------------------------------------------
+	// Engine centric timers
+
+	if (engine.runTime > 0)
+	{
+		engine.runTime++;
+		runTime();
+	}
+
+	if (count_RPM_fail > 0)
+		count_RPM_fail++;
+
+	if (count_oil_fail > 0)
+		count_oil_fail++;
+
+	if (count_temp_fail > 0)
+		count_temp_fail++;
+
+	//
+
+	if (PREHEAT_D != 0)
+		PREHEAT_D--;
+
+	if (CRANK_D != 0)
+		CRANK_D--;
+
+	if (POST_D != 0)
+		POST_D--;
+
+	if (ATTEMPT_D != 0)
+		ATTEMPT_D--;
+
+
+	//---------------------------------------------
+	// Lights centric timers
+
+	if (LIGHTS1HOUR_TMR != 0)
+		LIGHTS1HOUR_TMR--;
+
+	if (OILCHANGE_PRESS_TMR != 0)
+		OILCHANGE_PRESS_TMR++;
+
+	//---------------------------------------------
+	// screen centric timers
+
+	if (_DIAGNOSTIC_MODE_TMR != 0)
+		_DIAGNOSTIC_MODE_TMR--;
+
+	if (_SCREEN_UPDATE_D != 0)
+		_SCREEN_UPDATE_D--;
+
+	if (preLoadADCs != 0)
+		preLoadADCs--;
+}
 
 
 

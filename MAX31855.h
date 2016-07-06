@@ -10,10 +10,15 @@
 
 //--------------------------------------------------------------------
 
+void getThermocoupleData();
+static void _delay_ms(int t);
+void pollMAX31855();
 
 //--------------------------------------------------------------------
 
-
+static unsigned long TCRXVALUE = 0;
+static float centigrade = 0.0;
+static float internal = 0.0;
 
 //--------------------------------------------------------------------
 

@@ -19,6 +19,7 @@
 #include "Hardware.h"
 #include "AtoD.h"
 #include "config.h"
+#include "MAX31855.h"
 
 #define CALADC12_15V_30C  *((unsigned int *)0x1A22)   // Temperature Sensor Calibration-30 C
                                                       //See device datasheet for TLV table memory mapping
@@ -129,23 +130,23 @@ void loadAnalogData()
 {
 	 if	(TempCountdown == 0)
 	 {
-		 TempCountdown = 100;
+		 TempCountdown = 50;
 
-		 VALUE_INTERNAL_TEMP = ConvertInternalTempToCelcius(ADC[AD_INTERNAL_TEMP]) * 100;
+		 VALUE_INTERNAL_TEMP = ConvertInternalTempToCelcius(ADC[AD_INTERNAL_TEMP]);
+
+		 // Poll the thermocouple IC
+		 getThermocoupleData();
+
+
+		 VALUE_12V = ((float)ADC[AD_12V_BATTERY_VLT] / 4095) * 15;
+
+		 VALUE_24V = ((float)ADC[AD_P_BATTERY_VLT] / 4095) * 30;
+
+		 float bullshit = ((float)ADC[AD_N_BATTERY_VLT] / 4095) * 30;
+		 int fuck = (int)bullshit;
+
+		 VALUE_PCB_24V = ((float)ADC[AD_24V_POWER_VLT] / 4095) * 30;
 	 }
-
-	 float bullshit = ((float)ADC[AD_12V_BATTERY_VLT] / 4095) * 1500;
-	 VALUE_12V = (int)bullshit;
-	 VALUE_12V += 25;
-
-	 bullshit = ((float)ADC[AD_P_BATTERY_VLT] / 4095) * 3000;
-	 VALUE_24V = (int)bullshit;// - (int)bullshit;
-
-	 bullshit = ((float)ADC[AD_N_BATTERY_VLT] / 4095) * 3000;
-	 int fuck = (int)bullshit;// - (int)bullshit;
-	 	 	 	 	 	 	 // AD_24V_POWER_VLT
-	 bullshit = ((float)ADC[AD_N_BATTERY_VLT] / 4095) * 3000;
-	 VALUE_PCB_24V = (int)bullshit;
 
 }
 

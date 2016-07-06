@@ -33,6 +33,7 @@ void mastUpDown();
 void mast_stateMachine(mast_States_t deltastate);
 
 void handle_reset();
+void handle_pressDiagButton();
 
 //--------------------------------------------------------------------
 

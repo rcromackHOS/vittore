@@ -8,6 +8,9 @@ AtoD.obj: C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include/intrinsic
 AtoD.obj: C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include/intrinsics_legacy_undefs.h
 AtoD.obj: ../Hardware.h
 AtoD.obj: ../AtoD.h
+AtoD.obj: C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include/math.h
+AtoD.obj: C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include/linkage.h
+AtoD.obj: C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include/_defs.h
 AtoD.obj: ../config.h
 AtoD.obj: ../timeDate.h
 
@@ -19,5 +22,8 @@ C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include/intrinsics.h:
 C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include/intrinsics_legacy_undefs.h: 
 ../Hardware.h: 
 ../AtoD.h: 
+C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include/math.h: 
+C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include/linkage.h: 
+C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include/_defs.h: 
 ../config.h: 
 ../timeDate.h: 

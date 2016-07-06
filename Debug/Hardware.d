@@ -8,6 +8,9 @@ Hardware.obj: C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include/intri
 Hardware.obj: C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include/intrinsics_legacy_undefs.h
 Hardware.obj: ../Hardware.h
 Hardware.obj: ../AtoD.h
+Hardware.obj: C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include/math.h
+Hardware.obj: C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include/linkage.h
+Hardware.obj: C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include/_defs.h
 Hardware.obj: ../GPS.h
 
 ../Hardware.c: 
@@ -18,4 +21,7 @@ C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include/intrinsics.h:
 C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include/intrinsics_legacy_undefs.h: 
 ../Hardware.h: 
 ../AtoD.h: 
+C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include/math.h: 
+C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include/linkage.h: 
+C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include/_defs.h: 
 ../GPS.h: 

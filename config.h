@@ -16,18 +16,19 @@ extern int _ADCs_UPDATED_;
 
 //--------------------------------------------------------------------
 
-extern int _HIGH_SP_24V;
-extern int _LOW_SP_24V;
-extern int VALUE_24V;
+extern float _HIGH_SP_24V;
+extern float _LOW_SP_24V;
+extern float VALUE_24V;
 
-extern int VALUE_PCB_24V;
+extern float VALUE_PCB_24V;
 
 //--------------------------------------------------------------------
 
 extern int BMS_EVENT;
 
-extern int _HIGH_SP_BMS;
-extern int _LOW_SP_BMS;
+extern float _HIGH_SP_BMS;
+extern float _LOW_SP_BMS;
+
 extern int _CELLMONITOR_TMR_SP;
 extern int _BANK_BMS_TMR_SP;
 
@@ -36,21 +37,22 @@ extern int _BANK_BMS_TMR_D;
 
 //--------------------------------------------------------------------
 
-extern int _LOW_SP_12V;
-extern unsigned int VALUE_12V;
+extern float _LOW_SP_12V;
+extern float VALUE_12V;
 
 //--------------------------------------------------------------------
 
-extern int _HIGH_SP_INTERNAL_TEMP;
-extern int _LOW_SP_INTERNAL_TEMP;
-extern int VALUE_INTERNAL_TEMP;
+extern float _HIGH_SP_INTERNAL_TEMP;
+extern float _LOW_SP_INTERNAL_TEMP;
+extern float VALUE_INTERNAL_TEMP;
+extern float VALUE_INTERNAL2_TEMP;
 
 //--------------------------------------------------------------------
 
-extern int _HIGH_SP_TEMP;
-extern int _NOMINAL_SP_TEMP;
-extern int _LOW_SP_TEMP;
-extern int VALUE_BAT_TEMP;
+extern float _HIGH_SP_TEMP;
+extern float _NOMINAL_SP_TEMP;
+extern float _LOW_SP_TEMP;
+extern float VALUE_BAT_TEMP;
 
 extern int _HIGH_SP_RPM;
 extern int _LOW_SP_RPM;
@@ -102,6 +104,7 @@ extern int count_temp_fail;
 //--------------------------------------------------------------------
 
 extern int _SCREEN_UPDATE_D;
+extern int _UPDATE_SCREEN_;
 
 //--------------------------------------------------------------------
 
@@ -181,6 +184,8 @@ typedef enum
 extern mast_States_t _MAST_STATUS;
 
 //--------------------------------------------------------------------
+
+extern int diagBackButton;
 
 extern double lat;
 extern double lng;

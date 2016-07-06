@@ -47,17 +47,16 @@ void buildIdleArray()
 //
 int checkEngineTemp()
 {
-	if (P7IN & IN_ENGINE_TEMP_FAIL == 0)
+	if ((P7IN & IN_ENGINE_TEMP_FAIL) == 0)
 	  return 1;
 	return 0;
 }
-int skippp = 0;
 
 //--------------------------------------------------------------------
 //
 int checkOilPressure()
 {
-	return skippp;
+	return 1;
 
 	if ((P7IN & IN_OIL_PRESSURE_OK) == 0)
 	  return 1;
@@ -68,7 +67,7 @@ int checkOilPressure()
 //
 int checkEngineRPMs()
 {
-	if (P1IN & BIT7 != 0)
+	if ((P1IN & BIT7) != 0)
 		return 1;
 	return 0;
 }
@@ -412,13 +411,12 @@ void handle_oilchangeClear()
 		P10OUT |= OUT_ASSET_I1;
 		setStateCode( 4 );
 
-		// pull up and still input?
 		if ((P2IN & BUTTON_nOIL_RST) == 0)
 		{
 			if (OILCHANGE_PRESS_TMR == 0)
 				OILCHANGE_PRESS_TMR = 1;
 
-			if (OILCHANGE_PRESS_TMR == 6)
+			if (OILCHANGE_PRESS_TMR >= 5)
 			{
 				OILCHANGE_PRESS_TMR = 0;
 				_OILCHANGE_DUE += engine.engineHours;

@@ -37,8 +37,8 @@ void InitializeHardware(void)
 	ConfigurePins();
 	ConfigureCrystals();
 
-	ConfigureTimerA0();
-	//ConfigureTimerA1();
+	//ConfigureTimerA0();
+	ConfigureTimerA1();
 
 	ConfigureA2D();
 	ConfigureGPSSerialPort();
@@ -48,6 +48,12 @@ void InitializeHardware(void)
 }
 
 
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION: Sets pin registers
+//
+// RETURN/UPDATES: void
+//
+//---------------------------------------------------------------------------------------------
 static void ConfigurePins(void)
 {
 	// unconnected pins should be set to Output with REN enabled
@@ -105,11 +111,11 @@ static void ConfigurePins(void)
 	P8DS = 0;
 	P8SEL = 0;
 
-	P9DIR = THERM_CS + OUT_ENGINE_FAIL + OUT_ENGINE_GLOW + OUT_ENGINE_CRANK;
+	P9DIR = THERM_CS + OUT_ENGINE_FAIL + OUT_ENGINE_GLOW + OUT_ENGINE_CRANK + THERM_SPI_CLK;
 	P9OUT = BUTTON_nDIAGNOSTIC;
 	P9REN = BUTTON_nDIAGNOSTIC;
 	P9DS = 0;
-	P9SEL = 0;
+	//P9SEL |= THERM_SPI_MOSI + THERM_SPI_MISO + THERM_SPI_CLK;
 
 	P10DIR = OUT_ASSET_I1 + OUT_ASSET_I2 + OUT_ASSET_I3 + OUT_ASSET_I4 + OUT_nBATTERY_HEATER_ON + OUT_nCONTACTOR_ON + BIT6 + OUT_nCABINET_HEATER_ON;
 	P10OUT = BIT6;
@@ -166,6 +172,7 @@ static void ConfigureCrystals(void)
 //
 // RETURN/UPDATES:	n/a
 //---------------------------------------------------------------------------------------------
+
 void ConfigureTimerA0(void)
 {
 	StopTimerA0();
@@ -191,7 +198,7 @@ void ConfigureTimerA1(void)
 {
 	StopTimerA1();
 	TA1CCTL0 = CCIE;									// CCR0 interrupt enabled
-	TA1CCR0 = 328;										// 10ms/32.768kHz = 328
+	TA1CCR0 = 328;										// 328;
 	TA1CTL = TASSEL_1 + MC_1 + TACLR;					// ACLK, upmode, clear TAR
 }
 

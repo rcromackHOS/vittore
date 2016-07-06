@@ -32,11 +32,13 @@
 
 typedef struct //_gpsInformation_t
 {
-	int			DecodingGps;
-	int			BufferOverflow;
-	int			ChecksumOk;
-	int			Message[127];
+	int				decoding;
+	int				LookingForGpsMessages;
+	int				BufferOverflow;
+	unsigned char	Message[127];
 	//Put rest of GPS variables here
+
+	unsigned char	buffer[20];
 
 } GpsInformation_t;
 
@@ -45,21 +47,45 @@ typedef struct //_gpsInformation_t
 extern GpsInformation_t GpsInformation;
 //#endif
 
-extern unsigned int GpsStateCountdown;//,TempCountdown;
+typedef struct //StringInfo_t
+{
+	float		lat;
+	float		lng;
 
-GpsInformation_t oldGPSStrings[4];
-int oldGPSStringsIndex;
+	int			hour;
+	int			minute;
+	int			second;
+	int			month;
+	int			year;
+	int			day;
 
-extern void InitializeGPS();
-extern void handleGPSevent();
+	int 		fix;
+	int 		alt;
+	int 		sfov;
 
-extern void 		ConfigureGPSSerialPort();
-void 				GpsStateZero(void);
-void 				GpsStateMachine(void);
+	int hasGGA;
+	int hasRMC;
 
+} StringInfo_t;
 
-extern int 		ConfigureGPSNmeaOutput(void);
-extern int 		GpsDecode(void);
+StringInfo_t GPSinstance;
+
+StringInfo_t storedInstances[5];
+static int instanceIndex;
+
+extern int GpsStateCountdown;
+
+extern void pollGPS();
+static int GpsDecode(StringInfo_t gpsData);
+static int NMEAgetField(char* bufff, int index);
+
+void storeGPSInstance();
+void resetGpsInstance();
+
+extern void ConfigureGPSSerialPort();
+extern int ConfigureGPSNmeaOutput(void);
+extern int GpsMessageRetrieve(void);
+
 
 #endif
 

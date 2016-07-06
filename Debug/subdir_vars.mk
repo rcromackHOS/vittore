@@ -14,6 +14,7 @@ C_SRCS += \
 ../Common.c \
 ../GPS.c \
 ../Hardware.c \
+../MAX31855.c \
 ../MCP7940N.c \
 ../WatchdogTimerControl.c \
 ../bms.c \
@@ -31,6 +32,7 @@ OBJS += \
 ./Common.obj \
 ./GPS.obj \
 ./Hardware.obj \
+./MAX31855.obj \
 ./MCP7940N.obj \
 ./WatchdogTimerControl.obj \
 ./bms.obj \
@@ -48,6 +50,7 @@ C_DEPS += \
 ./Common.d \
 ./GPS.d \
 ./Hardware.d \
+./MAX31855.d \
 ./MCP7940N.d \
 ./WatchdogTimerControl.d \
 ./bms.d \
@@ -65,6 +68,7 @@ C_DEPS__QUOTED += \
 "Common.d" \
 "GPS.d" \
 "Hardware.d" \
+"MAX31855.d" \
 "MCP7940N.d" \
 "WatchdogTimerControl.d" \
 "bms.d" \
@@ -82,6 +86,7 @@ OBJS__QUOTED += \
 "Common.obj" \
 "GPS.obj" \
 "Hardware.obj" \
+"MAX31855.obj" \
 "MCP7940N.obj" \
 "WatchdogTimerControl.obj" \
 "bms.obj" \
@@ -99,6 +104,7 @@ C_SRCS__QUOTED += \
 "../Common.c" \
 "../GPS.c" \
 "../Hardware.c" \
+"../MAX31855.c" \
 "../MCP7940N.c" \
 "../WatchdogTimerControl.c" \
 "../bms.c" \

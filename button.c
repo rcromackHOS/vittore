@@ -132,16 +132,61 @@ void button_stateMachine()
 			if (buttonList[i].state == STATE_RELEASED)
 			{
 			    if (_UNIT_MODE != buttonList[i].mode)
-			    {
-			    	_UNIT_MODE = buttonList[i].mode;
-			    	updateDisplay();
-			    }
-			    else
 			    	_UNIT_MODE = buttonList[i].mode;
 
+			    else
+			    {
+			    	_UNIT_MODE = buttonList[i].mode;
+			    	_UPDATE_SCREEN_ = 1;
+			    }
 			}
 		}
 	}
 
 }
+
+//--------------------------------------------------------------------
+// Implimentation of reset functionality
+// hold reset button 5 seconds, apply the reset
+// then clear, reset flag a second after
+void handle_reset()
+{
+	if (_RESETTING_ == 1)
+	{
+		if (buttonList[3].state == STATE_NOMINAL)
+		{
+		   if (_DIAGNOSTIC_MODE == 1)
+		   {
+			   _DIAGNOSTIC_MODE = 0;
+			   _DIAGNOSTIC_MODE_TMR = 0;
+		   }
+		   else if (_DIAGNOSTIC_MODE == 0)
+		   {
+			   _SYS_FAILURE_ = 0;
+			   BMS_EVENT = 0;
+
+			   clearStateCode(_STATE_CODE);
+
+			   _UPDATE_SCREEN_ = 1;
+			   _RESETTING_ = 0;
+		   }
+		}
+	}
+}
+
+void handle_pressDiagButton()
+{
+	if (diagBackButton >= 200)
+	{
+		_nop();
+		diagBackButton = 0;
+
+		_DIAGNOSTIC_MODE = 1;
+		_DIAGNOSTIC_MODE_TMR = 60;
+	}
+}
+
+
+
+
 

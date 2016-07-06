@@ -15,8 +15,14 @@
 
 //extern struct engineStruct engine;
 
-//--------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:
 //
+//
+//
+// RETURN/UPDATES:
+//
+//---------------------------------------------------------------------------------------------
 void check_BatteryBox_Status()
 {
 	static int _contactorOn;
@@ -72,9 +78,9 @@ void check_BatteryBox_Status()
 		 VALUE_24V >= _HIGH_SP_BMS || VALUE_24V <= _LOW_SP_BMS  &&
 		 _BANK_BMS_TMR_D == 0 && BMS_EVENT == 0)
 	{
-		_BANK_BMS_TMR_D = 1;		// start counting down the cool-down period
-		_CELLMONITOR_TMR_D = 0;
-		_engineOn = 0;					// turn off the engine
+		//_BANK_BMS_TMR_D = 1;		// start counting down the cool-down period
+		//_CELLMONITOR_TMR_D = 0;
+		//_engineOn = 0;					// turn off the engine
 	}
 
 	// BMS _SYS_FAILURE_ APPLIED

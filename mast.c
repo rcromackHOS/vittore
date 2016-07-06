@@ -155,32 +155,6 @@ void mast_stateMachine(mast_States_t deltastate)
     }
 }
 
-//--------------------------------------------------------------------
-// Handle the reset button functionality
-void handle_reset()
-{
-	// Implimentation of reset functionality
-	// hold reset button 5 seconds, apply the reset
-	// then clear, reset flag a second after
-	if (buttonList[3].state == STATE_NOMINAL)
-	{
-	   if (_DIAGNOSTIC_MODE == 1)
-	   {
-		   _DIAGNOSTIC_MODE = 0;
-		   _DIAGNOSTIC_MODE_TMR = 0;
-	   }
-	   else if (_DIAGNOSTIC_MODE == 0)
-	   {
-		   _SYS_FAILURE_ = 0;
-		   BMS_EVENT = 0;
-
-		   clearStateCode(_STATE_CODE);
-
-		   _RESETTING_ = 0;
-	   }
-	}
-}
-
 
 
 
