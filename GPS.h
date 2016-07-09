@@ -76,7 +76,7 @@ static int instanceIndex;
 extern int GpsStateCountdown;
 
 extern void pollGPS();
-static int GpsDecode(StringInfo_t gpsData);
+static int GpsDecode();
 static int NMEAgetField(char* bufff, int index);
 
 void storeGPSInstance();

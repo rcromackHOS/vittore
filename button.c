@@ -86,20 +86,23 @@ void button_stateMachine()
 
 				if (high == 0)
 				{
+
 					buttonList[i].Offcounts++;
 
 					if (buttonList[i].Offcounts > 4)
 						buttonList[i].state = STATE_RELEASED;
 				}
 				else
+				{
 					buttonList[i].Oncounts++;
+
+					if (buttonList[i].mode == MODE_RESET)
+						_RESETTING_ = 1;
+				}
 
 				break;
 
 			case STATE_RELEASED:
-
-				if (buttonList[i].mode == MODE_RESET && buttonList[i].Oncounts >= 170)
-					_RESETTING_ = 1;
 
 				if (high == 0)
 				{
@@ -117,9 +120,9 @@ void button_stateMachine()
 		}
 	}
 
-	if ((buttonList[0].state == STATE_RELEASED && buttonList[0].Oncounts >= 50) &&
-		(buttonList[1].state == STATE_RELEASED && buttonList[1].Oncounts >= 50) &&
-		(buttonList[2].state == STATE_RELEASED && buttonList[2].Oncounts >= 50))
+	if ((buttonList[0].state == STATE_PRESSED && buttonList[0].Oncounts >= 50) &&
+		(buttonList[1].state == STATE_PRESSED && buttonList[1].Oncounts >= 50) &&
+		(buttonList[2].state == STATE_PRESSED && buttonList[2].Oncounts >= 50))
 	{
 		_DIAGNOSTIC_MODE = 1;
 		_DIAGNOSTIC_MODE_TMR = 60;
@@ -153,23 +156,23 @@ void handle_reset()
 {
 	if (_RESETTING_ == 1)
 	{
-		if (buttonList[3].state == STATE_NOMINAL)
+		if (buttonList[3].Oncounts >= 200)
 		{
-		   if (_DIAGNOSTIC_MODE == 1)
-		   {
+			if (_DIAGNOSTIC_MODE == 1)
+			{
 			   _DIAGNOSTIC_MODE = 0;
 			   _DIAGNOSTIC_MODE_TMR = 0;
-		   }
-		   else if (_DIAGNOSTIC_MODE == 0)
-		   {
+			}
+			else if (_DIAGNOSTIC_MODE == 0)
+			{
 			   _SYS_FAILURE_ = 0;
 			   BMS_EVENT = 0;
 
 			   clearStateCode(_STATE_CODE);
 
 			   _UPDATE_SCREEN_ = 1;
-			   _RESETTING_ = 0;
-		   }
+			}
+			_RESETTING_ = 0;
 		}
 	}
 }

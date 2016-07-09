@@ -48,6 +48,9 @@ static unsigned int 		GetGpsIdx(unsigned int startIdx,signed int cnt);
 static void 				ResetGPSRxBuffer(void);
 static int					SendNMEACmd(void);
 
+char ggamsg[] = {"$GPGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*47"};
+
+
 //---------------------------------------------------------------------------------------------
 // DESCRIPTION: main.cs calls function to pull GPS sentences and verify they are good
 //              if they pass error checking, they have their data pulled and loaded into "GPSinstance"
@@ -63,7 +66,14 @@ void pollGPS()
 		GpsStateCountdown = 50;
 		if (GpsMessageRetrieve() == 1)
 		{
-			if (GpsDecode(GPSinstance) == 1)
+			int i;
+			for (i = 0; i < strlen(ggamsg); i++)
+			GpsInformation.Message[i] = ggamsg[i];
+
+			resetGpsInstance();
+			GpsDecode(GPSinstance);
+
+			if (GPSinstance.hasGGA == 1 || GPSinstance.hasRMC == 1)
 			{
 				if (GPSinstance.hasGGA == 1 && GPSinstance.hasRMC == 1)
 					storeGPSInstance();
@@ -359,50 +369,49 @@ int GpsMessageRetrieve(void)
 // RETURN/UPDATES:		1 - GPS information has been decoded and loaded into "gpsData"
 //						0 - The sentence or data was bad
 //---------------------------------------------------------------------------------------------
-static int GpsDecode(StringInfo_t gpsData)
+static int GpsDecode()
 {
 	  char field[10];
 	  char venusBuff[10];
-
 	  NMEAgetField(field, 0);
 
 	  if (strcmp(field, "$GPGGA") == 0)
 	  {
 			NMEAgetField(field, 6);
-			gpsData.fix = atoi(field);
+			GPSinstance.fix = atoi(field);
 
-			if (gpsData.fix == 1)
+			if (GPSinstance.fix == 1)
 			{
 
 				NMEAgetField(field, 2);
 
-				gpsData.lat = (float)atof(field) / 100;
+				GPSinstance.lat = (float)atof(field) / 100;
 
 				NMEAgetField(field, 3);
 				if (strcmp(field, "S") == 0)
-					gpsData.lat = gpsData.lat * -1;
+					GPSinstance.lat = GPSinstance.lat * -1;
 
 				NMEAgetField(field, 4);
 
-				gpsData.lng = (float)atof(field) / 100;
+				GPSinstance.lng = (float)atof(field) / 100;
 
 				NMEAgetField(field, 5);
 				if (strcmp(field, "W") == 0)
-					gpsData.lng = gpsData.lng * -1;
+					GPSinstance.lng = GPSinstance.lng * -1;
 
 				NMEAgetField(field, 7);
-				gpsData.sfov = atoi(field);
+				GPSinstance.sfov = atoi(field);
 
 				NMEAgetField(field, 9);
-				gpsData.alt = (int)atoi(field);
+				GPSinstance.alt = (int)atoi(field);
 
-				if ((int)gpsData.lat == 0)
+				if ((int)GPSinstance.lat == 0)
 				  return 0;
 
-				if ((int)gpsData.lng == 0)
+				if ((int)GPSinstance.lng == 0)
 				  return 0;
 
-				gpsData.hasGGA = 1;
+				GPSinstance.hasGGA = 1;
 
 				return 1;
 			}
@@ -422,17 +431,17 @@ static int GpsDecode(StringInfo_t gpsData)
 			  venusBuff[0] = field[0];
 			  venusBuff[1] = field[1];
 			  venusBuff[2] = '\0';
-			  gpsData.hour = atoi(venusBuff);
+			  GPSinstance.hour = atoi(venusBuff);
 
 			  venusBuff[0] = field[2];
 			  venusBuff[1] = field[3];
 			  venusBuff[2] = '\0';
-			  gpsData.minute = atoi(venusBuff);
+			  GPSinstance.minute = atoi(venusBuff);
 
 			  venusBuff[0] = field[4];
 			  venusBuff[1] = field[5];
 			  venusBuff[2] = '\0';
-			  gpsData.second = atoi(venusBuff);
+			  GPSinstance.second = atoi(venusBuff);
 			}
 
 			NMEAgetField(field, 9);
@@ -442,20 +451,20 @@ static int GpsDecode(StringInfo_t gpsData)
 			  venusBuff[0] = field[0];
 			  venusBuff[1] = field[1];
 			  venusBuff[2] = '\0';
-			  gpsData.day = atoi(venusBuff);
+			  GPSinstance.day = atoi(venusBuff);
 
 			  venusBuff[0] = field[2];
 			  venusBuff[1] = field[3];
 			  venusBuff[2] = '\0';
-			  gpsData.month = atoi(venusBuff);
+			  GPSinstance.month = atoi(venusBuff);
 
 			  venusBuff[0] = field[4];
 			  venusBuff[1] = field[5];
 			  venusBuff[2] = '\0';
-			  gpsData.year = atoi(venusBuff) + 2000;
+			  GPSinstance.year = atoi(venusBuff) + 2000;
 			}
 
-			gpsData.hasRMC = 1;
+			GPSinstance.hasRMC = 1;
 
 			return 1;
 		}
@@ -487,7 +496,8 @@ static int SendNMEACmd(void)
 
 		// Wait until the Transmit Interrrupt is disabled (done in Interrupts)
 	timeout = 0xffff;			// ~4-6instructions x 25MHz = ~10ms
-	while(UCA0IE &UCTXIE) {
+	while(UCA0IE &UCTXIE)
+	{
 
 		if(--timeout == 0) {
 			__disable_interrupt();
