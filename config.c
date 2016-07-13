@@ -15,7 +15,7 @@ int _ADCs_UPDATED_	=			0;
 
 float _HIGH_SP_24V = 			28.10;
 float _LOW_SP_24V = 	    	23.00;
-float VALUE_24V = 	    		26.00;
+float VALUE_24V = 	    		26.55;
 
 float VALUE_PCB_24V = 	    	26.00;
 
@@ -47,8 +47,8 @@ int _STATE_CODE =				0;
 
 int BMS_EVENT =					0;
 
-float _HIGH_SP_BMS = 				28.60;
-float _LOW_SP_BMS = 				22.00;
+float _HIGH_SP_BMS = 			28.60;
+float _LOW_SP_BMS = 			22.00;
 
 int _BANK_BMS_TMR_SP = 			5;
 int _BANK_BMS_TMR_D = 			0;
@@ -77,6 +77,8 @@ int _DIAGNOSTIC_PAGES = 		2;
 int _OILCHANGE_DUE =     		0;
 
 int _SYS_FAILURE_ = 			0;
+
+int _POINTER_TO_ENGINE_MINS = 	0;
 
 //--------------------------------------------------------------------
 
@@ -112,8 +114,8 @@ int diagBackButton =			0;
 
 //--------------------------------------------------------------------
 
-double lat =					51.90;
-double lng = 					-131.21;
+double lat =					0.0;
+double lng = 					0.0;
 
 dateTimeStruct now;
 timeStruct sunSet;

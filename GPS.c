@@ -16,6 +16,9 @@
 #include "Hardware.h"
 #include "Common.h"
 #include "GPS.h"
+#include "timeDate.h"
+#include "solar.h"
+#include "config.h"
 
    /* Internal local static variables.                                  */
                               /* The following is used to buffer        */
@@ -32,7 +35,7 @@ static unsigned int 	TxInIndexGps;
 static unsigned int 	TxOutIndexGps;
 
 StringInfo_t storedInstances[5];
-int GpsStateCountdown = 100;
+long GpsStateCountdown = 100;
 static int instanceIndex = 0;
 
 //static const char VENUS_GGA_5SEC_REST_OFF[]		= {0xA0, 0xA1, 0x00, 0x09, 0x08, 0x05, 0x00, 0x00, 0x00, 0x05, 0x00, 0x00, 0x01}; // ADD CS,0x0D,0x0A
@@ -48,7 +51,7 @@ static unsigned int 		GetGpsIdx(unsigned int startIdx,signed int cnt);
 static void 				ResetGPSRxBuffer(void);
 static int					SendNMEACmd(void);
 
-char ggamsg[] = {"$GPGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*47"};
+//char ggamsg[] = {"$GPGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*47"};
 
 
 //---------------------------------------------------------------------------------------------
@@ -63,25 +66,23 @@ void pollGPS()
 {
 	if (GpsStateCountdown == 0)
 	{
-		GpsStateCountdown = 50;
+		GpsStateCountdown = 100;
+
 		if (GpsMessageRetrieve() == 1)
 		{
-			int i;
-			for (i = 0; i < strlen(ggamsg); i++)
-			GpsInformation.Message[i] = ggamsg[i];
 
-			resetGpsInstance();
-			GpsDecode(GPSinstance);
-
-			if (GPSinstance.hasGGA == 1 || GPSinstance.hasRMC == 1)
+			if (GpsDecode(GPSinstance) == 1)
 			{
 				if (GPSinstance.hasGGA == 1 && GPSinstance.hasRMC == 1)
 					storeGPSInstance();
+
 			}
 
-			else
-				resetGpsInstance();
+			//else
+			//	resetGpsInstance();
 		}
+
+		//resetGpsInstance();
 	}
 }
 
@@ -95,16 +96,55 @@ void pollGPS()
 //---------------------------------------------------------------------------------------------
 void storeGPSInstance()
 {
-	_nop();
 	storedInstances[instanceIndex] = GPSinstance;
 
 	instanceIndex++;
+
 	if (instanceIndex == 5)
 	{
 		instanceIndex = 0;
 
-		// TODO: compare the saved instances and determine validity
-		// TODO: use saved data to determine new coords & date & time
+		int APPLYING_LAT = (int)(GPSinstance.lat * 100);
+		int APPLYING_LNG = (int)(GPSinstance.lng * 100);
+
+		int lati;
+		int longi;
+		int fail = 0;
+
+		int i = 0;
+
+		for (i = 0; i < 5; i++)
+		{
+			lati = (int)storedInstances[instanceIndex].lat * 100;
+			longi = (int)storedInstances[instanceIndex].lng * 100;
+
+			if (APPLYING_LAT != lati || APPLYING_LNG != longi)
+				fail = 1;
+		}
+
+		if (fail == 0)
+		{
+			now.hour = GPSinstance.hour;
+			now.year = GPSinstance.year;
+			now.day = GPSinstance.day;
+			now.minute = GPSinstance.minute;
+			now.month = GPSinstance.month;
+			now.second = GPSinstance.second;
+
+			// TODO: update RTC then update "now"
+
+			lat = GPSinstance.lat;
+			lng = GPSinstance.lng;
+
+			solar_setCoords(lat, lng);
+
+			sunSet = solar_getSunset(now);
+			sunRise = solar_getSunrise(now);
+
+			GpsStateCountdown = 360000;
+		}
+
+		// TODO: use saved data to determine new coords
 	}
 
 	resetGpsInstance();
@@ -292,24 +332,28 @@ int GpsMessageRetrieve(void)
 								break;
 
 			case gpsGetChecksum1:
-								if(RecvBufferGps[outIndex] == '$') {
+								if(RecvBufferGps[outIndex] == '$')
+								{
 									idx = 0;
 									GpsInformation.Message[idx] = RecvBufferGps[outIndex];
 									gpsDecodeState = gpsFindEnd;
 								}
-								else {
+								else
+								{
 									GpsInformation.Message[idx] = RecvBufferGps[outIndex];
 									gpsDecodeState++;
 								}
 								break;
 
 			case gpsGetChecksum2:
-								if(RecvBufferGps[outIndex] == '$') {
+								if(RecvBufferGps[outIndex] == '$')
+								{
 									idx = 0;
 									GpsInformation.Message[idx] = RecvBufferGps[outIndex];
 									gpsDecodeState = gpsFindEnd;
 								}
-								else {
+								else
+								{
 									GpsInformation.Message[idx] = RecvBufferGps[outIndex];
 									GpsInformation.Message[++idx] = NULL;
 
@@ -318,7 +362,8 @@ int GpsMessageRetrieve(void)
 									checksum += ( asctohex(GpsInformation.Message[idx-2]) ) << 4;
 
 									calcChecksum = 0;
-									for(idx=1; idx <= endIdx; idx++) {
+									for(idx=1; idx <= endIdx; idx++)
+									{
 										calcChecksum ^= GpsInformation.Message[idx];
 									}
 
@@ -329,9 +374,10 @@ int GpsMessageRetrieve(void)
 									if(calcChecksum == checksum)
 									{
 										GpsInformation.LookingForGpsMessages = 0;
-										return 0;
+										return 1;
 									}
-									else {
+									else
+									{
 										idx = 0;
 										gpsDecodeState = gpsFindStart;
 									}

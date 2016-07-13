@@ -73,7 +73,7 @@ StringInfo_t GPSinstance;
 StringInfo_t storedInstances[5];
 static int instanceIndex;
 
-extern int GpsStateCountdown;
+extern long GpsStateCountdown;
 
 extern void pollGPS();
 static int GpsDecode();

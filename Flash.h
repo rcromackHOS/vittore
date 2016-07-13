@@ -41,14 +41,19 @@ typedef enum
 
 //ADD!! custom size
 
-
 #define MAX_INFO_SIZE 		128
+#define MEM_SEG_SIZE	 	11
 
+#define MEM_POINTER_EXTENT 	10
+#define MEM_SEG_EXTENT 		100
+
+int mem_pointer =			0;
+
+extern unsigned int DEFAULT_CONFIG[MAX_INFO_SIZE];
 extern unsigned char FlashRegisters[MAX_INFO_SIZE];
 
-extern unsigned char 	GetConfiguration(void);
-
-
+extern unsigned char GetConfiguration(void);
+extern void UpdateFlashMemory(void);
 
 #endif
 

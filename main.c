@@ -23,13 +23,14 @@
 #include "GPS.h"
 #include "timeDate.h"
 #include "engineController.h"
-#include "lcd.h"
+//#include "lcd.h"
 #include "button.h"
 #include "MCP7940N.h"
 #include "bms.h"
 #include "solar.h"
 #include "mast.h"
 #include "MAX31855.h"
+#include "Flash.h"
 
 //--------------------------------------------------------------------
 
@@ -67,7 +68,7 @@ static int preLoadADCs = 2;
 void enterLowPowerMode()
 {
 	P4OUT = 0;
-	OLED_clearDisplay();
+	//OLED_clearDisplay();
 
 	WdtDisable();
 	_BIS_SR(LPM3_bits + GIE); // LPM3_bits (SCG1+SCG0+CPUOFF) disabled & interrupts enabled
@@ -96,7 +97,7 @@ int main()
 
     buildButtonStateMachine();
 
-    InitializeDisplay();
+    //InitializeDisplay();
 
     InitializeEngine();
 
@@ -111,19 +112,30 @@ int main()
 	sunSet = time(0, 0, 19);
 	sunRise = time(0, 0, 7);
 
-	// pull coorindates from memory
-	lat = 51.12;
-	lng = -113.5;
+	// --------------------------
+
+	_UNIT_MODE = MODE_AUTO;
+    _SYS_FAILURE_ = 0;
+
+    // --------------------------
+
+    switch (GetConfiguration())
+    {
+   	  	  case SEG_VIRGIN:
+   	  	  case 0:	  //Display( ("#2: FLASH is Good\r\n") );
+   	  		  	  	  _nop();
+    	  	  	  	  break;
+   	  	  default: 	  // Flash is bad!
+    	  	  	  	  // Run on defaults
+   	  		  	  	  //Display( ("#2: FLASH ERROR\r\n") );
+    	  	  	  	  _nop();
+   	  		  	  	  break;
+   	 }
 
 	solar_setCoords(lat, lng);
 
 	sunSet = solar_getSunset(now);
 	sunRise = solar_getSunrise(now);
-
-	// --------------------------
-
-	_UNIT_MODE = MODE_AUTO;
-    _SYS_FAILURE_ = 0;
 
     // --------------------------
 
@@ -172,7 +184,7 @@ int main()
 
 		handle_lighting();
 
-		updateDisplay();
+		//updateDisplay();
 
 	    WdtKeepAlive();  // reset Watch dog
     }

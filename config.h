@@ -79,6 +79,8 @@ extern int _OILCHANGE_DUE;
 
 extern int _ADCs_UPDATED;
 
+extern int _POINTER_TO_ENGINE_MINS;
+
 //--------------------------------------------------------------------
 
 extern  int _PREHEAT_SP;
