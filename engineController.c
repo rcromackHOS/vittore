@@ -10,6 +10,7 @@
 #include "Hardware.h"
 #include "timeDate.h"
 #include "Common.h"
+#include "Flash.h"
 
 //--------------------------------------------------------------------
 
@@ -25,22 +26,6 @@ void InitializeEngine()
 
 	engine.lastRun = datetime( 0, 0, 0, 0, 0, 0 );
 	engine.lastRunEnd = datetime( 0, 0, 0, 0, 0, 0 );
-
-	// assemble the array of stored idle times
-	buildIdleArray();
-}
-
-//--------------------------------------------------------------------
-// Build the Idle time array with 0s
-void buildIdleArray()
-{
-	idleTime idles[4] =
-			{
-					{0, 0},
-					{0, 0},
-					{0, 0},
-					{0, 0}
-			};
 }
 
 //--------------------------------------------------------------------
@@ -285,7 +270,8 @@ void set_Engine_State(int mode)
 		   	    engine.mode = ENGINE_RUNNING;
 
 		   	    engine.lastRun = now;
-				store_idleTime( );
+
+		   	    store_idleTime( );
 
 				engine.lastRunEnd = datetime( 0, 0, 0, 0, 0, 0 );
 
@@ -308,7 +294,12 @@ void set_Engine_State(int mode)
 			clearStateCode(41);
 
 			if (engine.mode == ENGINE_RUNNING)
-				   engine.lastRunEnd = now;
+			{
+				engine.lastRunEnd = now;
+
+				// TODO: Save the time of last engine run
+				UpdateFlashMemory();
+			}
 
 			   P2OUT &= ~OUT_ENGINE_ACC;
 			   P9OUT &= ~OUT_ENGINE_CRANK;
@@ -340,6 +331,8 @@ void runTime()
 			// write hours to EEPROM
 		}
 
+		if (engine.engineMins % 10 == 0)
+			UpdateFlashMemory();
 		// write minutes to EEPROM
 	}
 }

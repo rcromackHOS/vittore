@@ -49,7 +49,7 @@ void handle_lighting();
 void handleButtonLight();
 
 void handleCabinetHeating();
-
+void checkTimeToSaveMemory();
 void incrementSecondCounts();
 
 //--------------------------------------------------------------------
@@ -122,12 +122,11 @@ int main()
     switch (GetConfiguration())
     {
    	  	  case SEG_VIRGIN:
-   	  	  case 0:	  //Display( ("#2: FLASH is Good\r\n") );
-   	  		  	  	  _nop();
+   	  	  case 0:
     	  	  	  	  break;
    	  	  default: 	  // Flash is bad!
     	  	  	  	  // Run on defaults
-   	  		  	  	  //Display( ("#2: FLASH ERROR\r\n") );
+
     	  	  	  	  _nop();
    	  		  	  	  break;
    	 }
@@ -138,7 +137,7 @@ int main()
 	sunRise = solar_getSunrise(now);
 
     // --------------------------
-
+	//UpdateFlashMemory();
     static int newMode;
 
 	// --------------------------
@@ -186,7 +185,9 @@ int main()
 
 		//updateDisplay();
 
-	    WdtKeepAlive();  // reset Watch dog
+		checkTimeToSaveMemory();
+
+		WdtKeepAlive();  // reset Watch dog
     }
 
 }
@@ -367,8 +368,13 @@ void handleLowFuelEvent()
 		P10OUT &= ~OUT_ASSET_I3;
 }
 
-//--------------------------------------------------------------------
-// Handles the way the unit using
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:				-
+//
+// FUNCTION CALLED BY:		-
+
+// VARIABLES: void
+//---------------------------------------------------------------------------------------------
 void handle_lighting()
 {
 	// Lights 1 hour mode.
@@ -393,8 +399,13 @@ void handle_lighting()
 		setLightsState(0);
 }
 
-//--------------------------------------------------------------------
-//
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:				-	overwrite flash memory with new values
+//							- 	called
+// FUNCTION CALLED BY:		-
+
+// VARIABLES: void
+//---------------------------------------------------------------------------------------------
 void handleCabinetHeating()
 {
 	if (VALUE_INTERNAL_TEMP <= _LOW_SP_INTERNAL_TEMP)
@@ -404,8 +415,37 @@ void handleCabinetHeating()
 		P10OUT &= ~OUT_nCABINET_HEATER_ON;
 }
 
-//--------------------------------------------------------------------
-//
+
+
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:				-	overwrite flash memory with new values
+//							- 	called
+// FUNCTION CALLED BY:		-
+
+// VARIABLES: void
+//---------------------------------------------------------------------------------------------
+void checkTimeToSaveMemory()
+{
+	static int memSaved;
+
+	if (now.hour == sunRise.hour && now.minute == sunRise.minute && memSaved == 0)
+	{
+    	UpdateFlashMemory();
+    	memSaved = 1;
+	}
+	else if (now.hour != sunRise.hour && now.minute != sunRise.minute)
+		memSaved = 0;
+}
+
+
+
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:				-	overwrite flash memory with new values
+//							- 	called
+// FUNCTION CALLED BY:		-
+
+// VARIABLES: void
+//---------------------------------------------------------------------------------------------
 void incrementSecondCounts()
 {
 	secondCount++;

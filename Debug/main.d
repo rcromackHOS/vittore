@@ -19,7 +19,6 @@ main.obj: C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include/linkage.h
 main.obj: C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include/_defs.h
 main.obj: ../GPS.h
 main.obj: ../engineController.h
-main.obj: ../lcd.h
 main.obj: ../button.h
 main.obj: ../MCP7940N.h
 main.obj: ../bms.h
@@ -27,6 +26,7 @@ main.obj: ../solar.h
 main.obj: C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include/math.h
 main.obj: ../mast.h
 main.obj: ../MAX31855.h
+main.obj: ../Flash.h
 
 ../main.c: 
 ../config.h: 
@@ -47,7 +47,6 @@ C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include/linkage.h:
 C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include/_defs.h: 
 ../GPS.h: 
 ../engineController.h: 
-../lcd.h: 
 ../button.h: 
 ../MCP7940N.h: 
 ../bms.h: 
@@ -55,3 +54,4 @@ C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include/_defs.h:
 C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include/math.h: 
 ../mast.h: 
 ../MAX31855.h: 
+../Flash.h: 

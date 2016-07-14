@@ -13,6 +13,11 @@ GPS.obj: ../Hardware.h
 GPS.obj: ../Common.h
 GPS.obj: C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include/stdbool.h
 GPS.obj: ../GPS.h
+GPS.obj: ../timeDate.h
+GPS.obj: ../solar.h
+GPS.obj: C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include/math.h
+GPS.obj: C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include/_defs.h
+GPS.obj: ../config.h
 
 ../GPS.c: 
 C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include/string.h: 
@@ -27,3 +32,8 @@ C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include/intrinsics_legacy_u
 ../Common.h: 
 C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include/stdbool.h: 
 ../GPS.h: 
+../timeDate.h: 
+../solar.h: 
+C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include/math.h: 
+C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include/_defs.h: 
+../config.h: 

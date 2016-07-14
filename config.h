@@ -141,9 +141,6 @@ typedef struct
 
 idleTime idles[4];
 
-extern int idleCount;
-
-
 //--------------------------------------------------------------------
 
 typedef enum

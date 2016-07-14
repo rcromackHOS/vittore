@@ -47,7 +47,9 @@ typedef enum
 #define MEM_POINTER_EXTENT 	10
 #define MEM_SEG_EXTENT 		100
 
-int mem_pointer =			0;
+#define IDLES_SEG_START 	80
+
+extern int mem_pointer;
 
 extern unsigned int DEFAULT_CONFIG[MAX_INFO_SIZE];
 extern unsigned char FlashRegisters[MAX_INFO_SIZE];

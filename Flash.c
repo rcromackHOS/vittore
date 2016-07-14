@@ -20,6 +20,7 @@
 unsigned char FlashRegisters[MAX_INFO_SIZE];
 
 unsigned int DEFAULT_CONFIG[] = { 0, 0, 0, 0, 0, 20, 70, 0, 51, 65, 1 };
+int mem_pointer;
 
 /*
  * 0-1  	Engine Hours
@@ -129,6 +130,8 @@ static void LoadRamRegistersFromFlash(flashseg_t seg)
 	unsigned char *Flash_ptr;
 	unsigned char reg;
 	unsigned long temp;
+	int i = 0;
+	int pointer = 0;
 
 	switch(seg)
 	{
@@ -160,11 +163,13 @@ static void LoadRamRegistersFromFlash(flashseg_t seg)
 	engine.engineHours = temp;
 
 	//----------------------------- load engine minutes
-
+	/*
 	// flashRegister[2] is the pointer to where the engine minutes are stored.
 	_POINTER_TO_ENGINE_MINS = FlashRegisters[2];
 
 	engine.engineMins = FlashRegisters[_POINTER_TO_ENGINE_MINS];
+	*/
+	engine.engineMins = FlashRegisters[2];
 
 	//----------------------------- Next oil change
 
@@ -193,7 +198,25 @@ static void LoadRamRegistersFromFlash(flashseg_t seg)
 	if (FlashRegisters[10] > 0)
 		lng *= -1;
 
-	_nop();
+	//----------------------------- idle time save
+
+	for (i = 0; i < 4; i++)
+	{
+		pointer = IDLES_SEG_START + (i * 4);
+
+		temp = FlashRegisters[pointer];
+		temp = temp << 8;
+		temp |= FlashRegisters[pointer+1];
+
+		idles[i].hours = temp;
+
+		temp = FlashRegisters[pointer+2];
+		temp = temp << 8;
+		temp |= FlashRegisters[pointer+3];
+
+		idles[i].minutes = temp;
+	}
+
 }
 
 //---------------------------------------------------------------------------------------------
@@ -234,7 +257,14 @@ void UpdateFlashMemory(void)
 	data[0] = (engine.engineHours >> 8) & 0xFF;
   	data[1] = engine.engineHours & 0xFF;
 
-	data[2] = engine.engineMins & 0xFF;
+	/*
+  	_POINTER_TO_ENGINE_MINS++;
+
+	_POINTER_TO_ENGINE_MINS = FlashRegisters[2];
+
+	engine.engineMins = FlashRegisters[_POINTER_TO_ENGINE_MINS];
+	*/
+  	data[2] = engine.engineMins & 0xFF;
 
 	data[3] = (_OILCHANGE_DUE >> 8) & 0xFF;
 	data[4] = _OILCHANGE_DUE & 0xFF;
@@ -269,6 +299,32 @@ void UpdateFlashMemory(void)
 	data[8] = (temp >> 8) & 0xFF;
 	data[9] = temp & 0xFF;
 
+	//------------------------------------------ save idle times
+
+	int i = 0;
+	int j = 0;
+	int pointer = 0;
+
+	for (i = 0; i < 4; i++)
+	{
+		pointer = IDLES_SEG_START + (i * 4);
+
+		//for (j = 0; j < 2; j++)
+		//{
+			data[pointer] = (idles[i].hours >> 8) & 0xFF;
+			data[pointer+1] = idles[i].hours & 0xFF;
+
+			data[pointer+2] = (idles[i].minutes >> 8) & 0xFF;
+			data[pointer+3] = idles[i].minutes & 0xFF;
+		//}
+
+		_nop();
+	}
+
+	//------------------------------------------
+
+	// TODO: Save the time of last engine run
+
 	//------------------------------------------
 
 	checksum = crc(&data[0],0,MAX_INFO_SIZE-2);
@@ -299,6 +355,11 @@ static void UpdateFlashRegistersFromRam(void)
   	for (idx = 0; idx < MAX_INFO_SIZE; idx++)
 	{
 		data[idx] = DEFAULT_CONFIG[idx] & 0xff;
+	}
+
+  	for (idx = 80; idx < 97; idx++)
+	{
+		data[idx] = 0x0;
 	}
 
 	checksum = crc(&data[0], 0, MAX_INFO_SIZE-2);

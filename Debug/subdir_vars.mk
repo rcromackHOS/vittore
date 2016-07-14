@@ -6,12 +6,10 @@
 CMD_SRCS += \
 ../lnk_msp430f5419a.cmd 
 
-LIB_SRCS += \
-../MSPMATHLIB_CCS_msp430_4xx_small_code_small_data.lib 
-
 C_SRCS += \
 ../AtoD.c \
 ../Common.c \
+../Flash.c \
 ../GPS.c \
 ../Hardware.c \
 ../MAX31855.c \
@@ -30,6 +28,7 @@ C_SRCS += \
 OBJS += \
 ./AtoD.obj \
 ./Common.obj \
+./Flash.obj \
 ./GPS.obj \
 ./Hardware.obj \
 ./MAX31855.obj \
@@ -48,6 +47,7 @@ OBJS += \
 C_DEPS += \
 ./AtoD.d \
 ./Common.d \
+./Flash.d \
 ./GPS.d \
 ./Hardware.d \
 ./MAX31855.d \
@@ -66,6 +66,7 @@ C_DEPS += \
 C_DEPS__QUOTED += \
 "AtoD.d" \
 "Common.d" \
+"Flash.d" \
 "GPS.d" \
 "Hardware.d" \
 "MAX31855.d" \
@@ -84,6 +85,7 @@ C_DEPS__QUOTED += \
 OBJS__QUOTED += \
 "AtoD.obj" \
 "Common.obj" \
+"Flash.obj" \
 "GPS.obj" \
 "Hardware.obj" \
 "MAX31855.obj" \
@@ -102,6 +104,7 @@ OBJS__QUOTED += \
 C_SRCS__QUOTED += \
 "../AtoD.c" \
 "../Common.c" \
+"../Flash.c" \
 "../GPS.c" \
 "../Hardware.c" \
 "../MAX31855.c" \

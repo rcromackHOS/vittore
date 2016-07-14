@@ -1,10 +1,10 @@
 ******************************************************************************
                   MSP430 Linker PC v15.12.1                    
 ******************************************************************************
->> Linked Tue Jun 28 14:52:42 2016
+>> Linked Wed Jul 13 23:45:10 2016
 
 OUTPUT FILE NAME:   <vittore.out>
-ENTRY POINT SYMBOL: "_c_int00_noargs_noexit"  address: 00005e4c
+ENTRY POINT SYMBOL: "_c_int00_noargs_noexit"  address: 00005dd2
 
 
 MEMORY CONFIGURATION
@@ -18,8 +18,8 @@ MEMORY CONFIGURATION
   INFOC                 00001880   00000080  00000000  00000080  RWIX
   INFOB                 00001900   00000080  00000000  00000080  RWIX
   INFOA                 00001980   00000080  00000000  00000080  RWIX
-  RAM                   00001c00   00004000  00000bee  00003412  RWIX
-  FLASH                 00005c00   0000a380  0000095d  00009a23  RWIX
+  RAM                   00001c00   00004000  00000756  000038aa  RWIX
+  FLASH                 00005c00   0000a380  000006ec  00009c94  RWIX
   INT00                 0000ff80   00000002  00000000  00000002  RWIX
   INT01                 0000ff82   00000002  00000000  00000002  RWIX
   INT02                 0000ff84   00000002  00000000  00000002  RWIX
@@ -84,7 +84,7 @@ MEMORY CONFIGURATION
   INT61                 0000fffa   00000002  00000002  00000000  RWIX
   INT62                 0000fffc   00000002  00000002  00000000  RWIX
   RESET                 0000fffe   00000002  00000002  00000000  RWIX
-  FLASH2                00010000   00015c00  0000c1d0  00009a30  RWIX
+  FLASH2                00010000   00015c00  000095fe  0000c602  RWIX
 
 
 SECTION ALLOCATION MAP
@@ -92,149 +92,78 @@ SECTION ALLOCATION MAP
  output                                  attributes/
 section   page    origin      length       input sections
 --------  ----  ----------  ----------   ----------------
-.bss       0    00001c00    00000aa8     UNINITIALIZED
-                  00001c00    00000410     (.common:oldGPSStrings)
-                  00002010    00000400     GPS.obj (.bss:RecvBufferGps)
-                  00002410    00000104     (.common:GpsInformation)
-                  00002514    00000080     GPS.obj (.bss:TransBufferGps)
-                  00002594    00000048     (.common:buttonList)
-                  000025dc    00000020     solar.obj (.bss)
-                  000025fc    00000020     (.common:engine)
-                  0000261c    00000014     (.common:__screenbuffer)
-                  00002630    00000014     (.common:__screenbuffer2)
-                  00002644    00000012     (.common:ADC)
-                  00002656    00000010     (.common:idles)
-                  00002666    0000000c     (.common:now)
-                  00002672    00000008     GPS.obj (.bss)
-                  0000267a    00000006     bms.obj (.bss)
-                  00002680    00000006     (.common:defaultSunrise)
-                  00002686    00000006     (.common:defaultSunset)
-                  0000268c    00000006     (.common:lastCalculated)
-                  00002692    00000006     (.common:sunRise)
-                  00002698    00000006     (.common:sunSet)
-                  0000269e    00000002     main.obj (.bss)
-                  000026a0    00000002     (.common:GpsMsgOk)
-                  000026a2    00000002     (.common:GpsStateCountdown)
-                  000026a4    00000002     (.common:oldGPSStringsIndex)
-                  000026a6    00000002     (.common:validCalc)
+.bss       0    00001c00    000004f2     UNINITIALIZED
+                  00001c00    00000200     GPS.obj (.bss:RecvBufferGps)
+                  00001e00    0000009a     (.common:GpsInformation)
+                  00001e9a    00000096     (.common:storedInstances)
+                  00001f30    00000080     (.common:FlashRegisters)
+                  00001fb0    00000048     (.common:buttonList)
+                  00001ff8    00000040     GPS.obj (.bss:TransBufferGps)
+                  00002038    00000020     solar.obj (.bss)
+                  00002058    00000020     (.common:engine)
+                  00002078    0000001e     (.common:GPSinstance)
+                  00002096    00000012     (.common:ADC)
+                  000020a8    00000010     (.common:idles)
+                  000020b8    0000000c     (.common:now)
+                  000020c4    00000008     GPS.obj (.bss)
+                  000020cc    00000006     bms.obj (.bss)
+                  000020d2    00000006     (.common:defaultSunrise)
+                  000020d8    00000006     (.common:defaultSunset)
+                  000020de    00000006     (.common:lastCalculated)
+                  000020e4    00000006     (.common:sunRise)
+                  000020ea    00000006     (.common:sunSet)
+                  000020f0    00000002     (.common:validCalc)
 
-.data      0    000026a8    000000a6     UNINITIALIZED
-                  000026a8    00000080     config.obj (.data)
-                  00002728    0000000c     MAX31855.obj (.data)
-                  00002734    00000008     lcd.obj (.data:OLED_new_line)
-                  0000273c    00000008     main.obj (.data)
-                  00002744    00000004     lcd.obj (.data)
-                  00002748    00000002     AtoD.obj (.data)
-                  0000274a    00000002     engineController.obj (.data)
-                  0000274c    00000002     rts430x_lc_rd_eabi.lib : errno.obj (.data)
+.data      0    000020f2    000001c4     UNINITIALIZED
+                  000020f2    00000100     Flash.obj (.data:DEFAULT_CONFIG)
+                  000021f2    000000a8     config.obj (.data)
+                  0000229a    0000000c     MAX31855.obj (.data)
+                  000022a6    00000006     GPS.obj (.data)
+                  000022ac    00000006     main.obj (.data)
+                  000022b2    00000002     AtoD.obj (.data)
+                  000022b4    00000002     rts430x_lc_rd_eabi.lib : errno.obj (.data)
 
 .stack     0    00005b60    000000a0     UNINITIALIZED
                   00005b60    00000004     rts430x_lc_rd_eabi.lib : boot.obj (.stack)
                   00005b64    0000009c     --HOLE--
 
 .text:_isr 
-*          0    00005c00    0000026e     
-                  00005c00    000000ee     AtoD.obj (.text:_isr:ADC12_ISR)
-                  00005cee    000000e4     GPS.obj (.text:_isr:USCI_A0_ISR)
-                  00005dd2    00000054     main.obj (.text:_isr:TIMER0_A0_ISR)
-                  00005e26    00000026     main.obj (.text:_isr:Port_2)
-                  00005e4c    0000001a     rts430x_lc_rd_eabi.lib : boot_special.obj (.text:_isr:_c_int00_noargs_noexit)
-                  00005e66    00000008                            : isr_trap.obj (.text:_isr:__TI_ISR_TRAP)
+*          0    00005c00    000001f4     
+                  00005c00    000000ba     GPS.obj (.text:_isr:USCI_A0_ISR)
+                  00005cba    00000090     AtoD.obj (.text:_isr:ADC12_ISR)
+                  00005d4a    00000062     main.obj (.text:_isr:TIMER1_A0_ISR)
+                  00005dac    00000026     main.obj (.text:_isr:Port_2)
+                  00005dd2    0000001a     rts430x_lc_rd_eabi.lib : boot_special.obj (.text:_isr:_c_int00_noargs_noexit)
+                  00005dec    00000008                            : isr_trap.obj (.text:_isr:__TI_ISR_TRAP)
 
-.cinit     0    000064c8    00000096     
-                  000064c8    00000072     (.cinit..data.load) [load image, compression = rle]
-                  0000653a    0000000b     (.cinit..bss.load) [load image, compression = rle]
-                  00006545    00000001     --HOLE-- [fill = 0]
-                  00006546    00000008     (__TI_handler_table)
-                  0000654e    00000010     (__TI_cinit_table)
+.cinit     0    0000623a    000000b2     
+                  0000623a    0000008e     (.cinit..data.load) [load image, compression = rle]
+                  000062c8    0000000b     (.cinit..bss.load) [load image, compression = rle]
+                  000062d3    00000001     --HOLE-- [fill = 0]
+                  000062d4    00000008     (__TI_handler_table)
+                  000062dc    00000010     (__TI_cinit_table)
 
 .init_array 
 *          0    00005c00    00000000     UNINITIALIZED
 
-.const     0    00005e6e    00000659     
-                  00005e6e    00000108     rts430x_lc_rd_eabi.lib : k_rem_pio2.obj (.const:ipio2)
-                  00005f76    00000101                            : ctype.obj (.const:.string:_ctypes_)
-                  00006077    00000001     --HOLE-- [fill = 0]
-                  00006078    00000080                            : k_tan.obj (.const:xxx)
-                  000060f8    00000056     GPS.obj (.const:.string)
-                  0000614e    00000040     rts430x_lc_rd_eabi.lib : k_rem_pio2.obj (.const:PIo2)
-                  0000618e    00000026                            : _printfi.obj (.const:.string)
-                  000061b4    00000018     engineController.obj (.const:$P$T1$2)
-                  000061cc    00000015     lcd.obj (.const:.string:emptyLine_char)
-                  000061e1    00000001     --HOLE-- [fill = 0]
-                  000061e2    00000015     lcd.obj (.const:.string:li0)
-                  000061f7    00000001     --HOLE-- [fill = 0]
-                  000061f8    00000015     lcd.obj (.const:.string:li1)
-                  0000620d    00000001     --HOLE-- [fill = 0]
-                  0000620e    00000015     lcd.obj (.const:.string:modename0)
-                  00006223    00000001     --HOLE-- [fill = 0]
-                  00006224    00000015     lcd.obj (.const:.string:modename1)
-                  00006239    00000001     --HOLE-- [fill = 0]
-                  0000623a    00000015     lcd.obj (.const:.string:modename2)
-                  0000624f    00000001     --HOLE-- [fill = 0]
-                  00006250    00000015     lcd.obj (.const:.string:msg12)
-                  00006265    00000001     --HOLE-- [fill = 0]
-                  00006266    00000015     lcd.obj (.const:.string:msg13)
-                  0000627b    00000001     --HOLE-- [fill = 0]
-                  0000627c    00000015     lcd.obj (.const:.string:msg14)
-                  00006291    00000001     --HOLE-- [fill = 0]
-                  00006292    00000015     lcd.obj (.const:.string:msg15)
-                  000062a7    00000001     --HOLE-- [fill = 0]
-                  000062a8    00000015     lcd.obj (.const:.string:msg16)
-                  000062bd    00000001     --HOLE-- [fill = 0]
-                  000062be    00000015     lcd.obj (.const:.string:msg17)
-                  000062d3    00000001     --HOLE-- [fill = 0]
-                  000062d4    00000015     lcd.obj (.const:.string:msg18)
-                  000062e9    00000001     --HOLE-- [fill = 0]
-                  000062ea    00000015     lcd.obj (.const:.string:msg19)
-                  000062ff    00000001     --HOLE-- [fill = 0]
-                  00006300    00000015     lcd.obj (.const:.string:msg1)
-                  00006315    00000001     --HOLE-- [fill = 0]
-                  00006316    00000015     lcd.obj (.const:.string:msg20)
-                  0000632b    00000001     --HOLE-- [fill = 0]
-                  0000632c    00000015     lcd.obj (.const:.string:msg2)
-                  00006341    00000001     --HOLE-- [fill = 0]
-                  00006342    00000015     lcd.obj (.const:.string:msg3)
-                  00006357    00000001     --HOLE-- [fill = 0]
-                  00006358    00000015     lcd.obj (.const:.string:msg4)
-                  0000636d    00000001     --HOLE-- [fill = 0]
-                  0000636e    00000015     lcd.obj (.const:.string:msg5)
-                  00006383    00000001     --HOLE-- [fill = 0]
-                  00006384    00000015     lcd.obj (.const:.string:msg6)
-                  00006399    00000001     --HOLE-- [fill = 0]
-                  0000639a    00000012     lcd.obj (.const:.string:oilchange_string)
-                  000063ac    00000011     lcd.obj (.const:.string:RPM_string)
-                  000063bd    00000001     --HOLE-- [fill = 0]
-                  000063be    00000011     lcd.obj (.const:.string:runtime_string)
-                  000063cf    00000001     --HOLE-- [fill = 0]
-                  000063d0    00000010     engineController.obj (.const:$P$T0$1)
-                  000063e0    00000010     lcd.obj (.const:.string:bt_tmp_string)
-                  000063f0    00000010     lcd.obj (.const:.string:int_tmp_string)
-                  00006400    00000010     rts430x_lc_rd_eabi.lib : e_fmod.obj (.const:Zero)
-                  00006410    0000000f     lcd.obj (.const:.string:enghrs_string)
-                  0000641f    00000001     --HOLE-- [fill = 0]
-                  00006420    0000000e     lcd.obj (.const:.string:msg23)
-                  0000642e    0000000e     lcd.obj (.const:.string:msg24)
-                  0000643c    0000000d     lcd.obj (.const:.string:msg21)
-                  00006449    00000001     --HOLE-- [fill = 0]
-                  0000644a    0000000d     lcd.obj (.const:.string:msg22)
-                  00006457    00000001     --HOLE-- [fill = 0]
-                  00006458    0000000c     button.obj (.const:$P$T0$1)
-                  00006464    0000000c     button.obj (.const:$P$T1$2)
-                  00006470    0000000c     button.obj (.const:$P$T2$3)
-                  0000647c    0000000c     button.obj (.const:$P$T3$4)
-                  00006488    0000000c     button.obj (.const:$P$T4$5)
-                  00006494    0000000c     button.obj (.const:$P$T5$6)
-                  000064a0    0000000c     lcd.obj (.const:modeArray)
-                  000064ac    00000008     rts430x_lc_rd_eabi.lib : k_rem_pio2.obj (.const:init_jk)
-                  000064b4    00000006     lcd.obj (.const:.string)
-                  000064ba    00000003     lcd.obj (.const:.string:VOLT_char)
-                  000064bd    00000001     --HOLE-- [fill = 0]
-                  000064be    00000002     lcd.obj (.const:.string:colon_char)
-                  000064c0    00000002     lcd.obj (.const:.string:slash_char)
-                  000064c2    00000002     lcd.obj (.const:.string:space_char)
-                  000064c4    00000002     lcd.obj (.const:.string:zero_char)
-                  000064c6    00000001     lcd.obj (.const:.string:empty_char)
+.const     0    00005df4    00000446     
+                  00005df4    00000108     rts430x_lc_rd_eabi.lib : k_rem_pio2.obj (.const:ipio2)
+                  00005efc    00000101                            : ctype.obj (.const:.string:_ctypes_)
+                  00005ffd    00000001     --HOLE-- [fill = 0]
+                  00005ffe    00000080                            : k_tan.obj (.const:xxx)
+                  0000607e    0000006c     GPS.obj (.const:.string)
+                  000060ea    00000050     rts430x_lc_rd_eabi.lib : strtod.obj (.const:digits)
+                  0000613a    00000048                            : strtod.obj (.const:powerof10)
+                  00006182    00000040                            : k_rem_pio2.obj (.const:PIo2)
+                  000061c2    00000018     engineController.obj (.const:$P$T0$1)
+                  000061da    00000010     rts430x_lc_rd_eabi.lib : e_fmod.obj (.const:Zero)
+                  000061ea    0000000c     button.obj (.const:$P$T0$1)
+                  000061f6    0000000c     button.obj (.const:$P$T1$2)
+                  00006202    0000000c     button.obj (.const:$P$T2$3)
+                  0000620e    0000000c     button.obj (.const:$P$T3$4)
+                  0000621a    0000000c     button.obj (.const:$P$T4$5)
+                  00006226    0000000c     button.obj (.const:$P$T5$6)
+                  00006232    00000008     rts430x_lc_rd_eabi.lib : k_rem_pio2.obj (.const:init_jk)
 
 RTC        0    0000ffd2    00000002     
                   0000ffd2    00000002     rts430x_lc_rd_eabi.lib : int41.obj (.int41)
@@ -263,7 +192,7 @@ TIMER1_A1
 
 TIMER1_A0 
 *          0    0000ffe2    00000002     
-                  0000ffe2    00000002     rts430x_lc_rd_eabi.lib : int49.obj (.int49)
+                  0000ffe2    00000002     main.obj (.int49)
 
 DMA        0    0000ffe4    00000002     
                   0000ffe4    00000002     rts430x_lc_rd_eabi.lib : int50.obj (.int50)
@@ -280,7 +209,7 @@ TIMER0_A1
 
 TIMER0_A0 
 *          0    0000ffec    00000002     
-                  0000ffec    00000002     main.obj (.int54)
+                  0000ffec    00000002     rts430x_lc_rd_eabi.lib : int54.obj (.int54)
 
 ADC12      0    0000ffee    00000002     
                   0000ffee    00000002     AtoD.obj (.int55)
@@ -311,221 +240,173 @@ SYSNMI     0    0000fffc    00000002
 .reset     0    0000fffe    00000002     
                   0000fffe    00000002     rts430x_lc_rd_eabi.lib : boot.obj (.reset)
 
-.text      0    00010000    0000c1d0     
+.text      0    00010000    000095fe     
                   00010000    00000da6     rts430x_lc_rd_eabi.lib : k_rem_pio2.obj (.text:__kernel_rem_pio2)
-                  00010da6    00000d10     solar.obj (.text:solar_calculate)
-                  00011ab6    000008e8     rts430x_lc_rd_eabi.lib : s_sin.obj (.text:sin)
-                  0001239e    000008e2                            : s_cos.obj (.text:cos)
-                  00012c80    000008c0                            : s_tan.obj (.text:tan)
-                  00013540    0000060a                            : e_asin.obj (.text:asin)
-                  00013b4a    00000594                            : e_fmod.obj (.text:fmod)
-                  000140de    00000526                            : e_acos.obj (.text:acos)
-                  00014604    00000522                            : k_tan.obj (.text:__kernel_tan)
-                  00014b26    00000486                            : frcdivd.obj (.text:__TI_frcdivd)
-                  00014fac    00000372                            : div64u.obj (.text:__mspabi_divull)
-                  0001531e    000002e4                            : frcmpyd.obj (.text:__TI_frcmpyd)
-                  00015602    000002e4                            : e_sqrt.obj (.text:sqrt)
-                  000158e6    000002d8                            : addd.obj (.text:__mspabi_addd)
-                  00015bbe    000002a6                            : k_sin.obj (.text:__kernel_sin)
-                  00015e64    00000282                            : mpyd.obj (.text:__mspabi_mpyd)
-                  000160e6    00000262                            : _printfi.obj (.text:_setfield)
-                  00016348    00000254                            : k_cos.obj (.text:__kernel_cos)
-                  0001659c    00000252                            : frcaddd.obj (.text:__TI_frcaddd)
-                  000167ee    00000248                            : _printfi.obj (.text:_pproc_fgea)
-                  00016a36    00000244     button.obj (.text:button_stateMachine)
-                  00016c7a    0000023c     rts430x_lc_rd_eabi.lib : _printfi.obj (.text:__TI_printfi)
-                  00016eb6    00000232     GPS.obj (.text:GpsDecode)
-                  000170e8    00000224     rts430x_lc_rd_eabi.lib : _printfi.obj (.text:acvt)
-                  0001730c    00000222                            : divd.obj (.text:__mspabi_divd)
-                  0001752e    00000218                            : _printfi.obj (.text:ecvt)
-                  00017746    00000202                            : _printfi.obj (.text:fcvt)
-                  00017948    000001fe     main.obj (.text:main)
-                  00017b46    000001ca     rts430x_lc_rd_eabi.lib : s_floor.obj (.text:floor)
-                  00017d10    000001ba     engineController.obj (.text:set_Engine_State)
-                  00017eca    000001b0     lcd.obj (.text:DIAG_showVoltage)
-                  0001807a    000001a4     rts430x_lc_rd_eabi.lib : _printfi.obj (.text:_pconv_e)
-                  0001821e    000001a0                            : s_scalbn.obj (.text:scalbn)
-                  000183be    00000188                            : _printfi.obj (.text:_getarg_diouxp)
-                  00018546    00000178     lcd.obj (.text:DIAG_showDate)
-                  000186be    00000176     lcd.obj (.text:DIAG_showSunRiseSet)
-                  00018834    0000016e     rts430x_lc_rd_eabi.lib : _printfi.obj (.text:_pconv_a)
-                  000189a2    00000148                            : _printfi.obj (.text:_pproc_diouxp)
-                  00018aea    00000136     lcd.obj (.text:Norm_showStateCode)
-                  00018c20    00000132     rts430x_lc_rd_eabi.lib : fs_add.obj (.text)
-                  00018d52    0000012e     lcd.obj (.text:InitializeDisplay)
-                  00018e80    0000012e     Common.obj (.text:itoa)
-                  00018fae    0000012e     engineController.obj (.text:store_idleTime)
-                  000190dc    00000128     rts430x_lc_rd_eabi.lib : _printfi.obj (.text:_ltostr)
-                  00019204    00000126     solar.obj (.text:solar_toJulian)
-                  0001932a    00000120     Hardware.obj (.text:ConfigurePins)
-                  0001944a    00000114     bms.obj (.text:check_BatteryBox_Status)
-                  0001955e    00000114     MAX31855.obj (.text:getThermocoupleData)
-                  00019672    00000112     mast.obj (.text:mast_stateMachine)
-                  00019784    000000fe     AtoD.obj (.text:loadAnalogData)
-                  00019882    000000fc     rts430x_lc_rd_eabi.lib : _printfi.obj (.text:_pconv_g)
-                  0001997e    000000fa                            : _printfi.obj (.text:_pproc_fwp)
-                  00019a78    000000f8     engineController.obj (.text:check_Engine_Status)
-                  00019b70    000000f6     solar.obj (.text:solar_getSunrise)
-                  00019c66    000000f6     solar.obj (.text:solar_getSunset)
-                  00019d5c    000000da     button.obj (.text:buildButtonStateMachine)
-                  00019e36    000000d8     lcd.obj (.text:DIAG_showLatLong)
-                  00019f0e    000000d8     GPS.obj (.text:SendNMEACmd)
-                  00019fe6    000000d8     rts430x_lc_rd_eabi.lib : cmpd.obj (.text:__mspabi_cmpd)
-                  0001a0be    000000d6     lcd.obj (.text:DIAG_showEngineHours)
-                  0001a194    000000c4     main.obj (.text:isQuietTime)
-                  0001a258    000000b8     rts430x_lc_rd_eabi.lib : fs_mpy.obj (.text)
-                  0001a310    000000b4     solar.obj (.text:solar_timeFromDayDec)
-                  0001a3c4    000000b2     lcd.obj (.text:OLED_sendByte)
-                  0001a476    000000b2     rts430x_lc_rd_eabi.lib : renormd.obj (.text:__TI_renormd)
-                  0001a528    000000b2                            : s_frexp.obj (.text:frexp)
-                  0001a5da    000000a6                            : _printfi.obj (.text:_pproc_str)
-                  0001a680    000000a0     main.obj (.text:inc_secondCounts)
-                  0001a720    0000009e     rts430x_lc_rd_eabi.lib : fltlid.obj (.text:__mspabi_fltlid)
-                  0001a7be    00000094                            : _printfi.obj (.text:_ecpy)
-                  0001a852    00000090                            : _printfi.obj (.text:_mcpy)
-                  0001a8e2    00000090                            : fs_div.obj (.text)
-                  0001a972    0000008e     lcd.obj (.text:DIAG_showBatteryTemp)
-                  0001aa00    0000008c     rts430x_lc_rd_eabi.lib : cvtdf.obj (.text:__mspabi_cvtdf)
-                  0001aa8c    0000008a     lcd.obj (.text:updateDisplay)
-                  0001ab16    00000084     lcd.obj (.text:DIAG_showInternalTemp)
-                  0001ab9a    00000084     lcd.obj (.text:DIAG_showRuntime)
-                  0001ac1e    00000082     rts430x_lc_rd_eabi.lib : autoinit_wdt.obj (.text:_auto_init_hold_wdt)
-                  0001aca0    00000080                            : fltuld.obj (.text:__mspabi_fltuld)
-                  0001ad20    00000080                            : ltoa.obj (.text:ltoa)
-                  0001ada0    0000007c     mast.obj (.text:mastUpDown)
-                  0001ae1c    00000078     rts430x_lc_rd_eabi.lib : _printfi.obj (.text:_pconv_f)
-                  0001ae94    00000070     lcd.obj (.text:DIAG_showRPM)
-                  0001af04    0000006e     AtoD.obj (.text:ConfigureA2D)
-                  0001af72    0000006e     rts430x_lc_rd_eabi.lib : cvtfd.obj (.text:__mspabi_cvtfd)
-                  0001afe0    0000006c     GPS.obj (.text:GetGpsIdx)
-                  0001b04c    00000068     rts430x_lc_rd_eabi.lib : copy_decompress_rle.obj (.text:__TI_decompress_rle_core)
-                  0001b0b4    00000068                            : fs_toi.obj (.text)
-                  0001b11c    00000066                            : fixdli.obj (.text:__mspabi_fixdli)
-                  0001b182    00000066                            : cpy_tbl.obj (.text:copy_in)
-                  0001b1e8    00000062                            : atoi.obj (.text:atoi)
-                  0001b24a    0000005c     MAX31855.obj (.text:pollMAX31855)
-                  0001b2a6    0000005c     solar.obj (.text:solar_setCoords)
-                  0001b302    0000005a     AtoD.obj (.text:ConvertInternalTempToCelcius)
-                  0001b35c    0000005a     lcd.obj (.text:OLED_command)
-                  0001b3b6    00000058     lcd.obj (.text:OLED_data)
-                  0001b40e    00000058     Hardware.obj (.text:SetVcoreUp)
-                  0001b466    00000058     rts430x_lc_rd_eabi.lib : div32u.obj (.text)
-                  0001b4be    00000052     main.obj (.text:handle_unitModeIndicator)
-                  0001b510    00000050     engineController.obj (.text:InitializeEngine)
-                  0001b560    0000004e     rts430x_lc_rd_eabi.lib : _printfi.obj (.text:_fcpy)
-                  0001b5ae    0000004a     timeDate.obj (.text:datetime)
-                  0001b5f8    0000004a     rts430x_lc_rd_eabi.lib : fs_cmp.obj (.text)
-                  0001b642    0000004a                            : fs_ltof.obj (.text)
-                  0001b68c    00000048     Hardware.obj (.text:ConfigureCrystals)
-                  0001b6d4    00000048     lcd.obj (.text:OLED_writeLine)
-                  0001b71c    00000048     main.obj (.text:handle_lighting)
-                  0001b764    00000044     rts430x_lc_rd_eabi.lib : sprintf.obj (.text:sprintf)
-                  0001b7a8    00000044     timeDate.obj (.text:time)
-                  0001b7ec    00000042     engineController.obj (.text:handle_oilchangeClear)
-                  0001b82e    00000040     Common.obj (.text:asctohex)
-                  0001b86e    00000040     rts430x_lc_rd_eabi.lib : div32s.obj (.text)
-                  0001b8ae    0000003e     solar.obj (.text:degrees)
-                  0001b8ec    0000003e     rts430x_lc_rd_eabi.lib : asr32.obj (.text:l_asr_const)
-                  0001b92a    0000003e                            : lsl32.obj (.text:l_lsl_const)
-                  0001b968    0000003e                            : lsr32.obj (.text:l_lsr_const)
-                  0001b9a6    0000003e     solar.obj (.text:radians)
-                  0001b9e4    0000003c     lcd.obj (.text:OLED_clockCycle)
-                  0001ba20    0000003a     rts430x_lc_rd_eabi.lib : lsl64.obj (.text:__mspabi_sllll)
-                  0001ba5a    0000003a                            : lsr64.obj (.text:__mspabi_srlll)
-                  0001ba94    0000003a     bms.obj (.text:setContactor)
-                  0001bace    00000038     timeDate.obj (.text:date)
-                  0001bb06    00000036     rts430x_lc_rd_eabi.lib : fs_itof.obj (.text)
-                  0001bb3c    00000036     bms.obj (.text:setBatteryHeater)
-                  0001bb72    00000032     rts430x_lc_rd_eabi.lib : subd.obj (.text:__mspabi_subd)
-                  0001bba4    00000032     mast.obj (.text:handle_reset)
-                  0001bbd6    00000032     rts430x_lc_rd_eabi.lib : fs_ultof.obj (.text)
-                  0001bc08    00000030     GPS.obj (.text:InitializeGPS)
-                  0001bc38    0000002e     GPS.obj (.text:ConfigureGPSSerialPort)
-                  0001bc66    0000002e     lcd.obj (.text:Norm_showCompanyName)
-                  0001bc94    0000002e     rts430x_lc_rd_eabi.lib : negd.obj (.text:__mspabi_negd)
-                  0001bcc2    0000002e                            : s_copysign.obj (.text:copysign)
-                  0001bcf0    0000002e     main.obj (.text:handleSystemFailEvent)
-                  0001bd1e    0000002c     MCP7940N.obj (.text:InitializeRTC)
-                  0001bd4a    0000002c     MAX31855.obj (.text:_delay_ms)
-                  0001bd76    0000002c     rts430x_lc_rd_eabi.lib : div16s.obj (.text)
-                  0001bda2    0000002c     bms.obj (.text:setEngineRun)
-                  0001bdce    00000028     GPS.obj (.text:ResetGPSRxBuffer)
-                  0001bdf6    00000028     rts430x_lc_rd_eabi.lib : fixdi.obj (.text:__mspabi_fixdi)
-                  0001be1e    00000026     engineController.obj (.text:runTime)
-                  0001be44    00000026     main.obj (.text:setLightsState)
-                  0001be6a    00000024     GPS.obj (.text:handleGPSevent)
-                  0001be8e    00000024     rts430x_lc_rd_eabi.lib : fs_utof.obj (.text)
-                  0001beb2    00000024                            : mult32_f5hw.obj (.text)
-                  0001bed6    00000022     lcd.obj (.text:Norm_showMode)
-                  0001bef8    00000022     lcd.obj (.text:OLED_clearDisplay)
-                  0001bf1a    00000020     rts430x_lc_rd_eabi.lib : sprintf.obj (.text:_outs)
-                  0001bf3a    00000020     lcd.obj (.text:clearLine)
-                  0001bf5a    0000001e     main.obj (.text:handleCabinetHeating)
-                  0001bf78    0000001e     rts430x_lc_rd_eabi.lib : memccpy.obj (.text:memccpy)
-                  0001bf96    0000001e                            : strcat.obj (.text:strcat)
-                  0001bfb4    0000001c                            : strchr.obj (.text:strchr)
-                  0001bfd0    00000018     Hardware.obj (.text:ConfigureTimerA0)
-                  0001bfe8    00000018     engineController.obj (.text:buildIdleArray)
-                  0001c000    00000018     rts430x_lc_rd_eabi.lib : mult16_f5hw.obj (.text)
-                  0001c018    00000016     Hardware.obj (.text:InitializeHardware)
-                  0001c02e    00000016     Common.obj (.text:clearStateCode)
-                  0001c044    00000016     main.obj (.text:enterLowPowerMode)
-                  0001c05a    00000016     rts430x_lc_rd_eabi.lib : memset.obj (.text:memset)
-                  0001c070    00000016                            : div16u.obj (.text)
-                  0001c086    00000014                            : sprintf.obj (.text:_outc)
-                  0001c09a    00000014     main.obj (.text:handleLowFuelEvent)
-                  0001c0ae    00000014     rts430x_lc_rd_eabi.lib : memcpy.obj (.text:memcpy)
-                  0001c0c2    00000014     Common.obj (.text:setStateCode)
-                  0001c0d6    00000012     rts430x_lc_rd_eabi.lib : copy_decompress_none.obj (.text:decompress:none:__TI_decompress_none)
-                  0001c0e8    00000012                            : strcpy.obj (.text:strcpy)
-                  0001c0fa    00000012                            : toupper.obj (.text:toupper)
-                  0001c10c    00000010     GPS.obj (.text:ConfigureGPSNmeaOutput)
-                  0001c11c    00000010     rts430x_lc_rd_eabi.lib : asr32.obj (.text:l_asr)
-                  0001c12c    00000010                            : lsl32.obj (.text:l_lsl)
-                  0001c13c    00000010                            : lsr32.obj (.text:l_lsr)
-                  0001c14c    0000000e     engineController.obj (.text:checkEngineRPMs)
-                  0001c15a    0000000e     rts430x_lc_rd_eabi.lib : strlen.obj (.text:strlen)
-                  0001c168    0000000c                            : fltid.obj (.text:__mspabi_fltid)
-                  0001c174    0000000a                            : abs.obj (.text:abs)
-                  0001c17e    0000000a                            : lsl16.obj (.text)
-                  0001c188    0000000a     mast.obj (.text:sleepModeProcess)
-                  0001c192    00000008     WatchdogTimerControl.obj (.text:WdtDisable)
-                  0001c19a    00000008     WatchdogTimerControl.obj (.text:WdtEnable)
-                  0001c1a2    00000008     WatchdogTimerControl.obj (.text:WdtKeepAlive)
-                  0001c1aa    00000008     engineController.obj (.text:checkOilPressure)
-                  0001c1b2    00000006     Hardware.obj (.text:StopTimerA0)
-                  0001c1b8    00000006     rts430x_lc_rd_eabi.lib : fltud.obj (.text:__mspabi_fltud)
-                  0001c1be    00000006                            : exit.obj (.text:abort)
-                  0001c1c4    00000006                            : copy_decompress_rle.obj (.text:decompress:rle24:__TI_decompress_rle24)
-                  0001c1ca    00000004                            : pre_init.obj (.text:_system_pre_init)
-                  0001c1ce    00000002                            : startup.obj (.text:_system_post_cinit)
+                  00010da6    00000b0c     solar.obj (.text:solar_calculate)
+                  000118b2    000008e8     rts430x_lc_rd_eabi.lib : s_sin.obj (.text:sin)
+                  0001219a    000008e2                            : s_cos.obj (.text:cos)
+                  00012a7c    000008c0                            : s_tan.obj (.text:tan)
+                  0001333c    0000060a                            : e_asin.obj (.text:asin)
+                  00013946    00000594                            : e_fmod.obj (.text:fmod)
+                  00013eda    00000526                            : e_acos.obj (.text:acos)
+                  00014400    00000522                            : k_tan.obj (.text:__kernel_tan)
+                  00014922    00000486                            : frcdivd.obj (.text:__TI_frcdivd)
+                  00014da8    000002e4                            : frcmpyd.obj (.text:__TI_frcmpyd)
+                  0001508c    000002e4                            : e_sqrt.obj (.text:sqrt)
+                  00015370    000002e4                            : strtod.obj (.text:strtod)
+                  00015654    000002d8                            : addd.obj (.text:__mspabi_addd)
+                  0001592c    000002a6                            : k_sin.obj (.text:__kernel_sin)
+                  00015bd2    00000282                            : mpyd.obj (.text:__mspabi_mpyd)
+                  00015e54    00000254                            : k_cos.obj (.text:__kernel_cos)
+                  000160a8    00000252                            : frcaddd.obj (.text:__TI_frcaddd)
+                  000162fa    00000222                            : divd.obj (.text:__mspabi_divd)
+                  0001651c    0000021c     GPS.obj (.text:GpsDecode)
+                  00016738    000001ca     rts430x_lc_rd_eabi.lib : s_floor.obj (.text:floor)
+                  00016902    000001a0                            : s_scalbn.obj (.text:scalbn)
+                  00016aa2    0000019e     engineController.obj (.text:set_Engine_State)
+                  00016c40    00000186     Flash.obj (.text:UpdateFlashMemory)
+                  00016dc6    0000016a     Flash.obj (.text:LoadRamRegistersFromFlash)
+                  00016f30    00000168     GPS.obj (.text:storeGPSInstance)
+                  00017098    00000166     button.obj (.text:button_stateMachine)
+                  000171fe    00000148     bms.obj (.text:check_BatteryBox_Status)
+                  00017346    00000132     rts430x_lc_rd_eabi.lib : fs_add.obj (.text)
+                  00017478    00000130     GPS.obj (.text:GpsMessageRetrieve)
+                  000175a8    00000120     Hardware.obj (.text:ConfigurePins)
+                  000176c8    00000110     main.obj (.text:main)
+                  000177d8    000000fe     solar.obj (.text:solar_toJulian)
+                  000178d6    000000f6     solar.obj (.text:solar_getSunrise)
+                  000179cc    000000f6     solar.obj (.text:solar_getSunset)
+                  00017ac2    000000da     button.obj (.text:buildButtonStateMachine)
+                  00017b9c    000000d8     rts430x_lc_rd_eabi.lib : cmpd.obj (.text:__mspabi_cmpd)
+                  00017c74    000000d8     engineController.obj (.text:check_Engine_Status)
+                  00017d4c    000000d2     mast.obj (.text:mast_stateMachine)
+                  00017e1e    000000ce     engineController.obj (.text:store_idleTime)
+                  00017eec    000000ca     MAX31855.obj (.text:getThermocoupleData)
+                  00017fb6    000000b8     rts430x_lc_rd_eabi.lib : fs_mpy.obj (.text)
+                  0001806e    000000b2                            : renormd.obj (.text:__TI_renormd)
+                  00018120    000000a2     main.obj (.text:isQuietTime)
+                  000181c2    000000a0     main.obj (.text:incrementSecondCounts)
+                  00018262    0000009e     rts430x_lc_rd_eabi.lib : fltlid.obj (.text:__mspabi_fltlid)
+                  00018300    00000094     AtoD.obj (.text:loadAnalogData)
+                  00018394    00000090     rts430x_lc_rd_eabi.lib : fs_div.obj (.text)
+                  00018424    0000008c                            : cvtdf.obj (.text:__mspabi_cvtdf)
+                  000184b0    00000082                            : autoinit_wdt.obj (.text:_auto_init_hold_wdt)
+                  00018532    0000007e     solar.obj (.text:solar_timeFromDayDec)
+                  000185b0    0000007c     Flash.obj (.text:overwriteInfoSeg)
+                  0001862c    0000007a     Flash.obj (.text:GetConfiguration)
+                  000186a6    00000078     mast.obj (.text:mastUpDown)
+                  0001871e    00000076     Flash.obj (.text:UpdateFlashRegistersFromRam)
+                  00018794    0000006e     AtoD.obj (.text:ConfigureA2D)
+                  00018802    0000006e     rts430x_lc_rd_eabi.lib : cvtfd.obj (.text:__mspabi_cvtfd)
+                  00018870    00000068                            : copy_decompress_rle.obj (.text:__TI_decompress_rle_core)
+                  000188d8    00000068                            : fs_toi.obj (.text)
+                  00018940    00000066                            : fixdli.obj (.text:__mspabi_fixdli)
+                  000189a6    00000066                            : cpy_tbl.obj (.text:copy_in)
+                  00018a0c    00000062                            : atoi.obj (.text:atoi)
+                  00018a6e    0000005c     Flash.obj (.text:copy_segCtoB)
+                  00018aca    0000004e     Hardware.obj (.text:SetVcoreUp)
+                  00018b18    0000004c     engineController.obj (.text:InitializeEngine)
+                  00018b64    0000004a     GPS.obj (.text:NMEAgetField)
+                  00018bae    0000004a     rts430x_lc_rd_eabi.lib : fs_cmp.obj (.text)
+                  00018bf8    0000004a                            : fs_ltof.obj (.text)
+                  00018c42    00000048     Hardware.obj (.text:ConfigureCrystals)
+                  00018c8a    00000046     main.obj (.text:handleButtonLight)
+                  00018cd0    00000046     main.obj (.text:handle_lighting)
+                  00018d16    00000042     AtoD.obj (.text:ConvertInternalTempToCelcius)
+                  00018d58    00000042     GPS.obj (.text:GetGpsIdx)
+                  00018d9a    00000042     engineController.obj (.text:handle_oilchangeClear)
+                  00018ddc    0000003e     main.obj (.text:handleCabinetHeating)
+                  00018e1a    0000003e     button.obj (.text:handle_reset)
+                  00018e58    0000003e     rts430x_lc_rd_eabi.lib : asr32.obj (.text:l_asr_const)
+                  00018e96    0000003e                            : lsl32.obj (.text:l_lsl_const)
+                  00018ed4    0000003e                            : lsr32.obj (.text:l_lsr_const)
+                  00018f12    0000003e     GPS.obj (.text:resetGpsInstance)
+                  00018f50    0000003e     solar.obj (.text:solar_setCoords)
+                  00018f8e    0000003a     Common.obj (.text:crc)
+                  00018fc8    0000003a     timeDate.obj (.text:datetime)
+                  00019002    0000003a     GPS.obj (.text:pollGPS)
+                  0001903c    0000003a     engineController.obj (.text:runTime)
+                  00019076    00000036     MAX31855.obj (.text:pollMAX31855)
+                  000190ac    00000036     rts430x_lc_rd_eabi.lib : fs_itof.obj (.text)
+                  000190e2    00000032                            : subd.obj (.text:__mspabi_subd)
+                  00019114    00000032                            : fs_ultof.obj (.text)
+                  00019146    00000030     bms.obj (.text:setContactor)
+                  00019176    0000002e     GPS.obj (.text:ConfigureGPSSerialPort)
+                  000191a4    0000002e     rts430x_lc_rd_eabi.lib : negd.obj (.text:__mspabi_negd)
+                  000191d2    0000002e                            : s_copysign.obj (.text:copysign)
+                  00019200    0000002e     main.obj (.text:handleSystemFailEvent)
+                  0001922e    0000002c     MCP7940N.obj (.text:InitializeRTC)
+                  0001925a    0000002c     rts430x_lc_rd_eabi.lib : div16s.obj (.text)
+                  00019286    0000002c     bms.obj (.text:setBatteryHeater)
+                  000192b2    0000002c     timeDate.obj (.text:time)
+                  000192de    0000002a     Flash.obj (.text:verify_info_checksum)
+                  00019308    00000028     rts430x_lc_rd_eabi.lib : fixdi.obj (.text:__mspabi_fixdi)
+                  00019330    00000024     GPS.obj (.text:ResetGPSRxBuffer)
+                  00019354    00000024     timeDate.obj (.text:date)
+                  00019378    00000024     rts430x_lc_rd_eabi.lib : fs_utof.obj (.text)
+                  0001939c    00000024                            : mult32_f5hw.obj (.text)
+                  000193c0    00000022     solar.obj (.text:degrees)
+                  000193e2    00000022     solar.obj (.text:radians)
+                  00019404    00000022     bms.obj (.text:setEngineRun)
+                  00019426    00000020     Common.obj (.text:asctohex)
+                  00019446    0000001c     main.obj (.text:setLightsState)
+                  00019462    0000001c     rts430x_lc_rd_eabi.lib : strcmp.obj (.text:strcmp)
+                  0001947e    0000001a     button.obj (.text:handle_pressDiagButton)
+                  00019498    00000018     Hardware.obj (.text:ConfigureTimerA1)
+                  000194b0    00000018     rts430x_lc_rd_eabi.lib : mult16_f5hw.obj (.text)
+                  000194c8    00000016                            : div16u.obj (.text)
+                  000194de    00000014     Hardware.obj (.text:InitializeHardware)
+                  000194f2    00000014     main.obj (.text:handleLowFuelEvent)
+                  00019506    00000014     rts430x_lc_rd_eabi.lib : memcpy.obj (.text:memcpy)
+                  0001951a    00000012                            : copy_decompress_none.obj (.text:decompress:none:__TI_decompress_none)
+                  0001952c    00000010     main.obj (.text:handleIndicators)
+                  0001953c    00000010     rts430x_lc_rd_eabi.lib : asr32.obj (.text:l_asr)
+                  0001954c    00000010                            : lsl32.obj (.text:l_lsl)
+                  0001955c    00000010                            : lsr32.obj (.text:l_lsr)
+                  0001956c    0000000e     engineController.obj (.text:checkEngineRPMs)
+                  0001957a    0000000c     rts430x_lc_rd_eabi.lib : fltid.obj (.text:__mspabi_fltid)
+                  00019586    0000000c     Common.obj (.text:clearStateCode)
+                  00019592    0000000c     Common.obj (.text:setStateCode)
+                  0001959e    0000000a     rts430x_lc_rd_eabi.lib : abs.obj (.text:abs)
+                  000195a8    0000000a                            : fs_neg.obj (.text)
+                  000195b2    0000000a                            : lsl16.obj (.text)
+                  000195bc    00000008     WatchdogTimerControl.obj (.text:WdtDisable)
+                  000195c4    00000008     WatchdogTimerControl.obj (.text:WdtEnable)
+                  000195cc    00000008     WatchdogTimerControl.obj (.text:WdtKeepAlive)
+                  000195d4    00000008     mast.obj (.text:sleepModeProcess)
+                  000195dc    00000006     Hardware.obj (.text:StopTimerA1)
+                  000195e2    00000006     rts430x_lc_rd_eabi.lib : exit.obj (.text:abort)
+                  000195e8    00000006                            : atof.obj (.text:atof)
+                  000195ee    00000006                            : copy_decompress_rle.obj (.text:decompress:rle24:__TI_decompress_rle24)
+                  000195f4    00000004                            : pre_init.obj (.text:_system_pre_init)
+                  000195f8    00000004     engineController.obj (.text:checkOilPressure)
+                  000195fc    00000002     rts430x_lc_rd_eabi.lib : startup.obj (.text:_system_post_cinit)
 
 MODULE SUMMARY
 
        Module                     code    ro data   rw data
        ------                     ----    -------   -------
     .\
-       solar.obj                  4526    0         32     
-       lcd.obj                    3514    624       52     
-       GPS.obj                    1300    88        2466   
-       main.obj                   1298    4         30     
-       engineController.obj       1222    40        2      
-       button.obj                 798     72        0      
-       AtoD.obj                   692     2         140    
-       Hardware.obj               500     0         0      
-       mast.obj                   458     0         0      
-       bms.obj                    432     0         6      
-       MAX31855.obj               412     0         12     
-       Common.obj                 408     0         0      
-       timeDate.obj               198     0         0      
-       config.obj                 0       0         152    
+       solar.obj                  3830    0         32     
+       GPS.obj                    1732    110       932    
+       Flash.obj                  1250    0         384    
+       engineController.obj       1054    24        0      
+       main.obj                   1042    4         18     
+       button.obj                 664     72        0      
+       AtoD.obj                   468     2         140    
+       Hardware.obj               488     0         0      
+       bms.obj                    454     0         6      
+       mast.obj                   338     0         0      
+       MAX31855.obj               256     0         12     
+       config.obj                 0       0         192    
+       timeDate.obj               138     0         0      
+       Common.obj                 114     0         0      
        MCP7940N.obj               44      0         0      
        WatchdogTimerControl.obj   24      0         0      
     +--+--------------------------+-------+---------+---------+
-       Total:                     15826   830       2892   
+       Total:                     11896   212       1716   
                                                            
     C:\ti\ccsv6\tools\compiler\ti-cgt-msp430_15.12.1.LTS\lib\rts430x_lc_rd_eabi.lib
-       _printfi.obj               6324    38        0      
        k_rem_pio2.obj             3494    336       0      
        s_sin.obj                  2280    0         0      
        s_cos.obj                  2274    0         0      
@@ -535,7 +416,7 @@ MODULE SUMMARY
        k_tan.obj                  1314    128       0      
        e_acos.obj                 1318    0         0      
        frcdivd.obj                1158    0         0      
-       div64u.obj                 882     0         0      
+       strtod.obj                 740     152       0      
        e_sqrt.obj                 740     0         0      
        frcmpyd.obj                740     0         0      
        addd.obj                   728     0         0      
@@ -551,29 +432,21 @@ MODULE SUMMARY
        cmpd.obj                   216     0         0      
        fs_mpy.obj                 184     0         0      
        renormd.obj                178     0         0      
-       s_frexp.obj                178     0         0      
        fltlid.obj                 158     0         0      
        fs_div.obj                 144     0         0      
        cvtdf.obj                  140     0         0      
        autoinit_wdt.obj           130     0         0      
-       fltuld.obj                 128     0         0      
-       ltoa.obj                   128     0         0      
-       sprintf.obj                120     0         0      
        copy_decompress_rle.obj    110     0         0      
        cvtfd.obj                  110     0         0      
        fs_toi.obj                 104     0         0      
        cpy_tbl.obj                102     0         0      
        fixdli.obj                 102     0         0      
        atoi.obj                   98      0         0      
-       div32u.obj                 88      0         0      
        asr32.obj                  78      0         0      
        lsl32.obj                  78      0         0      
        lsr32.obj                  78      0         0      
        fs_cmp.obj                 74      0         0      
        fs_ltof.obj                74      0         0      
-       div32s.obj                 64      0         0      
-       lsl64.obj                  58      0         0      
-       lsr64.obj                  58      0         0      
        fs_itof.obj                54      0         0      
        fs_ultof.obj               50      0         0      
        subd.obj                   50      0         0      
@@ -583,24 +456,19 @@ MODULE SUMMARY
        fixdi.obj                  40      0         0      
        fs_utof.obj                36      0         0      
        mult32_f5hw.obj            36      0         0      
-       memccpy.obj                30      0         0      
-       strcat.obj                 30      0         0      
-       strchr.obj                 28      0         0      
+       strcmp.obj                 28      0         0      
        boot_special.obj           26      0         0      
        mult16_f5hw.obj            24      0         0      
        div16u.obj                 22      0         0      
-       memset.obj                 22      0         0      
        memcpy.obj                 20      0         0      
        copy_decompress_none.obj   18      0         0      
-       strcpy.obj                 18      0         0      
-       toupper.obj                18      0         0      
-       strlen.obj                 14      0         0      
        fltid.obj                  12      0         0      
        abs.obj                    10      0         0      
+       fs_neg.obj                 10      0         0      
        lsl16.obj                  10      0         0      
        isr_trap.obj               8       0         0      
+       atof.obj                   6       0         0      
        exit.obj                   6       0         0      
-       fltud.obj                  6       0         0      
        pre_init.obj               4       0         0      
        boot.obj                   0       2         0      
        errno.obj                  0       0         2      
@@ -611,11 +479,11 @@ MODULE SUMMARY
        int46.obj                  0       2         0      
        int47.obj                  0       2         0      
        int48.obj                  0       2         0      
-       int49.obj                  0       2         0      
        int50.obj                  0       2         0      
        int51.obj                  0       2         0      
        int52.obj                  0       2         0      
        int53.obj                  0       2         0      
+       int54.obj                  0       2         0      
        int56.obj                  0       2         0      
        int58.obj                  0       2         0      
        int59.obj                  0       2         0      
@@ -624,24 +492,24 @@ MODULE SUMMARY
        int62.obj                  0       2         0      
        startup.obj                2       0         0      
     +--+--------------------------+-------+---------+---------+
-       Total:                     34412   813       2      
+       Total:                     27002   927       2      
                                                            
        Stack:                     0       0         160    
-       Linker Generated:          0       149       0      
+       Linker Generated:          0       177       0      
     +--+--------------------------+-------+---------+---------+
-       Grand Total:               50238   1792      3054   
+       Grand Total:               38898   1316      1878   
 
 
 LINKER GENERATED COPY TABLES
 
-__TI_cinit_table @ 0000654e records: 2, size/record: 8, table size: 16
-	.data: load addr=000064c8, load size=00000072 bytes, run addr=000026a8, run size=000000a6 bytes, compression=rle
-	.bss: load addr=0000653a, load size=0000000b bytes, run addr=00001c00, run size=00000aa8 bytes, compression=rle
+__TI_cinit_table @ 000062dc records: 2, size/record: 8, table size: 16
+	.data: load addr=0000623a, load size=0000008e bytes, run addr=000020f2, run size=000001c4 bytes, compression=rle
+	.bss: load addr=000062c8, load size=0000000b bytes, run addr=00001c00, run size=000004f2 bytes, compression=rle
 
 
 LINKER GENERATED HANDLER TABLE
 
-__TI_handler_table @ 00006546 records: 2, size/record: 4, table size: 8
+__TI_handler_table @ 000062d4 records: 2, size/record: 4, table size: 8
 	index: 0, handler: __TI_decompress_rle24
 	index: 1, handler: __TI_decompress_none
 
@@ -650,7 +518,7 @@ GLOBAL SYMBOLS: SORTED ALPHABETICALLY BY Name
 
 address   name                        
 -------   ----                        
-00002644  ADC                         
+00002096  ADC                         
 00000700  ADC12CTL0                   
 00000701  ADC12CTL0_H                 
 00000700  ADC12CTL0_L                 
@@ -733,11 +601,11 @@ address   name
 00000732  ADC12MEM9                   
 00000733  ADC12MEM9_H                 
 00000732  ADC12MEM9_L                 
-00005c00  ADC12_ISR                   
-0000270e  ATTEMPT_D                   
-000026d0  BMS_EVENT                   
-0001c1be  C$$EXIT                     
-00002706  CRANK_D                     
+00005cba  ADC12_ISR                   
+0000227c  ATTEMPT_D                   
+00002238  BMS_EVENT                   
+000195e2  C$$EXIT                     
+00002274  CRANK_D                     
 00000150  CRCDI                       
 00000152  CRCDIRB                     
 00000153  CRCDIRB_H                   
@@ -750,19 +618,10 @@ address   name
 00000156  CRCRESR                     
 00000157  CRCRESR_H                   
 00000156  CRCRESR_L                   
-0001af04  ConfigureA2D                
-0001c10c  ConfigureGPSNmeaOutput      
-0001bc38  ConfigureGPSSerialPort      
-0001b302  ConvertInternalTempToCelcius
-0001a972  DIAG_showBatteryTemp        
-00018546  DIAG_showDate               
-0001a0be  DIAG_showEngineHours        
-0001ab16  DIAG_showInternalTemp       
-00019e36  DIAG_showLatLong            
-0001ae94  DIAG_showRPM                
-0001ab9a  DIAG_showRuntime            
-000186be  DIAG_showSunRiseSet         
-00017eca  DIAG_showVoltage            
+00018794  ConfigureA2D                
+00019176  ConfigureGPSSerialPort      
+00018d16  ConvertInternalTempToCelcius
+000020f2  DEFAULT_CONFIG              
 00000510  DMA0CTL                     
 00000511  DMA0CTL_H                   
 00000510  DMA0CTL_L                   
@@ -820,16 +679,16 @@ address   name
 00000146  FCTL4                       
 00000147  FCTL4_H                     
 00000146  FCTL4_L                     
-00016eb6  GpsDecode                   
-00002410  GpsInformation              
-000026a0  GpsMsgOk                    
-000026a2  GpsStateCountdown           
-00018d52  InitializeDisplay           
-0001b510  InitializeEngine            
-0001bc08  InitializeGPS               
-0001c018  InitializeHardware          
-0001bd1e  InitializeRTC               
-000026cc  LIGHTS1HOUR_TMR             
+00001f30  FlashRegisters              
+00002078  GPSinstance                 
+0001862c  GetConfiguration            
+00001e00  GpsInformation              
+00017478  GpsMessageRetrieve          
+000022a6  GpsStateCountdown           
+00018b18  InitializeEngine            
+000194de  InitializeHardware          
+0001922e  InitializeRTC               
+00002234  LIGHTS1HOUR_TMR             
 000004c4  MAC                         
 000004da  MAC32H                      
 000004db  MAC32H_H                    
@@ -869,18 +728,7 @@ address   name
 000004c2  MPYS_L                      
 000004c1  MPY_H                       
 000004c0  MPY_L                       
-0001bc66  Norm_showCompanyName        
-0001bed6  Norm_showMode               
-00018aea  Norm_showStateCode          
-000026e4  OILCHANGE_PRESS_TMR         
-0001bef8  OLED_clearDisplay           
-0001b9e4  OLED_clockCycle             
-0001b35c  OLED_command                
-0001b3b6  OLED_data                   
-00002734  OLED_new_line               
-00002744  OLED_rows                   
-0001a3c4  OLED_sendByte               
-0001b6d4  OLED_writeLine              
+00002250  OILCHANGE_PRESS_TMR         
 000004c8  OP2                         
 000004e2  OP2H                        
 000004e3  OP2H_H                      
@@ -1039,13 +887,13 @@ address   name
 0000012e  PMMRIE                      
 0000012f  PMMRIE_H                    
 0000012e  PMMRIE_L                    
-0000270a  POST_D                      
-00002702  PREHEAT_D                   
-00005e26  Port_2                      
+00002278  POST_D                      
+00002270  PREHEAT_D                   
+00005dac  Port_2                      
 00000158  RCCTL0                      
 00000159  RCCTL0_H                    
 00000158  RCCTL0_L                    
-00002712  REATTEMPTS_D                
+00002280  REATTEMPTS_D                
 000001b0  REFCTL0                     
 000001b1  REFCTL0_H                   
 000001b0  REFCTL0_L                   
@@ -1061,14 +909,13 @@ address   name
 000004ea  RES3                        
 000004eb  RES3_H                      
 000004ea  RES3_L                      
-000026e2  RESET_TMR                   
+0000224e  RESET_TMR                   
 000004cc  RESHI                       
 000004cd  RESHI_H                     
 000004cc  RESHI_L                     
 000004ca  RESLO                       
 000004cb  RESLO_H                     
 000004ca  RESLO_L                     
-000063ac  RPM_string                  
 000004ba  RTCADOWDAY                  
 000004bb  RTCADOWDAY_H                
 000004ba  RTCADOWDAY_L                
@@ -1199,8 +1046,8 @@ address   name
 000003e0  TB0EX0                      
 000003ee  TB0IV                       
 000003d0  TB0R                        
-00005dd2  TIMER0_A0_ISR               
-00002748  TempCountdown               
+00005d4a  TIMER1_A0_ISR               
+000022b2  TempCountdown               
 000005d0  UCA0ABCTL                   
 000005c6  UCA0BRW                     
 000005c7  UCA0BRW_H                   
@@ -1376,72 +1223,75 @@ address   name
 00000170  UCSCTL8                     
 00000171  UCSCTL8_H                   
 00000170  UCSCTL8_L                   
-00005cee  USCI_A0_ISR                 
-000026b4  VALUE_12V                   
-000026ae  VALUE_24V                   
-000026bc  VALUE_BAT_TEMP              
-000026c2  VALUE_INTERNAL_TEMP         
-000026b0  VALUE_PCB_24V               
-000026c8  VALUE_RPM                   
-000064ba  VOLT_char                   
+00005c00  USCI_A0_ISR                 
+00016c40  UpdateFlashMemory           
+00002208  VALUE_12V                   
+000021fc  VALUE_24V                   
+00002218  VALUE_BAT_TEMP              
+00002228  VALUE_INTERNAL2_TEMP        
+00002224  VALUE_INTERNAL_TEMP         
+00002200  VALUE_PCB_24V               
+00002230  VALUE_RPM                   
 0000015c  WDTCTL                      
 0000015d  WDTCTL_H                    
 0000015c  WDTCTL_L                    
-0001c192  WdtDisable                  
-0001c19a  WdtEnable                   
-0001c1a2  WdtKeepAlive                
-000026ea  _ADCs_UPDATED               
-000026a8  _ADCs_UPDATED_              
-0000270c  _ATTEMPT_SP                 
-000026d8  _BANK_BMS_TMR_D             
-000026d6  _BANK_BMS_TMR_SP            
-000026dc  _CELLMONITOR_TMR_D          
-000026da  _CELLMONITOR_TMR_SP         
-00002704  _CRANK_SP                   
-000026ec  _DIAGNOSTIC_MODE            
-000026ee  _DIAGNOSTIC_MODE_TMR        
-000026f0  _DIAGNOSTIC_PAGE            
-000026f2  _DIAGNOSTIC_PAGES           
-000026e8  _FORCE_ENGINE_RUN           
-000026e6  _FORCE_LIGHTS_ON            
-000026aa  _HIGH_SP_24V                
-000026d2  _HIGH_SP_BMS                
-000026be  _HIGH_SP_INTERNAL_TEMP      
-000026c4  _HIGH_SP_RPM                
-000026b6  _HIGH_SP_TEMP               
-000026b2  _LOW_SP_12V                 
-000026ac  _LOW_SP_24V                 
-000026d4  _LOW_SP_BMS                 
-000026c0  _LOW_SP_INTERNAL_TEMP       
-000026c6  _LOW_SP_RPM                 
-000026ba  _LOW_SP_TEMP                
-000026de  _MAST_STATUS                
-000026b8  _NOMINAL_SP_TEMP            
-000026f4  _OILCHANGE_DUE              
-00002708  _POST_SP                    
-00002700  _PREHEAT_SP                 
-00002710  _REATTEMPTS_SP              
-000026e0  _RESETTING_                 
-00002714  _SCREEN_UPDATE_D            
-000026ce  _STATE_CODE                 
-000026f6  _SYS_FAILURE_               
-000026ca  _UNIT_MODE                  
+000195bc  WdtDisable                  
+000195c4  WdtEnable                   
+000195cc  WdtKeepAlive                
+00002256  _ADCs_UPDATED               
+000021f2  _ADCs_UPDATED_              
+0000227a  _ATTEMPT_SP                 
+00002244  _BANK_BMS_TMR_D             
+00002242  _BANK_BMS_TMR_SP            
+00002248  _CELLMONITOR_TMR_D          
+00002246  _CELLMONITOR_TMR_SP         
+00002272  _CRANK_SP                   
+00002258  _DIAGNOSTIC_MODE            
+0000225a  _DIAGNOSTIC_MODE_TMR        
+0000225c  _DIAGNOSTIC_PAGE            
+0000225e  _DIAGNOSTIC_PAGES           
+00002254  _FORCE_ENGINE_RUN           
+00002252  _FORCE_LIGHTS_ON            
+000021f4  _HIGH_SP_24V                
+0000223a  _HIGH_SP_BMS                
+0000221c  _HIGH_SP_INTERNAL_TEMP      
+0000222c  _HIGH_SP_RPM                
+0000220c  _HIGH_SP_TEMP               
+00002204  _LOW_SP_12V                 
+000021f8  _LOW_SP_24V                 
+0000223e  _LOW_SP_BMS                 
+00002220  _LOW_SP_INTERNAL_TEMP       
+0000222e  _LOW_SP_RPM                 
+00002214  _LOW_SP_TEMP                
+0000224a  _MAST_STATUS                
+00002210  _NOMINAL_SP_TEMP            
+00002260  _OILCHANGE_DUE              
+00002264  _POINTER_TO_ENGINE_MINS     
+00002276  _POST_SP                    
+0000226e  _PREHEAT_SP                 
+0000227e  _REATTEMPTS_SP              
+0000224c  _RESETTING_                 
+00002282  _SCREEN_UPDATE_D            
+00002236  _STATE_CODE                 
+00002262  _SYS_FAILURE_               
+00002232  _UNIT_MODE                  
+00002284  _UPDATE_SCREEN_             
 00005c00  __STACK_END                 
 000000a0  __STACK_SIZE                
 UNDEFED   __TI_BINIT_Base             
 UNDEFED   __TI_BINIT_Limit            
-0000654e  __TI_CINIT_Base             
-0000655e  __TI_CINIT_Limit            
-00006546  __TI_Handler_Table_Base     
-0000654e  __TI_Handler_Table_Limit    
+000062dc  __TI_CINIT_Base             
+000062ec  __TI_CINIT_Limit            
+000062d4  __TI_Handler_Table_Base     
+000062dc  __TI_Handler_Table_Limit    
 UNDEFED   __TI_INITARRAY_Base         
 UNDEFED   __TI_INITARRAY_Limit        
-00005e66  __TI_ISR_TRAP               
-0001c0d6  __TI_decompress_none        
-0001c1c4  __TI_decompress_rle24       
-0001659c  __TI_frcaddd                
-00014b26  __TI_frcdivd                
-0001531e  __TI_frcmpyd                
+00005dec  __TI_ISR_TRAP               
+0001951a  __TI_decompress_none        
+000195ee  __TI_decompress_rle24       
+000160a8  __TI_frcaddd                
+00014922  __TI_frcdivd                
+00014da8  __TI_frcmpyd                
 0000ffd2  __TI_int41                  
 0000ffd4  __TI_int42                  
 0000ffd6  __TI_int43                  
@@ -1465,251 +1315,196 @@ UNDEFED   __TI_INITARRAY_Limit
 0000fffa  __TI_int61                  
 0000fffc  __TI_int62                  
 ffffffff  __TI_pprof_out_hndl         
-00016c7a  __TI_printfi                
 ffffffff  __TI_prof_data_size         
 ffffffff  __TI_prof_data_start        
-0001a476  __TI_renormd                
+0001806e  __TI_renormd                
 ffffffff  __c_args__                  
-00016348  __kernel_cos                
+00015e54  __kernel_cos                
 00010000  __kernel_rem_pio2           
-00015bbe  __kernel_sin                
-00014604  __kernel_tan                
-000158e6  __mspabi_addd               
-00018c26  __mspabi_addf               
-00019fe6  __mspabi_cmpd               
-0001b5f8  __mspabi_cmpf               
-0001aa00  __mspabi_cvtdf              
-0001af72  __mspabi_cvtfd              
-0001730c  __mspabi_divd               
-0001a8e2  __mspabi_divf               
-0001bd76  __mspabi_divi               
-0001b86e  __mspabi_divli              
-0001c070  __mspabi_divu               
-0001b466  __mspabi_divul              
-00014fac  __mspabi_divull             
-0001bdf6  __mspabi_fixdi              
-0001b11c  __mspabi_fixdli             
-0001b0b4  __mspabi_fixfi              
-0001c168  __mspabi_fltid              
-0001bb06  __mspabi_fltif              
-0001a720  __mspabi_fltlid             
-0001b642  __mspabi_fltlif             
-0001c1b8  __mspabi_fltud              
-0001be8e  __mspabi_fltuf              
-0001aca0  __mspabi_fltuld             
-0001bbd6  __mspabi_fltulf             
-00015e64  __mspabi_mpyd               
-0001a258  __mspabi_mpyf               
-0001c000  __mspabi_mpyi_f5hw          
-0001beb2  __mspabi_mpyl_f5hw          
-0001bc94  __mspabi_negd               
-0001bd76  __mspabi_remi               
-0001b86e  __mspabi_remli              
-0001c070  __mspabi_remu               
-0001b466  __mspabi_remul              
-0001c17e  __mspabi_slli               
-0001c12c  __mspabi_slll               
-0001b962  __mspabi_slll_1             
-0001b93e  __mspabi_slll_10            
-0001b93a  __mspabi_slll_11            
-0001b936  __mspabi_slll_12            
-0001b932  __mspabi_slll_13            
-0001b92e  __mspabi_slll_14            
-0001b92a  __mspabi_slll_15            
-0001b95e  __mspabi_slll_2             
-0001b95a  __mspabi_slll_3             
-0001b956  __mspabi_slll_4             
-0001b952  __mspabi_slll_5             
-0001b94e  __mspabi_slll_6             
-0001b94a  __mspabi_slll_7             
-0001b946  __mspabi_slll_8             
-0001b942  __mspabi_slll_9             
-0001ba20  __mspabi_sllll              
-0001c11c  __mspabi_sral               
-0001b924  __mspabi_sral_1             
-0001b900  __mspabi_sral_10            
-0001b8fc  __mspabi_sral_11            
-0001b8f8  __mspabi_sral_12            
-0001b8f4  __mspabi_sral_13            
-0001b8f0  __mspabi_sral_14            
-0001b8ec  __mspabi_sral_15            
-0001b920  __mspabi_sral_2             
-0001b91c  __mspabi_sral_3             
-0001b918  __mspabi_sral_4             
-0001b914  __mspabi_sral_5             
-0001b910  __mspabi_sral_6             
-0001b90c  __mspabi_sral_7             
-0001b908  __mspabi_sral_8             
-0001b904  __mspabi_sral_9             
-0001c13c  __mspabi_srll               
-0001b9a0  __mspabi_srll_1             
-0001b97c  __mspabi_srll_10            
-0001b978  __mspabi_srll_11            
-0001b974  __mspabi_srll_12            
-0001b970  __mspabi_srll_13            
-0001b96c  __mspabi_srll_14            
-0001b968  __mspabi_srll_15            
-0001b99c  __mspabi_srll_2             
-0001b998  __mspabi_srll_3             
-0001b994  __mspabi_srll_4             
-0001b990  __mspabi_srll_5             
-0001b98c  __mspabi_srll_6             
-0001b988  __mspabi_srll_7             
-0001b984  __mspabi_srll_8             
-0001b980  __mspabi_srll_9             
-0001ba5a  __mspabi_srlll              
-0001bb72  __mspabi_subd               
-00018c20  __mspabi_subf               
-0000261c  __screenbuffer              
-00002630  __screenbuffer2             
-0001ac1e  _auto_init_hold_wdt         
-00005e4c  _c_int00_noargs_noexit      
-00005f76  _ctypes_                    
+0001592c  __kernel_sin                
+00014400  __kernel_tan                
+00015654  __mspabi_addd               
+0001734c  __mspabi_addf               
+00017b9c  __mspabi_cmpd               
+00018bae  __mspabi_cmpf               
+00018424  __mspabi_cvtdf              
+00018802  __mspabi_cvtfd              
+000162fa  __mspabi_divd               
+00018394  __mspabi_divf               
+0001925a  __mspabi_divi               
+000194c8  __mspabi_divu               
+00019308  __mspabi_fixdi              
+00018940  __mspabi_fixdli             
+000188d8  __mspabi_fixfi              
+0001957a  __mspabi_fltid              
+000190ac  __mspabi_fltif              
+00018262  __mspabi_fltlid             
+00018bf8  __mspabi_fltlif             
+00019378  __mspabi_fltuf              
+00019114  __mspabi_fltulf             
+00015bd2  __mspabi_mpyd               
+00017fb6  __mspabi_mpyf               
+000194b0  __mspabi_mpyi_f5hw          
+0001939c  __mspabi_mpyl_f5hw          
+000191a4  __mspabi_negd               
+000195a8  __mspabi_negf               
+0001925a  __mspabi_remi               
+000194c8  __mspabi_remu               
+000195b2  __mspabi_slli               
+0001954c  __mspabi_slll               
+00018ece  __mspabi_slll_1             
+00018eaa  __mspabi_slll_10            
+00018ea6  __mspabi_slll_11            
+00018ea2  __mspabi_slll_12            
+00018e9e  __mspabi_slll_13            
+00018e9a  __mspabi_slll_14            
+00018e96  __mspabi_slll_15            
+00018eca  __mspabi_slll_2             
+00018ec6  __mspabi_slll_3             
+00018ec2  __mspabi_slll_4             
+00018ebe  __mspabi_slll_5             
+00018eba  __mspabi_slll_6             
+00018eb6  __mspabi_slll_7             
+00018eb2  __mspabi_slll_8             
+00018eae  __mspabi_slll_9             
+0001953c  __mspabi_sral               
+00018e90  __mspabi_sral_1             
+00018e6c  __mspabi_sral_10            
+00018e68  __mspabi_sral_11            
+00018e64  __mspabi_sral_12            
+00018e60  __mspabi_sral_13            
+00018e5c  __mspabi_sral_14            
+00018e58  __mspabi_sral_15            
+00018e8c  __mspabi_sral_2             
+00018e88  __mspabi_sral_3             
+00018e84  __mspabi_sral_4             
+00018e80  __mspabi_sral_5             
+00018e7c  __mspabi_sral_6             
+00018e78  __mspabi_sral_7             
+00018e74  __mspabi_sral_8             
+00018e70  __mspabi_sral_9             
+0001955c  __mspabi_srll               
+00018f0c  __mspabi_srll_1             
+00018ee8  __mspabi_srll_10            
+00018ee4  __mspabi_srll_11            
+00018ee0  __mspabi_srll_12            
+00018edc  __mspabi_srll_13            
+00018ed8  __mspabi_srll_14            
+00018ed4  __mspabi_srll_15            
+00018f08  __mspabi_srll_2             
+00018f04  __mspabi_srll_3             
+00018f00  __mspabi_srll_4             
+00018efc  __mspabi_srll_5             
+00018ef8  __mspabi_srll_6             
+00018ef4  __mspabi_srll_7             
+00018ef0  __mspabi_srll_8             
+00018eec  __mspabi_srll_9             
+000190e2  __mspabi_subd               
+00017346  __mspabi_subf               
+000184b0  _auto_init_hold_wdt         
+00005dd2  _c_int00_noargs_noexit      
+00005efc  _ctypes_                    
 0000fffe  _reset_vector               
 00005b60  _stack                      
-0001c1ce  _system_post_cinit          
-0001c1ca  _system_pre_init            
-0001c1be  abort                       
-0001c174  abs                         
-000140de  acos                        
-000140de  acosl                       
-0001b82e  asctohex                    
-00013540  asin                        
-00013540  asinl                       
-0001b1e8  atoi                        
-000063e0  bt_tmp_string               
-00019d5c  buildButtonStateMachine     
-0001bfe8  buildIdleArray              
-00002594  buttonList                  
-00016a36  button_stateMachine         
-0001c14c  checkEngineRPMs             
-0001c1aa  checkOilPressure            
-0001944a  check_BatteryBox_Status     
-00019a78  check_Engine_Status         
-0001bf3a  clearLine                   
-0001c02e  clearStateCode              
-000064be  colon_char                  
-0001b182  copy_in                     
-0001bcc2  copysign                    
-0001bcc2  copysignl                   
-0001239e  cos                         
-0001239e  cosl                        
-000026fa  count_RPM_fail              
-000026fc  count_oil_fail              
-000026f8  count_run                   
-000026fe  count_temp_fail             
-0001bace  date                        
-0001b5ae  datetime                    
-00002680  defaultSunrise              
-00002686  defaultSunset               
-0001b8ae  degrees                     
-000061cc  emptyLine_char              
-000064c6  empty_char                  
-00006410  enghrs_string               
-000025fc  engine                      
-0001c044  enterLowPowerMode           
-0000274c  errno                       
-00017b46  floor                       
-00017b46  floorl                      
-00013b4a  fmod                        
-00013b4a  fmodl                       
-0001a528  frexp                       
-0001a528  frexpl                      
-0001955e  getThermocoupleData         
-0001bf5a  handleCabinetHeating        
-0001be6a  handleGPSevent              
-0001c09a  handleLowFuelEvent          
-0001bcf0  handleSystemFailEvent       
-0001b71c  handle_lighting             
-0001b7ec  handle_oilchangeClear       
-0001bba4  handle_reset                
-0001b4be  handle_unitModeIndicator    
-00002716  idleCount                   
-00002656  idles                       
-0001a680  inc_secondCounts            
-000063f0  int_tmp_string              
-0001a194  isQuietTime                 
-00018e80  itoa                        
-0000268c  lastCalculated              
-00002718  lat                         
-0001821e  ldexp                       
-0001821e  ldexpl                      
-000061e2  li0                         
-000061f8  li1                         
-00002720  lng                         
-00019784  loadAnalogData              
-0001ad20  ltoa                        
-00017948  main                        
-0001ada0  mastUpDown                  
-00019672  mast_stateMachine           
-0001bf78  memccpy                     
-0001c0ae  memcpy                      
-0001c05a  memset                      
-000064a0  modeArray                   
-0000620e  modename0                   
-00006224  modename1                   
-0000623a  modename2                   
-00006300  msg1                        
-00006250  msg12                       
-00006266  msg13                       
-0000627c  msg14                       
-00006292  msg15                       
-000062a8  msg16                       
-000062be  msg17                       
-000062d4  msg18                       
-000062ea  msg19                       
-0000632c  msg2                        
-00006316  msg20                       
-0000643c  msg21                       
-0000644a  msg22                       
-00006420  msg23                       
-0000642e  msg24                       
-00006342  msg3                        
-00006358  msg4                        
-0000636e  msg5                        
-00006384  msg6                        
-00002666  now                         
-0000639a  oilchange_string            
-00001c00  oldGPSStrings               
-000026a4  oldGPSStringsIndex          
-0001b24a  pollMAX31855                
-0001b9a6  radians                     
-0001be1e  runTime                     
-000063be  runtime_string              
-0001821e  scalbn                      
-0001821e  scalbnl                     
-0001bb3c  setBatteryHeater            
-0001ba94  setContactor                
-0001bda2  setEngineRun                
-0001be44  setLightsState              
-0001c0c2  setStateCode                
-00017d10  set_Engine_State            
-00011ab6  sin                         
-00011ab6  sinl                        
-0000274a  skippp                      
-000064c0  slash_char                  
-0001c188  sleepModeProcess            
-00019b70  solar_getSunrise            
-00019c66  solar_getSunset             
-0001b2a6  solar_setCoords             
-000064c2  space_char                  
-0001b764  sprintf                     
-00015602  sqrt                        
-00015602  sqrtl                       
-00018fae  store_idleTime              
-0001bf96  strcat                      
-0001bfb4  strchr                      
-0001c0e8  strcpy                      
-0001c15a  strlen                      
-00002692  sunRise                     
-00002698  sunSet                      
-00012c80  tan                         
-00012c80  tanl                        
-0001b7a8  time                        
-0001c0fa  toupper                     
-0001aa8c  updateDisplay               
-000026a6  validCalc                   
-000064c4  zero_char                   
+000195fc  _system_post_cinit          
+000195f4  _system_pre_init            
+000195e2  abort                       
+0001959e  abs                         
+00013eda  acos                        
+00013eda  acosl                       
+00019426  asctohex                    
+0001333c  asin                        
+0001333c  asinl                       
+000195e8  atof                        
+00018a0c  atoi                        
+00017ac2  buildButtonStateMachine     
+00001fb0  buttonList                  
+00017098  button_stateMachine         
+0001956c  checkEngineRPMs             
+000195f8  checkOilPressure            
+000171fe  check_BatteryBox_Status     
+00017c74  check_Engine_Status         
+00019586  clearStateCode              
+000189a6  copy_in                     
+000191d2  copysign                    
+000191d2  copysignl                   
+0001219a  cos                         
+0001219a  cosl                        
+00002268  count_RPM_fail              
+0000226a  count_oil_fail              
+00002266  count_run                   
+0000226c  count_temp_fail             
+00018f8e  crc                         
+00019354  date                        
+00018fc8  datetime                    
+000020d2  defaultSunrise              
+000020d8  defaultSunset               
+000193c0  degrees                     
+00002288  diagBackButton              
+00002058  engine                      
+000022b4  errno                       
+00016738  floor                       
+00016738  floorl                      
+00013946  fmod                        
+00013946  fmodl                       
+00017eec  getThermocoupleData         
+00018c8a  handleButtonLight           
+00018ddc  handleCabinetHeating        
+0001952c  handleIndicators            
+000194f2  handleLowFuelEvent          
+00019200  handleSystemFailEvent       
+00018cd0  handle_lighting             
+00018d9a  handle_oilchangeClear       
+0001947e  handle_pressDiagButton      
+00018e1a  handle_reset                
+00002286  idleCount                   
+000020a8  idles                       
+000181c2  incrementSecondCounts       
+00018120  isQuietTime                 
+000020de  lastCalculated              
+0000228a  lat                         
+00016902  ldexp                       
+00016902  ldexpl                      
+00002292  lng                         
+00018300  loadAnalogData              
+000176c8  main                        
+000186a6  mastUpDown                  
+00017d4c  mast_stateMachine           
+00019506  memcpy                      
+000020b8  now                         
+00019002  pollGPS                     
+00019076  pollMAX31855                
+000193e2  radians                     
+00018f12  resetGpsInstance            
+0001903c  runTime                     
+00016902  scalbn                      
+00016902  scalbnl                     
+00019286  setBatteryHeater            
+00019146  setContactor                
+00019404  setEngineRun                
+00019446  setLightsState              
+00019592  setStateCode                
+00016aa2  set_Engine_State            
+000118b2  sin                         
+000118b2  sinl                        
+000195d4  sleepModeProcess            
+000178d6  solar_getSunrise            
+000179cc  solar_getSunset             
+00018f50  solar_setCoords             
+0001508c  sqrt                        
+0001508c  sqrtl                       
+00016f30  storeGPSInstance            
+00017e1e  store_idleTime              
+00001e9a  storedInstances             
+00019462  strcmp                      
+00015370  strtod                      
+00015370  strtold                     
+000020e4  sunRise                     
+000020ea  sunSet                      
+00012a7c  tan                         
+00012a7c  tanl                        
+000192b2  time                        
+000020f0  validCalc                   
 
 
 GLOBAL SYMBOLS: SORTED BY Symbol Address 
@@ -2397,138 +2192,100 @@ address   name
 0000073e  ADC12MEM15                  
 0000073e  ADC12MEM15_L                
 0000073f  ADC12MEM15_H                
-00001c00  oldGPSStrings               
-00002410  GpsInformation              
-00002594  buttonList                  
-000025fc  engine                      
-0000261c  __screenbuffer              
-00002630  __screenbuffer2             
-00002644  ADC                         
-00002656  idles                       
-00002666  now                         
-00002680  defaultSunrise              
-00002686  defaultSunset               
-0000268c  lastCalculated              
-00002692  sunRise                     
-00002698  sunSet                      
-000026a0  GpsMsgOk                    
-000026a2  GpsStateCountdown           
-000026a4  oldGPSStringsIndex          
-000026a6  validCalc                   
-000026a8  _ADCs_UPDATED_              
-000026aa  _HIGH_SP_24V                
-000026ac  _LOW_SP_24V                 
-000026ae  VALUE_24V                   
-000026b0  VALUE_PCB_24V               
-000026b2  _LOW_SP_12V                 
-000026b4  VALUE_12V                   
-000026b6  _HIGH_SP_TEMP               
-000026b8  _NOMINAL_SP_TEMP            
-000026ba  _LOW_SP_TEMP                
-000026bc  VALUE_BAT_TEMP              
-000026be  _HIGH_SP_INTERNAL_TEMP      
-000026c0  _LOW_SP_INTERNAL_TEMP       
-000026c2  VALUE_INTERNAL_TEMP         
-000026c4  _HIGH_SP_RPM                
-000026c6  _LOW_SP_RPM                 
-000026c8  VALUE_RPM                   
-000026ca  _UNIT_MODE                  
-000026cc  LIGHTS1HOUR_TMR             
-000026ce  _STATE_CODE                 
-000026d0  BMS_EVENT                   
-000026d2  _HIGH_SP_BMS                
-000026d4  _LOW_SP_BMS                 
-000026d6  _BANK_BMS_TMR_SP            
-000026d8  _BANK_BMS_TMR_D             
-000026da  _CELLMONITOR_TMR_SP         
-000026dc  _CELLMONITOR_TMR_D          
-000026de  _MAST_STATUS                
-000026e0  _RESETTING_                 
-000026e2  RESET_TMR                   
-000026e4  OILCHANGE_PRESS_TMR         
-000026e6  _FORCE_LIGHTS_ON            
-000026e8  _FORCE_ENGINE_RUN           
-000026ea  _ADCs_UPDATED               
-000026ec  _DIAGNOSTIC_MODE            
-000026ee  _DIAGNOSTIC_MODE_TMR        
-000026f0  _DIAGNOSTIC_PAGE            
-000026f2  _DIAGNOSTIC_PAGES           
-000026f4  _OILCHANGE_DUE              
-000026f6  _SYS_FAILURE_               
-000026f8  count_run                   
-000026fa  count_RPM_fail              
-000026fc  count_oil_fail              
-000026fe  count_temp_fail             
-00002700  _PREHEAT_SP                 
-00002702  PREHEAT_D                   
-00002704  _CRANK_SP                   
-00002706  CRANK_D                     
-00002708  _POST_SP                    
-0000270a  POST_D                      
-0000270c  _ATTEMPT_SP                 
-0000270e  ATTEMPT_D                   
-00002710  _REATTEMPTS_SP              
-00002712  REATTEMPTS_D                
-00002714  _SCREEN_UPDATE_D            
-00002716  idleCount                   
-00002718  lat                         
-00002720  lng                         
-00002734  OLED_new_line               
-00002744  OLED_rows                   
-00002748  TempCountdown               
-0000274a  skippp                      
-0000274c  errno                       
+00001e00  GpsInformation              
+00001e9a  storedInstances             
+00001f30  FlashRegisters              
+00001fb0  buttonList                  
+00002058  engine                      
+00002078  GPSinstance                 
+00002096  ADC                         
+000020a8  idles                       
+000020b8  now                         
+000020d2  defaultSunrise              
+000020d8  defaultSunset               
+000020de  lastCalculated              
+000020e4  sunRise                     
+000020ea  sunSet                      
+000020f0  validCalc                   
+000020f2  DEFAULT_CONFIG              
+000021f2  _ADCs_UPDATED_              
+000021f4  _HIGH_SP_24V                
+000021f8  _LOW_SP_24V                 
+000021fc  VALUE_24V                   
+00002200  VALUE_PCB_24V               
+00002204  _LOW_SP_12V                 
+00002208  VALUE_12V                   
+0000220c  _HIGH_SP_TEMP               
+00002210  _NOMINAL_SP_TEMP            
+00002214  _LOW_SP_TEMP                
+00002218  VALUE_BAT_TEMP              
+0000221c  _HIGH_SP_INTERNAL_TEMP      
+00002220  _LOW_SP_INTERNAL_TEMP       
+00002224  VALUE_INTERNAL_TEMP         
+00002228  VALUE_INTERNAL2_TEMP        
+0000222c  _HIGH_SP_RPM                
+0000222e  _LOW_SP_RPM                 
+00002230  VALUE_RPM                   
+00002232  _UNIT_MODE                  
+00002234  LIGHTS1HOUR_TMR             
+00002236  _STATE_CODE                 
+00002238  BMS_EVENT                   
+0000223a  _HIGH_SP_BMS                
+0000223e  _LOW_SP_BMS                 
+00002242  _BANK_BMS_TMR_SP            
+00002244  _BANK_BMS_TMR_D             
+00002246  _CELLMONITOR_TMR_SP         
+00002248  _CELLMONITOR_TMR_D          
+0000224a  _MAST_STATUS                
+0000224c  _RESETTING_                 
+0000224e  RESET_TMR                   
+00002250  OILCHANGE_PRESS_TMR         
+00002252  _FORCE_LIGHTS_ON            
+00002254  _FORCE_ENGINE_RUN           
+00002256  _ADCs_UPDATED               
+00002258  _DIAGNOSTIC_MODE            
+0000225a  _DIAGNOSTIC_MODE_TMR        
+0000225c  _DIAGNOSTIC_PAGE            
+0000225e  _DIAGNOSTIC_PAGES           
+00002260  _OILCHANGE_DUE              
+00002262  _SYS_FAILURE_               
+00002264  _POINTER_TO_ENGINE_MINS     
+00002266  count_run                   
+00002268  count_RPM_fail              
+0000226a  count_oil_fail              
+0000226c  count_temp_fail             
+0000226e  _PREHEAT_SP                 
+00002270  PREHEAT_D                   
+00002272  _CRANK_SP                   
+00002274  CRANK_D                     
+00002276  _POST_SP                    
+00002278  POST_D                      
+0000227a  _ATTEMPT_SP                 
+0000227c  ATTEMPT_D                   
+0000227e  _REATTEMPTS_SP              
+00002280  REATTEMPTS_D                
+00002282  _SCREEN_UPDATE_D            
+00002284  _UPDATE_SCREEN_             
+00002286  idleCount                   
+00002288  diagBackButton              
+0000228a  lat                         
+00002292  lng                         
+000022a6  GpsStateCountdown           
+000022b2  TempCountdown               
+000022b4  errno                       
 00005b60  _stack                      
-00005c00  ADC12_ISR                   
+00005c00  USCI_A0_ISR                 
 00005c00  __STACK_END                 
-00005cee  USCI_A0_ISR                 
-00005dd2  TIMER0_A0_ISR               
-00005e26  Port_2                      
-00005e4c  _c_int00_noargs_noexit      
-00005e66  __TI_ISR_TRAP               
-00005f76  _ctypes_                    
-000061cc  emptyLine_char              
-000061e2  li0                         
-000061f8  li1                         
-0000620e  modename0                   
-00006224  modename1                   
-0000623a  modename2                   
-00006250  msg12                       
-00006266  msg13                       
-0000627c  msg14                       
-00006292  msg15                       
-000062a8  msg16                       
-000062be  msg17                       
-000062d4  msg18                       
-000062ea  msg19                       
-00006300  msg1                        
-00006316  msg20                       
-0000632c  msg2                        
-00006342  msg3                        
-00006358  msg4                        
-0000636e  msg5                        
-00006384  msg6                        
-0000639a  oilchange_string            
-000063ac  RPM_string                  
-000063be  runtime_string              
-000063e0  bt_tmp_string               
-000063f0  int_tmp_string              
-00006410  enghrs_string               
-00006420  msg23                       
-0000642e  msg24                       
-0000643c  msg21                       
-0000644a  msg22                       
-000064a0  modeArray                   
-000064ba  VOLT_char                   
-000064be  colon_char                  
-000064c0  slash_char                  
-000064c2  space_char                  
-000064c4  zero_char                   
-000064c6  empty_char                  
-00006546  __TI_Handler_Table_Base     
-0000654e  __TI_CINIT_Base             
-0000654e  __TI_Handler_Table_Limit    
-0000655e  __TI_CINIT_Limit            
+00005cba  ADC12_ISR                   
+00005d4a  TIMER1_A0_ISR               
+00005dac  Port_2                      
+00005dd2  _c_int00_noargs_noexit      
+00005dec  __TI_ISR_TRAP               
+00005efc  _ctypes_                    
+000062d4  __TI_Handler_Table_Base     
+000062dc  __TI_CINIT_Base             
+000062dc  __TI_Handler_Table_Limit    
+000062ec  __TI_CINIT_Limit            
 0000ffd2  __TI_int41                  
 0000ffd4  __TI_int42                  
 0000ffd6  __TI_int43                  
@@ -2553,221 +2310,186 @@ address   name
 0000fffc  __TI_int62                  
 0000fffe  _reset_vector               
 00010000  __kernel_rem_pio2           
-00011ab6  sin                         
-00011ab6  sinl                        
-0001239e  cos                         
-0001239e  cosl                        
-00012c80  tan                         
-00012c80  tanl                        
-00013540  asin                        
-00013540  asinl                       
-00013b4a  fmod                        
-00013b4a  fmodl                       
-000140de  acos                        
-000140de  acosl                       
-00014604  __kernel_tan                
-00014b26  __TI_frcdivd                
-00014fac  __mspabi_divull             
-0001531e  __TI_frcmpyd                
-00015602  sqrt                        
-00015602  sqrtl                       
-000158e6  __mspabi_addd               
-00015bbe  __kernel_sin                
-00015e64  __mspabi_mpyd               
-00016348  __kernel_cos                
-0001659c  __TI_frcaddd                
-00016a36  button_stateMachine         
-00016c7a  __TI_printfi                
-00016eb6  GpsDecode                   
-0001730c  __mspabi_divd               
-00017948  main                        
-00017b46  floor                       
-00017b46  floorl                      
-00017d10  set_Engine_State            
-00017eca  DIAG_showVoltage            
-0001821e  ldexp                       
-0001821e  ldexpl                      
-0001821e  scalbn                      
-0001821e  scalbnl                     
-00018546  DIAG_showDate               
-000186be  DIAG_showSunRiseSet         
-00018aea  Norm_showStateCode          
-00018c20  __mspabi_subf               
-00018c26  __mspabi_addf               
-00018d52  InitializeDisplay           
-00018e80  itoa                        
-00018fae  store_idleTime              
-0001944a  check_BatteryBox_Status     
-0001955e  getThermocoupleData         
-00019672  mast_stateMachine           
-00019784  loadAnalogData              
-00019a78  check_Engine_Status         
-00019b70  solar_getSunrise            
-00019c66  solar_getSunset             
-00019d5c  buildButtonStateMachine     
-00019e36  DIAG_showLatLong            
-00019fe6  __mspabi_cmpd               
-0001a0be  DIAG_showEngineHours        
-0001a194  isQuietTime                 
-0001a258  __mspabi_mpyf               
-0001a3c4  OLED_sendByte               
-0001a476  __TI_renormd                
-0001a528  frexp                       
-0001a528  frexpl                      
-0001a680  inc_secondCounts            
-0001a720  __mspabi_fltlid             
-0001a8e2  __mspabi_divf               
-0001a972  DIAG_showBatteryTemp        
-0001aa00  __mspabi_cvtdf              
-0001aa8c  updateDisplay               
-0001ab16  DIAG_showInternalTemp       
-0001ab9a  DIAG_showRuntime            
-0001ac1e  _auto_init_hold_wdt         
-0001aca0  __mspabi_fltuld             
-0001ad20  ltoa                        
-0001ada0  mastUpDown                  
-0001ae94  DIAG_showRPM                
-0001af04  ConfigureA2D                
-0001af72  __mspabi_cvtfd              
-0001b0b4  __mspabi_fixfi              
-0001b11c  __mspabi_fixdli             
-0001b182  copy_in                     
-0001b1e8  atoi                        
-0001b24a  pollMAX31855                
-0001b2a6  solar_setCoords             
-0001b302  ConvertInternalTempToCelcius
-0001b35c  OLED_command                
-0001b3b6  OLED_data                   
-0001b466  __mspabi_divul              
-0001b466  __mspabi_remul              
-0001b4be  handle_unitModeIndicator    
-0001b510  InitializeEngine            
-0001b5ae  datetime                    
-0001b5f8  __mspabi_cmpf               
-0001b642  __mspabi_fltlif             
-0001b6d4  OLED_writeLine              
-0001b71c  handle_lighting             
-0001b764  sprintf                     
-0001b7a8  time                        
-0001b7ec  handle_oilchangeClear       
-0001b82e  asctohex                    
-0001b86e  __mspabi_divli              
-0001b86e  __mspabi_remli              
-0001b8ae  degrees                     
-0001b8ec  __mspabi_sral_15            
-0001b8f0  __mspabi_sral_14            
-0001b8f4  __mspabi_sral_13            
-0001b8f8  __mspabi_sral_12            
-0001b8fc  __mspabi_sral_11            
-0001b900  __mspabi_sral_10            
-0001b904  __mspabi_sral_9             
-0001b908  __mspabi_sral_8             
-0001b90c  __mspabi_sral_7             
-0001b910  __mspabi_sral_6             
-0001b914  __mspabi_sral_5             
-0001b918  __mspabi_sral_4             
-0001b91c  __mspabi_sral_3             
-0001b920  __mspabi_sral_2             
-0001b924  __mspabi_sral_1             
-0001b92a  __mspabi_slll_15            
-0001b92e  __mspabi_slll_14            
-0001b932  __mspabi_slll_13            
-0001b936  __mspabi_slll_12            
-0001b93a  __mspabi_slll_11            
-0001b93e  __mspabi_slll_10            
-0001b942  __mspabi_slll_9             
-0001b946  __mspabi_slll_8             
-0001b94a  __mspabi_slll_7             
-0001b94e  __mspabi_slll_6             
-0001b952  __mspabi_slll_5             
-0001b956  __mspabi_slll_4             
-0001b95a  __mspabi_slll_3             
-0001b95e  __mspabi_slll_2             
-0001b962  __mspabi_slll_1             
-0001b968  __mspabi_srll_15            
-0001b96c  __mspabi_srll_14            
-0001b970  __mspabi_srll_13            
-0001b974  __mspabi_srll_12            
-0001b978  __mspabi_srll_11            
-0001b97c  __mspabi_srll_10            
-0001b980  __mspabi_srll_9             
-0001b984  __mspabi_srll_8             
-0001b988  __mspabi_srll_7             
-0001b98c  __mspabi_srll_6             
-0001b990  __mspabi_srll_5             
-0001b994  __mspabi_srll_4             
-0001b998  __mspabi_srll_3             
-0001b99c  __mspabi_srll_2             
-0001b9a0  __mspabi_srll_1             
-0001b9a6  radians                     
-0001b9e4  OLED_clockCycle             
-0001ba20  __mspabi_sllll              
-0001ba5a  __mspabi_srlll              
-0001ba94  setContactor                
-0001bace  date                        
-0001bb06  __mspabi_fltif              
-0001bb3c  setBatteryHeater            
-0001bb72  __mspabi_subd               
-0001bba4  handle_reset                
-0001bbd6  __mspabi_fltulf             
-0001bc08  InitializeGPS               
-0001bc38  ConfigureGPSSerialPort      
-0001bc66  Norm_showCompanyName        
-0001bc94  __mspabi_negd               
-0001bcc2  copysign                    
-0001bcc2  copysignl                   
-0001bcf0  handleSystemFailEvent       
-0001bd1e  InitializeRTC               
-0001bd76  __mspabi_divi               
-0001bd76  __mspabi_remi               
-0001bda2  setEngineRun                
-0001bdf6  __mspabi_fixdi              
-0001be1e  runTime                     
-0001be44  setLightsState              
-0001be6a  handleGPSevent              
-0001be8e  __mspabi_fltuf              
-0001beb2  __mspabi_mpyl_f5hw          
-0001bed6  Norm_showMode               
-0001bef8  OLED_clearDisplay           
-0001bf3a  clearLine                   
-0001bf5a  handleCabinetHeating        
-0001bf78  memccpy                     
-0001bf96  strcat                      
-0001bfb4  strchr                      
-0001bfe8  buildIdleArray              
-0001c000  __mspabi_mpyi_f5hw          
-0001c018  InitializeHardware          
-0001c02e  clearStateCode              
-0001c044  enterLowPowerMode           
-0001c05a  memset                      
-0001c070  __mspabi_divu               
-0001c070  __mspabi_remu               
-0001c09a  handleLowFuelEvent          
-0001c0ae  memcpy                      
-0001c0c2  setStateCode                
-0001c0d6  __TI_decompress_none        
-0001c0e8  strcpy                      
-0001c0fa  toupper                     
-0001c10c  ConfigureGPSNmeaOutput      
-0001c11c  __mspabi_sral               
-0001c12c  __mspabi_slll               
-0001c13c  __mspabi_srll               
-0001c14c  checkEngineRPMs             
-0001c15a  strlen                      
-0001c168  __mspabi_fltid              
-0001c174  abs                         
-0001c17e  __mspabi_slli               
-0001c188  sleepModeProcess            
-0001c192  WdtDisable                  
-0001c19a  WdtEnable                   
-0001c1a2  WdtKeepAlive                
-0001c1aa  checkOilPressure            
-0001c1b8  __mspabi_fltud              
-0001c1be  C$$EXIT                     
-0001c1be  abort                       
-0001c1c4  __TI_decompress_rle24       
-0001c1ca  _system_pre_init            
-0001c1ce  _system_post_cinit          
+000118b2  sin                         
+000118b2  sinl                        
+0001219a  cos                         
+0001219a  cosl                        
+00012a7c  tan                         
+00012a7c  tanl                        
+0001333c  asin                        
+0001333c  asinl                       
+00013946  fmod                        
+00013946  fmodl                       
+00013eda  acos                        
+00013eda  acosl                       
+00014400  __kernel_tan                
+00014922  __TI_frcdivd                
+00014da8  __TI_frcmpyd                
+0001508c  sqrt                        
+0001508c  sqrtl                       
+00015370  strtod                      
+00015370  strtold                     
+00015654  __mspabi_addd               
+0001592c  __kernel_sin                
+00015bd2  __mspabi_mpyd               
+00015e54  __kernel_cos                
+000160a8  __TI_frcaddd                
+000162fa  __mspabi_divd               
+00016738  floor                       
+00016738  floorl                      
+00016902  ldexp                       
+00016902  ldexpl                      
+00016902  scalbn                      
+00016902  scalbnl                     
+00016aa2  set_Engine_State            
+00016c40  UpdateFlashMemory           
+00016f30  storeGPSInstance            
+00017098  button_stateMachine         
+000171fe  check_BatteryBox_Status     
+00017346  __mspabi_subf               
+0001734c  __mspabi_addf               
+00017478  GpsMessageRetrieve          
+000176c8  main                        
+000178d6  solar_getSunrise            
+000179cc  solar_getSunset             
+00017ac2  buildButtonStateMachine     
+00017b9c  __mspabi_cmpd               
+00017c74  check_Engine_Status         
+00017d4c  mast_stateMachine           
+00017e1e  store_idleTime              
+00017eec  getThermocoupleData         
+00017fb6  __mspabi_mpyf               
+0001806e  __TI_renormd                
+00018120  isQuietTime                 
+000181c2  incrementSecondCounts       
+00018262  __mspabi_fltlid             
+00018300  loadAnalogData              
+00018394  __mspabi_divf               
+00018424  __mspabi_cvtdf              
+000184b0  _auto_init_hold_wdt         
+0001862c  GetConfiguration            
+000186a6  mastUpDown                  
+00018794  ConfigureA2D                
+00018802  __mspabi_cvtfd              
+000188d8  __mspabi_fixfi              
+00018940  __mspabi_fixdli             
+000189a6  copy_in                     
+00018a0c  atoi                        
+00018b18  InitializeEngine            
+00018bae  __mspabi_cmpf               
+00018bf8  __mspabi_fltlif             
+00018c8a  handleButtonLight           
+00018cd0  handle_lighting             
+00018d16  ConvertInternalTempToCelcius
+00018d9a  handle_oilchangeClear       
+00018ddc  handleCabinetHeating        
+00018e1a  handle_reset                
+00018e58  __mspabi_sral_15            
+00018e5c  __mspabi_sral_14            
+00018e60  __mspabi_sral_13            
+00018e64  __mspabi_sral_12            
+00018e68  __mspabi_sral_11            
+00018e6c  __mspabi_sral_10            
+00018e70  __mspabi_sral_9             
+00018e74  __mspabi_sral_8             
+00018e78  __mspabi_sral_7             
+00018e7c  __mspabi_sral_6             
+00018e80  __mspabi_sral_5             
+00018e84  __mspabi_sral_4             
+00018e88  __mspabi_sral_3             
+00018e8c  __mspabi_sral_2             
+00018e90  __mspabi_sral_1             
+00018e96  __mspabi_slll_15            
+00018e9a  __mspabi_slll_14            
+00018e9e  __mspabi_slll_13            
+00018ea2  __mspabi_slll_12            
+00018ea6  __mspabi_slll_11            
+00018eaa  __mspabi_slll_10            
+00018eae  __mspabi_slll_9             
+00018eb2  __mspabi_slll_8             
+00018eb6  __mspabi_slll_7             
+00018eba  __mspabi_slll_6             
+00018ebe  __mspabi_slll_5             
+00018ec2  __mspabi_slll_4             
+00018ec6  __mspabi_slll_3             
+00018eca  __mspabi_slll_2             
+00018ece  __mspabi_slll_1             
+00018ed4  __mspabi_srll_15            
+00018ed8  __mspabi_srll_14            
+00018edc  __mspabi_srll_13            
+00018ee0  __mspabi_srll_12            
+00018ee4  __mspabi_srll_11            
+00018ee8  __mspabi_srll_10            
+00018eec  __mspabi_srll_9             
+00018ef0  __mspabi_srll_8             
+00018ef4  __mspabi_srll_7             
+00018ef8  __mspabi_srll_6             
+00018efc  __mspabi_srll_5             
+00018f00  __mspabi_srll_4             
+00018f04  __mspabi_srll_3             
+00018f08  __mspabi_srll_2             
+00018f0c  __mspabi_srll_1             
+00018f12  resetGpsInstance            
+00018f50  solar_setCoords             
+00018f8e  crc                         
+00018fc8  datetime                    
+00019002  pollGPS                     
+0001903c  runTime                     
+00019076  pollMAX31855                
+000190ac  __mspabi_fltif              
+000190e2  __mspabi_subd               
+00019114  __mspabi_fltulf             
+00019146  setContactor                
+00019176  ConfigureGPSSerialPort      
+000191a4  __mspabi_negd               
+000191d2  copysign                    
+000191d2  copysignl                   
+00019200  handleSystemFailEvent       
+0001922e  InitializeRTC               
+0001925a  __mspabi_divi               
+0001925a  __mspabi_remi               
+00019286  setBatteryHeater            
+000192b2  time                        
+00019308  __mspabi_fixdi              
+00019354  date                        
+00019378  __mspabi_fltuf              
+0001939c  __mspabi_mpyl_f5hw          
+000193c0  degrees                     
+000193e2  radians                     
+00019404  setEngineRun                
+00019426  asctohex                    
+00019446  setLightsState              
+00019462  strcmp                      
+0001947e  handle_pressDiagButton      
+000194b0  __mspabi_mpyi_f5hw          
+000194c8  __mspabi_divu               
+000194c8  __mspabi_remu               
+000194de  InitializeHardware          
+000194f2  handleLowFuelEvent          
+00019506  memcpy                      
+0001951a  __TI_decompress_none        
+0001952c  handleIndicators            
+0001953c  __mspabi_sral               
+0001954c  __mspabi_slll               
+0001955c  __mspabi_srll               
+0001956c  checkEngineRPMs             
+0001957a  __mspabi_fltid              
+00019586  clearStateCode              
+00019592  setStateCode                
+0001959e  abs                         
+000195a8  __mspabi_negf               
+000195b2  __mspabi_slli               
+000195bc  WdtDisable                  
+000195c4  WdtEnable                   
+000195cc  WdtKeepAlive                
+000195d4  sleepModeProcess            
+000195e2  C$$EXIT                     
+000195e2  abort                       
+000195e8  atof                        
+000195ee  __TI_decompress_rle24       
+000195f4  _system_pre_init            
+000195f8  checkOilPressure            
+000195fc  _system_post_cinit          
 ffffffff  __TI_pprof_out_hndl         
 ffffffff  __TI_prof_data_size         
 ffffffff  __TI_prof_data_start        
@@ -2777,4 +2499,4 @@ UNDEFED   __TI_BINIT_Limit
 UNDEFED   __TI_INITARRAY_Base         
 UNDEFED   __TI_INITARRAY_Limit        
 
-[1060 symbols]
+[987 symbols]
