@@ -23,14 +23,14 @@
 #include "GPS.h"
 #include "timeDate.h"
 #include "engineController.h"
-//#include "lcd.h"
+#include "lcd.h"
 #include "button.h"
 #include "MCP7940N.h"
 #include "bms.h"
 #include "solar.h"
 #include "mast.h"
 #include "MAX31855.h"
-#include "Flash.h"
+//#include "Flash.h"
 
 //--------------------------------------------------------------------
 
@@ -97,7 +97,7 @@ int main()
 
     buildButtonStateMachine();
 
-    //InitializeDisplay();
+    InitializeDisplay();
 
     InitializeEngine();
 
@@ -117,8 +117,11 @@ int main()
 	_UNIT_MODE = MODE_AUTO;
     _SYS_FAILURE_ = 0;
 
-    // --------------------------
+    // Set up the initial aquiring satellites condition
+    setStateCode(12);
 
+    // --------------------------
+    /*
     switch (GetConfiguration())
     {
    	  	  case SEG_VIRGIN:
@@ -130,7 +133,7 @@ int main()
     	  	  	  	  _nop();
    	  		  	  	  break;
    	 }
-
+	*/
 	solar_setCoords(lat, lng);
 
 	sunSet = solar_getSunset(now);
@@ -183,9 +186,9 @@ int main()
 
 		handle_lighting();
 
-		//updateDisplay();
+		updateDisplay();
 
-		checkTimeToSaveMemory();
+		//checkTimeToSaveMemory();
 
 		WdtKeepAlive();  // reset Watch dog
     }

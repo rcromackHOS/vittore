@@ -77,12 +77,7 @@ void pollGPS()
 					storeGPSInstance();
 
 			}
-
-			//else
-			//	resetGpsInstance();
 		}
-
-		//resetGpsInstance();
 	}
 }
 
@@ -115,11 +110,12 @@ void storeGPSInstance()
 
 		for (i = 0; i < 5; i++)
 		{
-			lati = (int)storedInstances[instanceIndex].lat * 100;
-			longi = (int)storedInstances[instanceIndex].lng * 100;
+			lati = (int)storedInstances[i].lat * 100;
+			longi = (int)storedInstances[i].lng * 100;
 
-			if (APPLYING_LAT != lati || APPLYING_LNG != longi)
+			if (APPLYING_LAT != lati || APPLYING_LNG != longi || storedInstances[i].year < 2016)
 				fail = 1;
+
 		}
 
 		if (fail == 0)
@@ -142,6 +138,8 @@ void storeGPSInstance()
 			sunRise = solar_getSunrise(now);
 
 			GpsStateCountdown = 360000;
+
+			clearStateCode(12);
 		}
 
 		// TODO: use saved data to determine new coords

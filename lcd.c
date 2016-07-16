@@ -88,8 +88,8 @@ const char* const messages[] =
 	msg24
 };
 
-const char li0[] = "  HORIZON OILFIELD  ";
-const char li1[] = "     SOLUTIONS      ";
+const char li0[] = "CLEANETEK INDUSTRIES";
+const char li1[] = "        INC         ";
 //const char* const cmpyName[] = {li0, li1};
 
 //--------------------------------------------------------------------
@@ -215,21 +215,28 @@ void Norm_showStateCode()
 			strcpy(__screenbuffer, msg6);
 			break;
 
+		case 12:
+			strcpy(__screenbuffer, msg11);
+			break;
+
+		case 14:
+			strcpy(__screenbuffer, msg9);
+			break;
+
 			/*
 		case 0:
 			strcpy(__screenbuffer, msg7);
+			break;
 
 		case 1:
 			strcpy(__screenbuffer, msg8);
+			break;
 
-		case 2:
-			strcpy(__screenbuffer, msg9);
 
 		case 3:
 			strcpy(__screenbuffer, msg10);
+			break;
 
-		case 10:
-			strcpy(__screenbuffer, msg11);
 		*/
 		case 30:
 			strcpy(__screenbuffer, msg12);

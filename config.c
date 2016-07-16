@@ -14,13 +14,13 @@ int _ADCs_UPDATED_	=			0;
 //--------------------------------------------------------------------
 
 float _HIGH_SP_24V = 			28.10;
-float _LOW_SP_24V = 	    	23.00;
-float VALUE_24V = 	    		26.55;
+float _LOW_SP_24V = 	    	25.50;
+float VALUE_24V = 	    		0.0;
 
-float VALUE_PCB_24V = 	    	26.00;
+float VALUE_PCB_24V = 	    	0.0;
 
 float _LOW_SP_12V = 	    	11.00;
-float VALUE_12V = 	    		12.50;
+float VALUE_12V = 	    		0.0;
 
 float _HIGH_SP_TEMP = 			40.00;
 float _NOMINAL_SP_TEMP = 		20.00;

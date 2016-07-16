@@ -78,9 +78,9 @@ void check_BatteryBox_Status()
 		 VALUE_24V >= _HIGH_SP_BMS || VALUE_24V <= _LOW_SP_BMS  &&
 		 _BANK_BMS_TMR_D == 0 && BMS_EVENT == 0)
 	{
-		//_BANK_BMS_TMR_D = 1;		// start counting down the cool-down period
-		//_CELLMONITOR_TMR_D = 0;
-		//_engineOn = 0;					// turn off the engine
+		_BANK_BMS_TMR_D = 1;		// start counting down the cool-down period
+		_CELLMONITOR_TMR_D = 0;
+		_engineOn = 0;					// turn off the engine
 	}
 
 	// BMS _SYS_FAILURE_ APPLIED
@@ -132,16 +132,27 @@ int setContactor(int s)
 //
 int setBatteryHeater(int s)
 {
-	if (s == 1 && BMS_EVENT == 0)
+	if (VALUE_BAT_TEMP == -300)
 	{
-	    setStateCode(3);
-	    P10OUT |= OUT_nBATTERY_HEATER_ON;
+		setStateCode(14);
+		P10OUT &= ~OUT_nBATTERY_HEATER_ON;
 	}
-    else
+	else
 	{
-	    clearStateCode(3);
-	    P10OUT &= ~OUT_nBATTERY_HEATER_ON;
+		clearStateCode(14);
+
+		if (s == 1 && BMS_EVENT == 0)
+		{
+			setStateCode(3);
+			P10OUT |= OUT_nBATTERY_HEATER_ON;
+		}
+		else
+		{
+			clearStateCode(3);
+			P10OUT &= ~OUT_nBATTERY_HEATER_ON;
+		}
 	}
+
 	return 1;
 }
 

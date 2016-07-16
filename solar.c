@@ -169,12 +169,12 @@ int solar_calculate(float y, float m, float d)
 
 	 // _sunrise_d = (solarnoon_t-hourangle*4/1440)+0.011;  // added 0.011 for the 15m offset.
 	  //_sunset_d = (solarnoon_t+hourangle*4/1440)-0.011;  // subtracted 0.011 for the 15m offset.
-	  double l0 = offset * 60;
-	  double l1 = 4 * _lng;
-	  double l2 = eqtime + l0;
-	  double l3 = 720 - l1;
-	  double l4 = l3 - l2;
-	  double l5 = l4/1400;
+	 // double l0 = offset * 60;
+	 // double l1 = 4 * _lng;
+	  //double l2 = eqtime + l0;
+	  //double l3 = 720 - l1;
+	  //double l4 = l3 - l2;
+	  //double l5 = l4/1400;
 
 	  _sunrise_d = (solarnoon_t-hourangle*4/1440);
 	  _sunset_d = (solarnoon_t+hourangle*4/1440);

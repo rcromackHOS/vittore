@@ -142,8 +142,8 @@ void loadAnalogData()
 
 		 VALUE_24V = ((float)ADC[AD_P_BATTERY_VLT] / 4095) * 30;
 
-		 float bullshit = ((float)ADC[AD_N_BATTERY_VLT] / 4095) * 30;
-		 int fuck = (int)bullshit;
+		 //float bullshit = ((float)ADC[AD_N_BATTERY_VLT] / 4095) * 30;
+		 //int fuck = (int)bullshit;
 
 		 VALUE_PCB_24V = ((float)ADC[AD_24V_POWER_VLT] / 4095) * 30;
 	 }
