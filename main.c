@@ -31,6 +31,7 @@
 #include "mast.h"
 #include "MAX31855.h"
 //#include "Flash.h"
+#include "RTC.h"
 
 //--------------------------------------------------------------------
 
@@ -139,7 +140,8 @@ int main()
 	sunSet = solar_getSunset(now);
 	sunRise = solar_getSunrise(now);
 
-    // --------------------------
+
+	// --------------------------
 	//UpdateFlashMemory();
     static int newMode;
 
@@ -158,6 +160,32 @@ int main()
 
 	while(1)
     {
+
+	    if (ReadRTCRegisters(0,1)  == 0)
+	    {
+	      	 _nop(); //error
+	    }
+	    if ((RtcRxBuffer[0] & 0x80) != 0x80)
+	    {
+	   	 // RTC is not configured!!!
+	   	 // Turn on 32Khz crystal
+			 if (WriteRTCRegister(0,0x80) == 0)
+			 {
+				 _nop(); //error
+			 }
+			 //ADD!! setup rest of RTC for date and time
+	    }
+
+	    RtcCountdown = 200;			// 2 seconds delay to make sure seconds are incrementing
+	    while (RtcCountdown)
+	    {
+	   	 WdtKeepAlive();
+	    }
+
+	    if(ReadRTCRegisters(0,2) == 0)
+	    {		// should read 0x8+2 seconds delay
+	   	 _nop();
+	    }
 
 		if (_ADCs_UPDATED_ == 1)
 		{
@@ -236,6 +264,14 @@ __interrupt void TIMER1_A0_ISR(void)
 	   diagBackButton++;
    else
 	   diagBackButton = 0;
+
+	// countdown before starting
+    if (RtcCountdown != 0)
+		RtcCountdown--;
+
+	// the timeout for i2C comms.
+    if (RtcTimeout != 0)
+		RtcTimeout--;
 
 }
 

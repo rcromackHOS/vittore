@@ -12,7 +12,6 @@ engineController.obj: ../timeDate.h
 engineController.obj: ../Hardware.h
 engineController.obj: ../Common.h
 engineController.obj: C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include/stdbool.h
-engineController.obj: ../Flash.h
 
 ../engineController.c: 
 ../engineController.h: 
@@ -26,4 +25,3 @@ C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include/intrinsics_legacy_u
 ../Hardware.h: 
 ../Common.h: 
 C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include/stdbool.h: 
-../Flash.h: 

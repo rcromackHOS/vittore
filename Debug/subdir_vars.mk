@@ -13,7 +13,7 @@ C_SRCS += \
 ../GPS.c \
 ../Hardware.c \
 ../MAX31855.c \
-../MCP7940N.c \
+../RTC.c \
 ../WatchdogTimerControl.c \
 ../bms.c \
 ../button.c \
@@ -32,7 +32,7 @@ OBJS += \
 ./GPS.obj \
 ./Hardware.obj \
 ./MAX31855.obj \
-./MCP7940N.obj \
+./RTC.obj \
 ./WatchdogTimerControl.obj \
 ./bms.obj \
 ./button.obj \
@@ -51,7 +51,7 @@ C_DEPS += \
 ./GPS.d \
 ./Hardware.d \
 ./MAX31855.d \
-./MCP7940N.d \
+./RTC.d \
 ./WatchdogTimerControl.d \
 ./bms.d \
 ./button.d \
@@ -70,7 +70,7 @@ C_DEPS__QUOTED += \
 "GPS.d" \
 "Hardware.d" \
 "MAX31855.d" \
-"MCP7940N.d" \
+"RTC.d" \
 "WatchdogTimerControl.d" \
 "bms.d" \
 "button.d" \
@@ -89,7 +89,7 @@ OBJS__QUOTED += \
 "GPS.obj" \
 "Hardware.obj" \
 "MAX31855.obj" \
-"MCP7940N.obj" \
+"RTC.obj" \
 "WatchdogTimerControl.obj" \
 "bms.obj" \
 "button.obj" \
@@ -108,7 +108,7 @@ C_SRCS__QUOTED += \
 "../GPS.c" \
 "../Hardware.c" \
 "../MAX31855.c" \
-"../MCP7940N.c" \
+"../RTC.c" \
 "../WatchdogTimerControl.c" \
 "../bms.c" \
 "../button.c" \

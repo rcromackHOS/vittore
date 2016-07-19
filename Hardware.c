@@ -21,6 +21,7 @@
 #include "Hardware.h"
 #include "AtoD.h"
 #include "GPS.h"
+#include "RTC.h"
 
 static void ConfigurePins(void);
 static void ConfigureCrystals(void);
@@ -39,7 +40,7 @@ void InitializeHardware(void)
 
 	//ConfigureTimerA0();
 	ConfigureTimerA1();
-
+	ConfigureI2CForRTC();
 	ConfigureA2D();
 	ConfigureGPSSerialPort();
 

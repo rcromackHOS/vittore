@@ -16,7 +16,7 @@ ORDERED_OBJS += \
 "./GPS.obj" \
 "./Hardware.obj" \
 "./MAX31855.obj" \
-"./MCP7940N.obj" \
+"./RTC.obj" \
 "./WatchdogTimerControl.obj" \
 "./bms.obj" \
 "./button.obj" \
@@ -156,7 +156,7 @@ all: vittore.out
 vittore.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: MSP430 Linker'
-	"C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/bin/cl430" -vmspx --data_model=restricted -O1 --opt_for_speed=0 --use_hw_mpy=F5 --advice:power=all -g --define=__MSP430F5419A__ --diag_warning=225 --display_error_number --diag_wrap=off --silicon_errata=CPU21 --silicon_errata=CPU22 --silicon_errata=CPU23 --silicon_errata=CPU40 --printf_support=full -z -m"vittore.map" --heap_size=160 --stack_size=160 --cinit_hold_wdt=on -i"C:/ti/ccsv6/ccs_base/msp430/include" -i"C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/lib" -i"C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include" -i"C:/ti/ccsv6/ccs_base/msp430/lib/5xx_6xx_FRxx" --reread_libs --display_error_number --warn_sections --diag_wrap=off --xml_link_info="vittore_linkInfo.xml" --use_hw_mpy=F5 --rom_model -o "vittore.out" $(ORDERED_OBJS)
+	"C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/bin/cl430" -vmspx --data_model=restricted -Ooff --opt_for_speed=0 --use_hw_mpy=F5 --advice:power=all -g --define=__MSP430F5419A__ --diag_warning=225 --display_error_number --diag_wrap=off --silicon_errata=CPU21 --silicon_errata=CPU22 --silicon_errata=CPU23 --silicon_errata=CPU40 --printf_support=full -z -m"vittore.map" --heap_size=160 --stack_size=160 --cinit_hold_wdt=on -i"C:/ti/ccsv6/ccs_base/msp430/include" -i"C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/lib" -i"C:/ti/ccsv6/tools/compiler/ti-cgt-msp430_15.12.1.LTS/include" -i"C:/ti/ccsv6/ccs_base/msp430/lib/5xx_6xx_FRxx" --reread_libs --display_error_number --warn_sections --diag_wrap=off --xml_link_info="vittore_linkInfo.xml" --use_hw_mpy=F5 --rom_model -o "vittore.out" $(ORDERED_OBJS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -169,8 +169,8 @@ vittore.hex: $(EXE_OUTPUTS)
 # Other Targets
 clean:
 	-$(RM) $(EXE_OUTPUTS__QUOTED)$(BIN_OUTPUTS__QUOTED)
-	-$(RM) "AtoD.d" "Common.d" "Flash.d" "GPS.d" "Hardware.d" "MAX31855.d" "MCP7940N.d" "WatchdogTimerControl.d" "bms.d" "button.d" "config.d" "engineController.d" "lcd.d" "main.d" "mast.d" "solar.d" "timeDate.d" 
-	-$(RM) "AtoD.obj" "Common.obj" "Flash.obj" "GPS.obj" "Hardware.obj" "MAX31855.obj" "MCP7940N.obj" "WatchdogTimerControl.obj" "bms.obj" "button.obj" "config.obj" "engineController.obj" "lcd.obj" "main.obj" "mast.obj" "solar.obj" "timeDate.obj" 
+	-$(RM) "AtoD.d" "Common.d" "Flash.d" "GPS.d" "Hardware.d" "MAX31855.d" "RTC.d" "WatchdogTimerControl.d" "bms.d" "button.d" "config.d" "engineController.d" "lcd.d" "main.d" "mast.d" "solar.d" "timeDate.d" 
+	-$(RM) "AtoD.obj" "Common.obj" "Flash.obj" "GPS.obj" "Hardware.obj" "MAX31855.obj" "RTC.obj" "WatchdogTimerControl.obj" "bms.obj" "button.obj" "config.obj" "engineController.obj" "lcd.obj" "main.obj" "mast.obj" "solar.obj" "timeDate.obj" 
 	-@echo 'Finished clean'
 	-@echo ' '
 
