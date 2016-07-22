@@ -13,8 +13,8 @@ int _ADCs_UPDATED_	=			0;
 
 //--------------------------------------------------------------------
 
-float _HIGH_SP_24V = 			28.10;
-float _LOW_SP_24V = 	    	25.50;
+float _HIGH_SP_24V = 			28.1;//27.5 for 15 min
+float _LOW_SP_24V = 	    	25.50;//26.5 for 15 min
 float VALUE_24V = 	    		0.0;
 
 float VALUE_PCB_24V = 	    	0.0;
@@ -48,7 +48,7 @@ int _STATE_CODE =				0;
 int BMS_EVENT =					0;
 
 float _HIGH_SP_BMS = 			28.60;
-float _LOW_SP_BMS = 			22.00;
+float _LOW_SP_BMS = 			22.50;
 
 int _BANK_BMS_TMR_SP = 			5;
 int _BANK_BMS_TMR_D = 			0;
@@ -101,6 +101,8 @@ int count_temp_fail =			0;
 
  int _REATTEMPTS_SP =  		 	3;
  int REATTEMPTS_D =				0;
+
+ float VALUE_CURRENT_OUT =		0.0;
 
  //--------------------------------------------------------------------
 

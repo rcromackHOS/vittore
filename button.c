@@ -181,7 +181,6 @@ void handle_pressDiagButton()
 {
 	if (diagBackButton >= 200)
 	{
-		_nop();
 		diagBackButton = 0;
 
 		_DIAGNOSTIC_MODE = 1;

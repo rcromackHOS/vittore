@@ -15,14 +15,16 @@
 #ifndef _RTC_H_
 #define _RTC_H_
 
+#define RTC_ADDRESS		0x6f
+
 #include <msp430.h>        /* Compiler specific Chip header.                  */
-#include <timeDate.h>
+#include "timeDate.h"
 
 extern void InitializeRTC();
-
+extern void pollTime();
 extern int RTC_adjust(dateTimeStruct dt);
-extern int RTC_isRunning(void);
-extern int RTC_lostTime(void);
+int RTC_isRunning(void);
+int RTC_timeIsSet(void);
 extern dateTimeStruct RTC_now();
 
 extern void ConfigureI2CForRTC(void);
@@ -30,7 +32,7 @@ int WriteRTCRegister(unsigned char regAddr, unsigned char val);
 int ReadRTCRegisters(unsigned char regAddr, unsigned char cnt);
 
 extern unsigned char RtcRxBuffer[];
+extern unsigned int	RtcCountdown;
 extern unsigned int	RtcTimeout;
-
 
 #endif

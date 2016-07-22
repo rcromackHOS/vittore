@@ -32,8 +32,8 @@ void InitializeEngine()
 //
 int checkEngineTemp()
 {
-	if ((P7IN & IN_ENGINE_TEMP_FAIL) == 0)
-	  return 1;
+	if ((P7IN & IN_ENGINE_TEMP_FAIL) != 0)
+		return 1;
 	return 0;
 }
 
@@ -41,10 +41,8 @@ int checkEngineTemp()
 //
 int checkOilPressure()
 {
-	return 1;
-
-	if ((P7IN & IN_OIL_PRESSURE_OK) == 0)
-	  return 1;
+	if ((P6IN & IN_OIL_PRESSURE_OK) != 0)
+		return 1;
 	return 0;
 }
 
@@ -93,7 +91,7 @@ int check_Engine_Status()
 
 		// ---------------------------------------- Engine running checks
 		else if (mode == ENGINE_RUNNING)
-		{
+		{	/*
 			// Check engine RPMS
 			if (checkEngineRPMs() != 1)
 			{
@@ -114,7 +112,7 @@ int check_Engine_Status()
 					count_RPM_fail = 0;
 				}
 			}
-
+			*/
 			// ---------------------------------------- Check Engine Oil Pressure
 			if (checkOilPressure() == 0)
 			{
@@ -131,7 +129,7 @@ int check_Engine_Status()
 					count_oil_fail = 0;
 				}
 			}
-			/*
+
 			// ----------------------------------------  Check Engine Temperature
 			if (checkEngineTemp() == 0)
 			{
@@ -148,13 +146,12 @@ int check_Engine_Status()
 					count_temp_fail = 0;
 				}
 			}
-			 */
+
 		}
 	}
 	else
 	{
-		if (mode != ENGINE_STOP &&
-			mode != ENGINE_STOP)
+		if (mode != ENGINE_STOP)
 		{
 			mode = ENGINE_STOP;
 		}
@@ -177,16 +174,16 @@ void set_Engine_State(int mode)
 
 			 if (engine.mode != ENGINE_PRE)
 			 {
-			   P2OUT |= OUT_ENGINE_ACC;
-			   P9OUT |= OUT_ENGINE_GLOW;
-			   P8OUT |= OUT_ASSET_IGNITION;
+				 P2OUT |= OUT_ENGINE_ACC;
+				 P9OUT |= OUT_ENGINE_GLOW;
+				 P8OUT |= OUT_ASSET_IGNITION;
 
-			   engine.mode = ENGINE_PRE;
+				 engine.mode = ENGINE_PRE;
 
-			   PREHEAT_D = _PREHEAT_SP;
-			   REATTEMPTS_D = _REATTEMPTS_SP;
+				 PREHEAT_D = _PREHEAT_SP;
+				 REATTEMPTS_D = _REATTEMPTS_SP;
 
-			   setStateCode(40);
+				 setStateCode( 28 );
 			 }
 
 			 if (PREHEAT_D == 0)
@@ -251,7 +248,8 @@ void set_Engine_State(int mode)
 
 			 if (POST_D == 0)
 			 {
-				 if (checkEngineRPMs() == 1)
+				 //if (checkEngineRPMs() == 1)
+				 if (checkOilPressure() == 1)
 				 {
 					 P9OUT &= ~OUT_ENGINE_GLOW;
 					 set_Engine_State(ENGINE_RUNNING);
@@ -275,7 +273,7 @@ void set_Engine_State(int mode)
 
 				engine.lastRunEnd = datetime( 0, 0, 0, 0, 0, 0 );
 
-				setStateCode(41);
+				setStateCode(29);
 
 				engine.runTime=1;
 			}
@@ -288,23 +286,27 @@ void set_Engine_State(int mode)
 
 		case ENGINE_STOP:
 
-		   //if (engine.mode != ENGINE_STOP && engine.mode != ENGINE_STOP)
-		   //{
-			clearStateCode(40);
-			clearStateCode(41);
+			//if (engine.mode != ENGINE_STOP)
+		   	//{
+				clearStateCode(28);
+				clearStateCode(29);
+		    //}
 
 			if (engine.mode == ENGINE_RUNNING)
 			{
 				engine.lastRunEnd = now;
 
+
 				// TODO: Save the time of last engine run
-				UpdateFlashMemory();
+				//UpdateFlashMemory();
 			}
 
-			   P2OUT &= ~OUT_ENGINE_ACC;
-			   P9OUT &= ~OUT_ENGINE_CRANK;
-			   P9OUT &= ~OUT_ENGINE_GLOW;
-			   P8OUT &= ~OUT_ASSET_IGNITION;
+			engine.runTime = 0;
+
+		    P2OUT &= ~OUT_ENGINE_ACC;
+			P9OUT &= ~OUT_ENGINE_CRANK;
+			P9OUT &= ~OUT_ENGINE_GLOW;
+			P8OUT &= ~OUT_ASSET_IGNITION;
 		   //}
 
 		   engine.mode = ENGINE_STOP;
@@ -328,12 +330,7 @@ void runTime()
 		{
 			engine.engineHours++;
 			engine.engineMins = 0;
-			// write hours to EEPROM
 		}
-
-		if (engine.engineMins % 10 == 0)
-			UpdateFlashMemory();
-		// write minutes to EEPROM
 	}
 }
 

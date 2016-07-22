@@ -21,6 +21,11 @@
 #include "config.h"
 #include "MAX31855.h"
 
+unsigned int ADC_SAMPLES_24V[10];
+unsigned long ADC_TOTAL_24V;
+unsigned int adc_counts = 10;
+unsigned int adc_count_index = 0;
+
 #define CALADC12_15V_30C  *((unsigned int *)0x1A22)   // Temperature Sensor Calibration-30 C
                                                       //See device datasheet for TLV table memory mapping
 #define CALADC12_15V_85C  *((unsigned int *)0x1A24)   // Temperature Sensor Calibration-85 C
@@ -128,25 +133,39 @@ float ConvertInternalTempToCelcius(unsigned int rawCount)
 //
 void loadAnalogData()
 {
-	 if	(TempCountdown == 0)
-	 {
-		 TempCountdown = 50;
+
+	if	(TempCountdown == 0)
+	{
+		 TempCountdown = 20;
 
 		 VALUE_INTERNAL_TEMP = ConvertInternalTempToCelcius(ADC[AD_INTERNAL_TEMP]);
 
 		 // Poll the thermocouple IC
 		 getThermocoupleData();
 
+		 //-------------------------
 
-		 VALUE_12V = ((float)ADC[AD_12V_BATTERY_VLT] / 4095) * 15;
+		 ADC_TOTAL_24V -= ADC_SAMPLES_24V[adc_count_index];
+		 ADC_SAMPLES_24V[adc_count_index] = ADC[AD_24V_POWER_VLT];
+		 ADC_TOTAL_24V += ADC_SAMPLES_24V[adc_count_index];
 
-		 VALUE_24V = ((float)ADC[AD_P_BATTERY_VLT] / 4095) * 30;
+		 adc_count_index++;
+		 if (adc_count_index == adc_counts)
+			 adc_count_index = 0;
 
-		 //float bullshit = ((float)ADC[AD_N_BATTERY_VLT] / 4095) * 30;
-		 //int fuck = (int)bullshit;
+		 VALUE_PCB_24V = ((float)(ADC_TOTAL_24V / adc_counts) / 4095) * 30;
 
-		 VALUE_PCB_24V = ((float)ADC[AD_24V_POWER_VLT] / 4095) * 30;
-	 }
+		 //-------------------------
+
+		 VALUE_12V = ((float)ADC[AD_12V_BATTERY_VLT] / 4095) * 15.5;
+
+		 VALUE_24V = (((float)ADC[AD_P_BATTERY_VLT] / 4095) * 30);
+
+		 VALUE_24V = VALUE_PCB_24V;
+
+		 VALUE_CURRENT_OUT = ((float)ADC[AD_P_ENGINE_CUR] / 4095) * 500;
+		 //VALUE_12V = ((float)ADC[AD_N_ENGINE_CUR] / 4095) * 500;
+	}
 
 }
 

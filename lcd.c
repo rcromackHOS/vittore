@@ -238,6 +238,14 @@ void Norm_showStateCode()
 			break;
 
 		*/
+		case 28:
+			strcpy(__screenbuffer, msg19);
+			break;
+
+		case 29:
+			strcpy(__screenbuffer, msg20);
+			break;
+
 		case 30:
 			strcpy(__screenbuffer, msg12);
 			break;
@@ -256,14 +264,6 @@ void Norm_showStateCode()
 
 		case 34:
 			strcpy(__screenbuffer, msg16);
-			break;
-
-		case 40:
-			strcpy(__screenbuffer, msg19);
-			break;
-
-		case 41:
-			strcpy(__screenbuffer, msg20);
 			break;
 
 		case 98:

@@ -19,6 +19,7 @@
 #include "timeDate.h"
 #include "solar.h"
 #include "config.h"
+#include "RTC.h"
 
    /* Internal local static variables.                                  */
                               /* The following is used to buffer        */
@@ -68,6 +69,8 @@ void pollGPS()
 	{
 		GpsStateCountdown = 100;
 
+		setStateCode(12);
+
 		if (GpsMessageRetrieve() == 1)
 		{
 
@@ -95,6 +98,17 @@ void storeGPSInstance()
 
 	instanceIndex++;
 
+	if (lat == 0.0	|| lng == 0.0)
+	{
+		lat = GPSinstance.lat;
+		lng = GPSinstance.lng;
+
+		solar_setCoords(lat, lng);
+
+		sunSet = solar_getSunset(now);
+		sunRise = solar_getSunrise(now);
+	}
+
 	if (instanceIndex == 5)
 	{
 		instanceIndex = 0;
@@ -110,8 +124,8 @@ void storeGPSInstance()
 
 		for (i = 0; i < 5; i++)
 		{
-			lati = (int)storedInstances[i].lat * 100;
-			longi = (int)storedInstances[i].lng * 100;
+			lati = (int)(storedInstances[i].lat * 100);
+			longi = (int)(storedInstances[i].lng * 100);
 
 			if (APPLYING_LAT != lati || APPLYING_LNG != longi || storedInstances[i].year < 2016)
 				fail = 1;
@@ -120,14 +134,7 @@ void storeGPSInstance()
 
 		if (fail == 0)
 		{
-			now.hour = GPSinstance.hour;
-			now.year = GPSinstance.year;
-			now.day = GPSinstance.day;
-			now.minute = GPSinstance.minute;
-			now.month = GPSinstance.month;
-			now.second = GPSinstance.second;
-
-			// TODO: update RTC then update "now"
+			RTC_adjust( datetime(GPSinstance.second, GPSinstance.minute, GPSinstance.hour, GPSinstance.day, GPSinstance.month, GPSinstance.year) );
 
 			lat = GPSinstance.lat;
 			lng = GPSinstance.lng;

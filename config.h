@@ -58,6 +58,8 @@ extern int _HIGH_SP_RPM;
 extern int _LOW_SP_RPM;
 extern int VALUE_RPM;
 
+extern float VALUE_CURRENT_OUT;
+
 extern int _UNIT_MODE;
 extern int LIGHTS1HOUR_TMR;
 

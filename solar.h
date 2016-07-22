@@ -21,7 +21,7 @@ static double _lat;
 static double _sunset_d;
 static double _sunrise_d;
 
-int validCalc;
+extern int SOLAR_validCalc;
 
 dateStruct lastCalculated;
 

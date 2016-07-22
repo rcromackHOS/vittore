@@ -15,6 +15,7 @@
 
 #define	M_PI		3.14159265358979323846	/* pi */
 //#define	M_PI_2		1.57079632679489661923	/* pi/2 */
+int SOLAR_validCalc = 0;
 
 //--------------------------------------------------------------------
 
@@ -37,7 +38,7 @@ void solar_setCoords(double lat, double lng)
    _lng = lng;
 
    lastCalculated = date(0, 1, 2015);
-   validCalc = 0;
+   SOLAR_validCalc = 0;
 }
 
 //------------------------------------------------------------------
@@ -66,12 +67,12 @@ timeStruct solar_getSunrise(dateTimeStruct ds)
 		  return ts;
 	  }
 
-	  validCalc = 0;
+	  SOLAR_validCalc = 0;
 
 	  if (solar_calculate(ds.year, ds.month, ds.day) == 1)
 	  {
 		  lastCalculated = date(ds.day, ds.month, ds.year);
-		  validCalc = 1;
+		  SOLAR_validCalc = 1;
 
 		  ts = solar_timeFromDayDec((float)_sunrise_d);//, ts);
 		  return ts;
@@ -93,12 +94,12 @@ timeStruct solar_getSunset(dateTimeStruct ds)
 		  return ts;
 	  }
 
-	  validCalc = 0;
+	  SOLAR_validCalc = 0;
 
 	  if (solar_calculate(ds.year, ds.month, ds.day) == 1)
 	  {
 		  lastCalculated = date(ds.day, ds.month, ds.year);
-		  validCalc = 1;
+		  SOLAR_validCalc = 1;
 
 		  ts = solar_timeFromDayDec((float)_sunset_d);//, ts);
 		  return ts;

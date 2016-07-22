@@ -31,7 +31,10 @@ void check_BatteryBox_Status()
 
 	//---------------------------------------------- VOLTAGE
 
-	if (VALUE_24V < _LOW_SP_24V && _FORCE_ENGINE_RUN == 0)
+	if (_FORCE_ENGINE_RUN == 1)
+		_engineOn = 1;
+
+	if (VALUE_24V < _LOW_SP_24V)
 	{
 		setStateCode(2);
 		_engineOn = 1;
@@ -39,7 +42,7 @@ void check_BatteryBox_Status()
 	else
 		clearStateCode(2);
 
-	if (VALUE_24V > _HIGH_SP_24V)
+	if (VALUE_24V >= _HIGH_SP_24V)
 		_engineOn = 0;
 
 	//---------------------------------------------- TEMPERATURE
@@ -160,17 +163,20 @@ int setBatteryHeater(int s)
 //
 int setEngineRun(int s)
 {
-	if (s == 1 &&
-		BMS_EVENT == 0 &&
-		_SYS_FAILURE_ == 0)
-	{
+	if (s == 1)
 		_FORCE_ENGINE_RUN = 1;
-	}
 	else
 	{
 		_FORCE_ENGINE_RUN = 0;
 		engine.mode = ENGINE_STOP;
 	}
+
+	if (BMS_EVENT == 1 || _SYS_FAILURE_ == 1)
+	{
+		_FORCE_ENGINE_RUN = 0;
+		engine.mode = ENGINE_STOP;
+	}
+
 	return 1;
 }
 

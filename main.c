@@ -62,7 +62,7 @@ timeStruct defaultSunrise;
 
 static unsigned int tmrCnt = 0;
 static int secondCount = 0;
-static int preLoadADCs = 2;
+static int preLoadADCs = 5;
 
 //--------------------------------------------------------------------
 //
@@ -93,14 +93,13 @@ int main()
 
     InitializeHardware();
 
-	InitializeRTC();
-	// pull time/date from RTC
-
     buildButtonStateMachine();
 
     InitializeDisplay();
 
     InitializeEngine();
+
+	InitializeRTC();
 
     // --------------------------
 
@@ -112,14 +111,6 @@ int main()
 	defaultSunrise = time(0, 0, 7);
 	sunSet = time(0, 0, 19);
 	sunRise = time(0, 0, 7);
-
-	// --------------------------
-
-	_UNIT_MODE = MODE_AUTO;
-    _SYS_FAILURE_ = 0;
-
-    // Set up the initial aquiring satellites condition
-    setStateCode(12);
 
     // --------------------------
     /*
@@ -140,7 +131,6 @@ int main()
 	sunSet = solar_getSunset(now);
 	sunRise = solar_getSunrise(now);
 
-
 	// --------------------------
 	//UpdateFlashMemory();
     static int newMode;
@@ -160,33 +150,6 @@ int main()
 
 	while(1)
     {
-
-	    if (ReadRTCRegisters(0,1)  == 0)
-	    {
-	      	 _nop(); //error
-	    }
-	    if ((RtcRxBuffer[0] & 0x80) != 0x80)
-	    {
-	   	 // RTC is not configured!!!
-	   	 // Turn on 32Khz crystal
-			 if (WriteRTCRegister(0,0x80) == 0)
-			 {
-				 _nop(); //error
-			 }
-			 //ADD!! setup rest of RTC for date and time
-	    }
-
-	    RtcCountdown = 200;			// 2 seconds delay to make sure seconds are incrementing
-	    while (RtcCountdown)
-	    {
-	   	 WdtKeepAlive();
-	    }
-
-	    if(ReadRTCRegisters(0,2) == 0)
-	    {		// should read 0x8+2 seconds delay
-	   	 _nop();
-	    }
-
 		if (_ADCs_UPDATED_ == 1)
 		{
 			loadAnalogData();
@@ -203,6 +166,8 @@ int main()
 		}
 
 		pollGPS();
+
+		pollTime();
 
 		handleIndicators();
 
@@ -346,13 +311,13 @@ int isQuietTime(dateTimeStruct now)
   timeStruct SS = defaultSunset;
   timeStruct SR = defaultSunrise;
 
-  /*
-  if (Rhys.validCalc)
+
+  if (SOLAR_validCalc == 1)
   {
     SS = sunSet;
     SR = sunRise;
   }
-  */
+
 
   if (SR.hour > SS.hour)
   {
@@ -367,7 +332,7 @@ int isQuietTime(dateTimeStruct now)
     if (now.hour < SS.hour || (now.hour == SS.hour && now.minute >= SS.minute))
       return 1;
     else if (now.hour > SR.hour || (now.hour == SR.hour && now.minute < SR.minute))
-      return 0;
+      return 1;
   }
 
   return 1;
@@ -505,6 +470,9 @@ void incrementSecondCounts()
 		engine.runTime++;
 		runTime();
 	}
+
+	if (count_run != 0)
+		count_run++;
 
 	if (count_RPM_fail > 0)
 		count_RPM_fail++;

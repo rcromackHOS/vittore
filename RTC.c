@@ -26,8 +26,8 @@
 
 static void KillI2C(void);
 
-
 // Global variables
+unsigned int	RtcCountdown;
 unsigned int	RtcTimeout;
 unsigned char 	RtcRxBuffer[8];
 
@@ -52,27 +52,27 @@ unsigned char Write;
 //---------------------------------------------------------------------------------------------
 void InitializeRTC()
 {
+	now = datetime(0, 0, 12, 1, 1, 2016);
 
-	/*
-	now = datetime(0, 0, 12, 27, 6, 2015);
-
-	if (RTC_isRunning() == 99)	// 99 = no I2C response
+	if (RTC_timeIsSet() == 0)
 	{
-		setStateCode(11);
+		RTC_adjust(now);
+		setStateCode(10);
 	}
-	else
+
+    RtcCountdown = 200;			// 2 seconds delay to make sure seconds are incrementing
+    while (RtcCountdown)
     {
-		// If we've lost the time
-		if (RTC_lostTime() == 1)
-	    {
-			setStateCode(10);     // 10 = RTC lost time (LIR32 _SYS_FAILURE_?)
-			RTC_adjust(now);
-	    }
-		else
-			now = RTC_now();
+    	WdtKeepAlive();
     }
-	*/
-	now = datetime(0, 0, 12, 27, 6, 2015); //
+
+    if (ReadRTCRegisters(0, 2) == 1)
+    {
+    	if (bcd2bin(RtcRxBuffer[0] & 0x7f) != (now.second + 2))
+    		setStateCode(11);
+    }
+    else
+    	setStateCode(11);
 }
 
 //---------------------------------------------------------------------------------------------
@@ -81,18 +81,13 @@ void InitializeRTC()
 // RETURN/UPDATES:
 //
 //---------------------------------------------------------------------------------------------
-int RTC_isRunning(void)
+void pollTime()
 {
-//  Wire.beginTransmission(RTC_ADDRESS);
-//  Wire.write(i);
-
-//  if (Wire.endTransmission() != 0)
-//	return 99;
-
-//  Wire.requestFrom(RTC_ADDRESS, 1);
-//  int ss = Wire.read();
-//  return (ss>>7);
-	return 0;
+	if (RtcCountdown == 0)
+	{
+		RtcCountdown = 100;
+		now = RTC_now();
+	}
 }
 
 //---------------------------------------------------------------------------------------------
@@ -101,7 +96,7 @@ int RTC_isRunning(void)
 // RETURN/UPDATES:
 //
 //---------------------------------------------------------------------------------------------
-int RTC_lostTime(void)
+int RTC_timeIsSet(void)
 {
 //  Wire.beginTransmission(RTC_ADDRESS);
 //  Wire.write(i);
@@ -117,7 +112,13 @@ int RTC_lostTime(void)
   //Wire.read();//Serial.println(bcd2bin(Wire.read()));
 //  if (bcd2bin(Wire.read()) <= 15)
 //	  return 1;
-  return 0;
+
+    ReadRTCRegisters(0, 7);
+
+    if (bcd2bin(RtcRxBuffer[6]) >= 16)
+    	return 1;
+
+	return 0;
 }
 
 //---------------------------------------------------------------------------------------------
@@ -141,15 +142,15 @@ int RTC_adjust(dateTimeStruct dt)
     Wire.write(bin2bcd( dt.year - 2000 ));
     Wire.write(i);
     Wire.endTransmission(); */
-	WriteRTCRegister(RTC_ADDRESS, 0);
-	WriteRTCRegister(RTC_ADDRESS, bin2bcd( dt.second ) | 0x80);
-	WriteRTCRegister(RTC_ADDRESS, bin2bcd( dt.minute ));
-	WriteRTCRegister(RTC_ADDRESS, bin2bcd( dt.hour )); // (0100 0000) 0x40 = 12 Hr clock
-	WriteRTCRegister(RTC_ADDRESS, bin2bcd( 0x08 ));		 // (1000 0000) 0x80 = MFP asserts HIGH // (0000 8000) 0x08 = VBAT enabled
-	WriteRTCRegister(RTC_ADDRESS, bin2bcd( dt.day ));
-	WriteRTCRegister(RTC_ADDRESS, bin2bcd( dt.month ));
-	WriteRTCRegister(RTC_ADDRESS, bin2bcd( dt.year - 2000 ));
-	WriteRTCRegister(RTC_ADDRESS, 0);
+	//WriteRTCRegister(RTC_ADDRESS, 0);
+	WriteRTCRegister(0, bin2bcd( dt.second ) | 0x80);
+	WriteRTCRegister(1, bin2bcd( dt.minute ));
+	WriteRTCRegister(2, bin2bcd( dt.hour )); // (0100 0000) 0x40 = 12 Hr clock
+	WriteRTCRegister(3, bin2bcd( 0x08 ));		 // (1000 0000) 0x80 = MFP asserts HIGH // (0000 8000) 0x08 = VBAT enabled
+	WriteRTCRegister(4, bin2bcd( dt.day ));
+	WriteRTCRegister(5, bin2bcd( dt.month ));
+	WriteRTCRegister(6, bin2bcd( dt.year - 2000 ));
+
 	return 0;
 }
 
@@ -179,7 +180,18 @@ dateTimeStruct RTC_now()
   int y = bcd2bin(Wire.read()) + 2000;
 
   return datetime(ss, mm, hh, d, m, y);*/
-  return datetime(0, 0, 12, 1, 1, 2015);
+
+    ReadRTCRegisters(0, 10);
+    int ss = bcd2bin(RtcRxBuffer[0] & 0x7f);
+    int mm = bcd2bin(RtcRxBuffer[1]);
+    int hh = bcd2bin(RtcRxBuffer[2] & 0x3f);
+
+    int d = bcd2bin(RtcRxBuffer[4]);
+
+    int m = bcd2bin(RtcRxBuffer[5] ^ 0x20);
+    int y = bcd2bin(RtcRxBuffer[6]) + 2000;
+
+    return datetime(ss, mm, hh, d, m, y);
 }
 
 
@@ -257,7 +269,8 @@ void ConfigureI2CForRTC(void)
 	UCB0CTL1 = UCSSEL_2 + UCSWRST;            // Use SMCLK, keep SW reset
 	UCB0BR0 = 15;                             // fSCL = SMCLK/15 = ~100kHz
 	UCB0BR1 = 0;
-	UCB0I2CSA = 0x6f;                         // Slave Address is B1101111
+	//UCB0I2CSA = 0x6f;                         // Slave Address is B1101111
+	UCB0I2CSA = RTC_ADDRESS;
 }
 
 
@@ -284,7 +297,7 @@ int WriteRTCRegister(unsigned char regAddr, unsigned char val)
 	WdtKeepAlive();
 	while (UCB0CTL1 & UCTXSTP)
 	{             // Ensure stop condition got sent
-		if(RtcTimeout == 0)
+		if (RtcTimeout == 0)
 		{
 			KillI2C();
 			return(0);
@@ -295,7 +308,7 @@ int WriteRTCRegister(unsigned char regAddr, unsigned char val)
 
 	while( (LastByte == 0) || ((UCB0CTL1 & UCTXSTP) != 0) )
 	{
-		if(RtcTimeout ==0)
+		if (RtcTimeout == 0)
 		{
 			KillI2C();
 			return(0);
@@ -318,7 +331,6 @@ int ReadRTCRegisters(unsigned char regAddr, unsigned char cnt)
 	Write = 0;
 	if(cnt > (sizeof RtcRxBuffer) )	cnt = sizeof RtcRxBuffer;
 	if(cnt > 1) cnt = cnt-1;	// always read 2 bytes
-
 
 	TxData[0] = regAddr;
 	TXByteCtr = 1;
@@ -346,7 +358,7 @@ int ReadRTCRegisters(unsigned char regAddr, unsigned char cnt)
 	RtcTimeout = 20;
 	while( (LastByte == 0) || ((UCB0CTL1 & UCTXSTP) != 0) )
 	{
-		if(RtcTimeout ==0)
+		if(RtcTimeout == 0)
 		{
 			KillI2C();
 			return(0);
@@ -369,7 +381,7 @@ static void KillI2C(void)
 	WdtKeepAlive();
 	while (UCB0CTL1 & UCTXSTP)
 	{             // Ensure stop condition got sent
-		if(RtcTimeout == 0)
+		if (RtcTimeout == 0)
 		{
 			UCB0CTL1 |= UCSWRST;
 			UCB0IE &= ~(UCTXIE + UCRXIE);                // Disable TX and RX interrupts
