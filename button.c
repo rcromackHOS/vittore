@@ -12,8 +12,11 @@
 #include "Common.h"
 #include "mast.h"
 
-//--------------------------------------------------------------------
-
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:		build and populate the button arrays for the statemachine
+//
+// RETURN/UPDATES:	void
+//---------------------------------------------------------------------------------------------
 void buildButtonStateMachine()
 {
     button x = {BUTTON_nAUTO, OUT_AUTO_LED, MODE_AUTO, STATE_NOMINAL, 0, 0};
@@ -48,8 +51,11 @@ void buildButtonStateMachine()
 	*/
 }
 
-//--------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:		button state machine
 //
+// RETURN/UPDATES:	void
+//---------------------------------------------------------------------------------------------
 void button_stateMachine()
 {
 	int high;
@@ -148,10 +154,13 @@ void button_stateMachine()
 
 }
 
-//--------------------------------------------------------------------
-// Implimentation of reset functionality
-// hold reset button 5 seconds, apply the reset
-// then clear, reset flag a second after
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:		Implimentation of reset functionality
+// 					hold reset button 5 seconds, apply the reset
+// 					then clear, reset flag a second after
+//
+// RETURN/UPDATES:	void
+//---------------------------------------------------------------------------------------------
 void handle_reset()
 {
 	if (_RESETTING_ == 1)
@@ -177,6 +186,11 @@ void handle_reset()
 	}
 }
 
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:		an alternative way to enter diagnostic mode. Button on the back of the PCB
+//
+// RETURN/UPDATES:	void
+//---------------------------------------------------------------------------------------------
 void handle_pressDiagButton()
 {
 	if (diagBackButton >= 200)

@@ -59,35 +59,6 @@ const char oilchange_string[] = {"Oil Change Due:  "};
 const char RPM_string[] =     {"Engine RPMs:    "};
 const char runtime_string[] = {"Engine Runtime: "};
 
-//                            {"    Bank Charging   "};
-const char* const messages[] =
-{
-	msg1,
-	msg2,
-	msg3,
-	msg4,
-	msg5,
-	msg6,
-	msg7,
-	msg8,
-	msg9,
-	msg10,
-	msg11,
-	msg12,
-	msg13,
-	msg14,
-	msg15,
-	msg16,
-	msg17,
-	msg18,
-	msg19,
-	msg20,
-	msg21,
-	msg22,
-	msg23,
-	msg24
-};
-
 const char li0[] = "CLEANETEK INDUSTRIES";
 const char li1[] = "        INC         ";
 //const char* const cmpyName[] = {li0, li1};
@@ -100,8 +71,12 @@ int OLED_rows = 0x08;
 char __screenbuffer[20];
 char __screenbuffer2[20];
 
-//--------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:		Statemachine for the screen messages. flip screen every 3 seconds in normal mode
+//					update screen every second in diagnostic mode
 //
+// RETURN/UPDATES:	void
+//---------------------------------------------------------------------------------------------
 void updateDisplay()
 {
 	if (_SCREEN_UPDATE_D == 0 || _UPDATE_SCREEN_ == 1)
@@ -166,8 +141,11 @@ void updateDisplay()
 
 }
 
-//--------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:		show the company name
 //
+// RETURN/UPDATES:	void
+//---------------------------------------------------------------------------------------------
 void Norm_showCompanyName()
 {
 	strcpy(__screenbuffer, li0);
@@ -177,16 +155,22 @@ void Norm_showCompanyName()
 	OLED_writeLine(__screenbuffer, 1);
 }
 
-//--------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:		Show the unit mode
 //
+// RETURN/UPDATES:	void
+//---------------------------------------------------------------------------------------------
 void Norm_showMode()
 {
 	strcpy(__screenbuffer, modeArray[_UNIT_MODE]);
 	OLED_writeLine(__screenbuffer, 3);
 }
 
-//--------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:		Show the message relative to every state code
 //
+// RETURN/UPDATES:	void
+//---------------------------------------------------------------------------------------------
 void Norm_showStateCode()
 {
 	switch (_STATE_CODE)
@@ -288,10 +272,11 @@ const char msg11[] = {"Aquiring Satellites "};
 
 */
 
-//====================================================================
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:		Convert the date and time to the buffer for printing
 //
-//====================================================================
-//
+// RETURN/UPDATES:	void
+//---------------------------------------------------------------------------------------------
 void DIAG_showDate()
 {
 	strcpy(__screenbuffer, "");
@@ -342,8 +327,11 @@ void DIAG_showDate()
 	OLED_writeLine(__screenbuffer, 0);
 }
 
-//--------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:		Convert the 24v and 12v to the buffer for printing
 //
+// RETURN/UPDATES:	void
+//---------------------------------------------------------------------------------------------
 void DIAG_showVoltage()
 {
 	strcpy(__screenbuffer, empty_char);
@@ -388,8 +376,11 @@ void DIAG_showVoltage()
 	OLED_writeLine(__screenbuffer, 1);
 }
 
-//--------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:		Convert the battery temp to the buffer for printing
 //
+// RETURN/UPDATES:	void
+//---------------------------------------------------------------------------------------------
 void DIAG_showBatteryTemp()
 {
 	strcpy(__screenbuffer, bt_tmp_string);
@@ -410,8 +401,11 @@ void DIAG_showBatteryTemp()
 }
 
 
-//--------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:		Convert the internal temp to the buffer for printing
 //
+// RETURN/UPDATES:	void
+//---------------------------------------------------------------------------------------------
 void DIAG_showInternalTemp()
 {
 	strcpy(__screenbuffer, int_tmp_string);
@@ -424,8 +418,11 @@ void DIAG_showInternalTemp()
 	OLED_writeLine(__screenbuffer, 3);
 }
 
-//--------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:		Convert the RPMs to the buffer for printing
 //
+// RETURN/UPDATES:	void
+//---------------------------------------------------------------------------------------------
 void DIAG_showRPM()
 {
 	strcpy(__screenbuffer, RPM_string);
@@ -443,8 +440,11 @@ void DIAG_showRPM()
 	OLED_writeLine(__screenbuffer, 2);
 }
 
-//--------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:		Convert the engine hours to the buffer for printing
 //
+// RETURN/UPDATES:	void
+//---------------------------------------------------------------------------------------------
 void DIAG_showEngineHours()
 {
 	strcpy(__screenbuffer, enghrs_string);
@@ -479,8 +479,11 @@ void DIAG_showEngineHours()
 
 }
 
-//--------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:		Convert the runtime to the buffer for printing
 //
+// RETURN/UPDATES:	void
+//---------------------------------------------------------------------------------------------
 void DIAG_showRuntime()
 {
 	strcpy(__screenbuffer, runtime_string);
@@ -501,8 +504,11 @@ void DIAG_showRuntime()
 	OLED_writeLine(__screenbuffer, 3);
 }
 
-//--------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:		Convert the sunrise and sunset to the buffer for printing
 //
+// RETURN/UPDATES:	void
+//---------------------------------------------------------------------------------------------
 void DIAG_showSunRiseSet()
 {
 	timeStruct ss = sunSet;
@@ -554,8 +560,11 @@ void DIAG_showSunRiseSet()
 
 }
 
-//--------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:		Convert the globals lat and long to the buffer for printing
 //
+// RETURN/UPDATES:	void
+//---------------------------------------------------------------------------------------------
 void DIAG_showLatLong()
 {
 	strcpy(__screenbuffer, msg23);
@@ -580,8 +589,11 @@ void DIAG_showLatLong()
 }
 
 
-//====================================================================
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:		Print the buffer 'char' on line, 'line'
 //
+// RETURN/UPDATES:	void
+//---------------------------------------------------------------------------------------------
 void OLED_writeLine(char* chars, int line)
 {
 	OLED_command(OLED_new_line[line]);
@@ -593,16 +605,22 @@ void OLED_writeLine(char* chars, int line)
 	}
 }
 
-//====================================================================
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:		Clear out the line in the argument
 //
+// RETURN/UPDATES:	void
+//---------------------------------------------------------------------------------------------
 void clearLine(int line)
 {
 	strcpy(__screenbuffer, emptyLine_char);
 	OLED_writeLine(__screenbuffer, line);
 }
 
-//====================================================================
-// Simulates a clock pulse
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:		Simulates a clock pulse
+//
+// RETURN/UPDATES:	void
+//---------------------------------------------------------------------------------------------
 void OLED_clockCycle()
 {
    int i = 0;
@@ -615,8 +633,11 @@ void OLED_clockCycle()
    }
 }
 
-//--------------------------------------------------------------------
-//  PREPAOLED_Reset THE TRANSMISSION OF A COMMAND
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:		PREPAOLED_Reset THE TRANSMISSION OF A COMMAND
+//
+// RETURN/UPDATES:	void
+//---------------------------------------------------------------------------------------------
 void OLED_command(int c)
 {
    int i = 0;
@@ -635,8 +656,11 @@ void OLED_command(int c)
    OLED_sendByte(c);
 }
 
-//--------------------------------------------------------------------
-//  PREPAOLED_Reset THE TRANSMISSION OF A BYTE OF DATA
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:		PREPAOLED_Reset THE TRANSMISSION OF A BYTE OF DATA
+//
+// RETURN/UPDATES:	void
+//---------------------------------------------------------------------------------------------
 void OLED_data(int d)
 {
    int i = 0;
@@ -657,8 +681,11 @@ void OLED_data(int d)
    OLED_sendByte(d);
 }
 
-//--------------------------------------------------------------------
-//  SEND TO THE DISPLAY THE BYTE IN tx_b
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:		SEND TO THE DISPLAY THE BYTE IN tx_b
+//
+// RETURN/UPDATES:	void
+//---------------------------------------------------------------------------------------------
 void OLED_sendByte(int tx_b)
 {
    int i = 0;
@@ -704,9 +731,11 @@ void OLED_sendByte(int tx_b)
    }
 }
 
-
-//--------------------------------------------------------------------
-// Clears display (and cursor home)
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:		Clears display (and cursor home)
+//
+// RETURN/UPDATES:	void
+//---------------------------------------------------------------------------------------------
 void OLED_clearDisplay()
 {
 	OLED_command(0x01);
@@ -715,8 +744,11 @@ void OLED_clearDisplay()
 	   {}
 }
 
-//--------------------------------------------------------------------
-// INITIAL SETUP
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:		INITIAL SETUP, set up the ports, and configure the display
+//
+// RETURN/UPDATES:	void
+//---------------------------------------------------------------------------------------------
 void InitializeDisplay()
 {
    // Sets HIGH the LCD_SPI_SCK line of the display

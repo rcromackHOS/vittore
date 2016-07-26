@@ -35,11 +35,10 @@
 
 //--------------------------------------------------------------------
 
-
 void enterLowPowerMode();
 void exitLowPowerMode();
 
-int setLightsState(int s);
+void setLightsState(int s);
 int isQuietTime(dateTimeStruct now);
 
 void handleIndicators();
@@ -64,26 +63,38 @@ static unsigned int tmrCnt = 0;
 static int secondCount = 0;
 static int preLoadADCs = 5;
 
-//--------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:		Handling function that preps the unit for low power mode
+//						- turn off peripherals
+//						- raise the flag
 //
+// RETURN/UPDATES:	void
+//---------------------------------------------------------------------------------------------
 void enterLowPowerMode()
 {
-	P4OUT = 0;
 	//OLED_clearDisplay();
 
-	WdtDisable();
-	_BIS_SR(LPM3_bits + GIE); // LPM3_bits (SCG1+SCG0+CPUOFF) disabled & interrupts enabled
+	//WdtDisable();
+	//_BIS_SR(LPM3_bits + GIE); // LPM3_bits (SCG1+SCG0+CPUOFF) disabled & interrupts enabled
+
+	_LPMODE = 1;
+
+	P2OUT = ~OUT_ENGINE_ACC;
+	P3OUT = ~OUT_LIGHTS_ON;
+	P4OUT = ~(OUT_RESET_LED + OUT_LIGHT_1H_LED + OUT_AUTO_LED + OUT_STANDBY_LED + OUT_DOWN_LED + OUT_UP_LED);
+	P5OUT = ~BIT4;
+	P7OUT = ~(OUT_DOWN_MAST + OUT_UP_MAST);
+	P8OUT = ~(OUT_HEARTBEAT_LED + OUT_ASSET_IGNITION);
+	P9OUT = ~(OUT_ENGINE_FAIL + OUT_ENGINE_GLOW + OUT_ENGINE_CRANK);
+	P10OUT = ~(OUT_ASSET_I1 + OUT_ASSET_I2 + OUT_ASSET_I3 + OUT_ASSET_I4 + OUT_nBATTERY_HEATER_ON + OUT_nCONTACTOR_ON + OUT_nCABINET_HEATER_ON);
+	P11OUT = ~(OUT_nSPARE3_ON + OUT_nSPARE2_ON + OUT_nSPARE4_ON);
 }
 
-//--------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:	Main
 //
-void handle_minuteEvents()
-{
-	secondCount = 0;
-}
-
-//--------------------------------------------------------------------
-//
+// RETURN/UPDATES:	int
+//---------------------------------------------------------------------------------------------
 int main()
 {
     WdtDisable();
@@ -132,19 +143,17 @@ int main()
 	sunRise = solar_getSunrise(now);
 
 	// --------------------------
+
 	//UpdateFlashMemory();
     static int newMode;
 
 	// --------------------------
 
-	//if (_MAST_STATUS == MAST_MAXDOWN)
-	//	enterLowPowerMode();
+	if (_MAST_STATUS == MAST_MAXDOWN)
+		enterLowPowerMode();
 
-	//else
-	//{
-		_BIS_SR(GIE); // interrupts enabled
-		WdtEnable();  // enable Watch dog
-	//}
+	_BIS_SR(GIE); // interrupts enabled
+	WdtEnable();  // enable Watch dog
 
 	// --------------------------
 
@@ -157,31 +166,35 @@ int main()
 			_ADCs_UPDATED_ = 0;
 		}
 
-		if (preLoadADCs == 0)
+		if (_LPMODE == 0)
 		{
-			check_BatteryBox_Status();
+		    if (preLoadADCs == 0)
+			{
+				check_BatteryBox_Status();
 
-			newMode = check_Engine_Status();
-			set_Engine_State(newMode);
-		}
+				newMode = check_Engine_Status();
+				set_Engine_State(newMode);
+			}
 
-		pollGPS();
+			pollGPS();
 
-		pollTime();
+			pollTime();
 
-		handleIndicators();
+			handleIndicators();
 
-		handleCabinetHeating();
+			handleCabinetHeating();
 
-		handle_pressDiagButton();
+			handle_pressDiagButton();
 
-		handle_reset();
+			handle_reset();
 
-		handle_lighting();
+			handle_lighting();
 
-		updateDisplay();
+			updateDisplay();
 
-		//checkTimeToSaveMemory();
+			//checkTimeToSaveMemory();
+
+    	}
 
 		WdtKeepAlive();  // reset Watch dog
     }
@@ -240,8 +253,12 @@ __interrupt void TIMER1_A0_ISR(void)
 
 }
 
-//------------------------------------------------------------------------------------------------------------------------------------
-// Port 2 interrupt service routine
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:		-PORT2 Interrupt
+//
+// RETURN/UPDATES:	-Checks for solar wing latch pulled.
+//					-See if the mast is no longer down, leave low power mode
+//---------------------------------------------------------------------------------------------
 #pragma vector = PORT2_VECTOR
 __interrupt void Port_2(void)
 {
@@ -252,15 +269,27 @@ __interrupt void Port_2(void)
 		//__disable_interrupt();
 
 		//_BIS_SR(GIE);
-		WdtEnable();  // enable Watch dog
-		_BIC_SR(LPM3_EXIT); // wake up from low power mode
+		//_BIC_SR(LPM3_EXIT); // wake up from low power mode
+
+		//WdtEnable();  // enable Watch dog
+
+		_LPMODE = 0;
+
+		_SYS_FAILURE_ = 0;
+		BMS_EVENT = 0;
+
+		P5OUT |= BIT4;
+
 		P2IFG &= ~IN_MAST_CUT_OUT;
 	}
 }
 
 
-//------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:		handles the redumentary indicators
 //
+// RETURN/UPDATES:	void
+//---------------------------------------------------------------------------------------------
 void handleIndicators()
 {
 	handleSystemFailEvent();
@@ -272,8 +301,11 @@ void handleIndicators()
 	handleButtonLight();
 }
 
-//------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:		light up the buttons, to indicate the mode we're in
 //
+// RETURN/UPDATES:	void
+//---------------------------------------------------------------------------------------------
 void handleButtonLight()
 {
 	int i;
@@ -288,21 +320,27 @@ void handleButtonLight()
 	P4OUT &= ~BIT0;
 }
 
-//--------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:
 //
-int setLightsState(int s)
+// RETURN/UPDATES:	void
+//---------------------------------------------------------------------------------------------
+void setLightsState(int s)
 {
 	if (s == 1 && BMS_EVENT == 0)
 		P3OUT |= OUT_LIGHTS_ON;
 
     else
     	P3OUT &= ~OUT_LIGHTS_ON;
-
-	return 1;
 }
 
-//--------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:		Calculates if we're inside or outside, sunrise and sunset
+//					if no coordinates are found, use a default schedule
 //
+// RETURN/UPDATES:	0 - we're outside quiet time, turn on lights
+//					1 - we're inside quiet time, lights off
+//---------------------------------------------------------------------------------------------
 int isQuietTime(dateTimeStruct now)
 {
   if (_FORCE_LIGHTS_ON == 1)
@@ -311,13 +349,11 @@ int isQuietTime(dateTimeStruct now)
   timeStruct SS = defaultSunset;
   timeStruct SR = defaultSunrise;
 
-
   if (SOLAR_validCalc == 1)
   {
     SS = sunSet;
     SR = sunRise;
   }
-
 
   if (SR.hour > SS.hour)
   {
@@ -338,9 +374,12 @@ int isQuietTime(dateTimeStruct now)
   return 1;
 }
 
-//--------------------------------------------------------------------
-// System Failure
-// Turn on the LED and alert the asset tracker
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:		handles the indicator LEDs for a failed condition
+//					runs the GPS output
+//
+// RETURN/UPDATES:	void
+//---------------------------------------------------------------------------------------------
 void handleSystemFailEvent()
 {
 	if (_SYS_FAILURE_ == 1)
@@ -361,9 +400,12 @@ void handleSystemFailEvent()
 		P11OUT |= OUT_nSPARE2_ON;
 }
 
-//--------------------------------------------------------------------
-// Low fuel
-// alert the asset tracker
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:		handles the low fuel event. Turn on the indicator LED
+//					run the GPS input
+//
+// RETURN/UPDATES:	void
+//---------------------------------------------------------------------------------------------
 void handleLowFuelEvent()
 {
 	if ((P2IN & IN_nLOW_FUEL) == 0)
@@ -373,11 +415,13 @@ void handleLowFuelEvent()
 }
 
 //---------------------------------------------------------------------------------------------
-// DESCRIPTION:				-
+// DESCRIPTION:		runs through the conditions to run the lights
+//						-	Auto
+//								Checks for lighting schedule
+//						-	Lights on 1 hr
+//								runs the lights for a full hour
 //
-// FUNCTION CALLED BY:		-
-
-// VARIABLES: void
+// RETURN/UPDATES:	void
 //---------------------------------------------------------------------------------------------
 void handle_lighting()
 {
@@ -385,9 +429,10 @@ void handle_lighting()
 	// Count to 1 hour, then default to auto mode.
 	if (_UNIT_MODE == MODE_LIGHT1H)
 	{
+		// set the lights to begin counting
 		if (LIGHTS1HOUR_TMR == 0)
 			LIGHTS1HOUR_TMR = 1;
-
+		// count until 3600 seconds (1 hour) elapses
 		if (LIGHTS1HOUR_TMR == 3600)
 		{
 			_UNIT_MODE = MODE_AUTO;
@@ -404,11 +449,10 @@ void handle_lighting()
 }
 
 //---------------------------------------------------------------------------------------------
-// DESCRIPTION:				-	overwrite flash memory with new values
-//							- 	called
-// FUNCTION CALLED BY:		-
-
-// VARIABLES: void
+// DESCRIPTION:		checks for conditions to run the PCB cabinet heater
+//
+//
+// RETURN/UPDATES:	void
 //---------------------------------------------------------------------------------------------
 void handleCabinetHeating()
 {
@@ -419,14 +463,11 @@ void handleCabinetHeating()
 		P10OUT &= ~OUT_nCABINET_HEATER_ON;
 }
 
-
-
 //---------------------------------------------------------------------------------------------
-// DESCRIPTION:				-	overwrite flash memory with new values
-//							- 	called
-// FUNCTION CALLED BY:		-
-
-// VARIABLES: void
+// DESCRIPTION:		checks the time to save our accumulated data
+//						-	saves onces a day, at sunRise
+//
+// RETURN/UPDATES:	void
 //---------------------------------------------------------------------------------------------
 void checkTimeToSaveMemory()
 {
@@ -444,11 +485,10 @@ void checkTimeToSaveMemory()
 
 
 //---------------------------------------------------------------------------------------------
-// DESCRIPTION:				-	overwrite flash memory with new values
-//							- 	called
-// FUNCTION CALLED BY:		-
-
-// VARIABLES: void
+// DESCRIPTION:		Second based counts
+//						increment the counters that require proper second increments
+//
+// RETURN/UPDATES:	void
 //---------------------------------------------------------------------------------------------
 void incrementSecondCounts()
 {

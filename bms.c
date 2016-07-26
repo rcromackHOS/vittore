@@ -16,12 +16,13 @@
 //extern struct engineStruct engine;
 
 //---------------------------------------------------------------------------------------------
-// DESCRIPTION:
+// DESCRIPTION:		main BMS function. checks
+//					 -	Engine control for low voltage
+//					 -	checks for cold battery box, turns on heater
+//					 -  controls contactor
+//					 -  BMS failure timers, cell loop and voltage based
 //
-//
-//
-// RETURN/UPDATES:
-//
+// RETURN/UPDATES:	void
 //---------------------------------------------------------------------------------------------
 void check_BatteryBox_Status()
 {
@@ -112,9 +113,12 @@ void check_BatteryBox_Status()
 	setEngineRun(_engineOn);
 }
 
-//--------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:		sets the contactor state by checking various conditions
 //
-int setContactor(int s)
+// RETURN/UPDATES:	void
+//---------------------------------------------------------------------------------------------
+void setContactor(int s)
 {
 	  if (s == 1 && BMS_EVENT == 0)
 	  {
@@ -128,12 +132,14 @@ int setContactor(int s)
 		P10OUT &= ~OUT_nCONTACTOR_ON;
 	    P10OUT |= OUT_ASSET_I2;
 	  }
-	  return 1;
 }
 
-//--------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:		sets the battery heater state based on system conditions
 //
-int setBatteryHeater(int s)
+// RETURN/UPDATES:	void
+//---------------------------------------------------------------------------------------------
+void setBatteryHeater(int s)
 {
 	if (VALUE_BAT_TEMP == -300)
 	{
@@ -156,12 +162,14 @@ int setBatteryHeater(int s)
 		}
 	}
 
-	return 1;
 }
 
-//--------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:		sets the engine state based on system conditions
 //
-int setEngineRun(int s)
+// RETURN/UPDATES:	void
+//---------------------------------------------------------------------------------------------
+void setEngineRun(int s)
 {
 	if (s == 1)
 		_FORCE_ENGINE_RUN = 1;
@@ -176,8 +184,6 @@ int setEngineRun(int s)
 		_FORCE_ENGINE_RUN = 0;
 		engine.mode = ENGINE_STOP;
 	}
-
-	return 1;
 }
 
 

@@ -45,9 +45,11 @@ unsigned char Write;
 
 
 //---------------------------------------------------------------------------------------------
-// DESCRIPTION:
+// DESCRIPTION:		initialize the RTC, check the status of the RTC IC, and it's saved data
+//					validate it's alive, load new data if the time is lost, make sure
+//					it counts the new data
 //
-// RETURN/UPDATES:
+// RETURN/UPDATES:	void
 //
 //---------------------------------------------------------------------------------------------
 void InitializeRTC()
@@ -76,10 +78,9 @@ void InitializeRTC()
 }
 
 //---------------------------------------------------------------------------------------------
-// DESCRIPTION:
+// DESCRIPTION:		Pull the time from the RTC IC
 //
-// RETURN/UPDATES:
-//
+// RETURN/UPDATES:	void
 //---------------------------------------------------------------------------------------------
 void pollTime()
 {
@@ -91,28 +92,13 @@ void pollTime()
 }
 
 //---------------------------------------------------------------------------------------------
-// DESCRIPTION:
+// DESCRIPTION:		Pull data from the RTC, make sure it's valid, and we get an Ack
 //
-// RETURN/UPDATES:
-//
+// RETURN/UPDATES:	1 - A time is saved in the RTC IC
+//					0 - No data is pulled
 //---------------------------------------------------------------------------------------------
 int RTC_timeIsSet(void)
 {
-//  Wire.beginTransmission(RTC_ADDRESS);
-//  Wire.write(i);
-//  Wire.endTransmission();
-
-//  Wire.requestFrom(RTC_ADDRESS, 7);
-//  Wire.read();//Serial.println(bcd2bin(Wire.read()));
-//  Wire.read();//Serial.println(bcd2bin(Wire.read()));
-//  Wire.read();//Serial.println(bcd2bin(Wire.read()));
-//  Wire.read();
-//  Wire.read();//Serial.println(bcd2bin(Wire.read()));
-//  Wire.read();//Serial.println(bcd2bin(Wire.read()));
-  //Wire.read();//Serial.println(bcd2bin(Wire.read()));
-//  if (bcd2bin(Wire.read()) <= 15)
-//	  return 1;
-
     ReadRTCRegisters(0, 7);
 
     if (bcd2bin(RtcRxBuffer[6]) >= 16)
@@ -122,27 +108,12 @@ int RTC_timeIsSet(void)
 }
 
 //---------------------------------------------------------------------------------------------
-// DESCRIPTION:
+// DESCRIPTION:		Load the argument date and time into the RTC IC
 //
-// RETURN/UPDATES:
-//
+// RETURN/UPDATES:	void
 //---------------------------------------------------------------------------------------------
-int RTC_adjust(dateTimeStruct dt)
-{ /*
-	Wire.beginTransmission(RTC_ADDRESS);
-    Wire.write(i);
-    Wire.write(bin2bcd( dt.second ) | 0x80);
-    Wire.write(bin2bcd( dt.minute ));
-    Wire.write(bin2bcd( dt.hour ));  // (0100 0000) 0x40 = 12 Hr clock
-    Wire.write(bin2bcd( 0x08 ));		 // (1000 0000) 0x80 = MFP asserts HIGH // (0000 8000) 0x08 = VBAT enabled
-    Wire.write(bin2bcd( dt.day ));
-    //Serial.print("setMonth ");Serial.println(dt.month());
-	//Serial.print("bin2bcd ");Serial.println( bin2bcd(dt.month()) );
-	Wire.write(bin2bcd( dt.month ));
-    Wire.write(bin2bcd( dt.year - 2000 ));
-    Wire.write(i);
-    Wire.endTransmission(); */
-	//WriteRTCRegister(RTC_ADDRESS, 0);
+void RTC_adjust(dateTimeStruct dt)
+{
 	WriteRTCRegister(0, bin2bcd( dt.second ) | 0x80);
 	WriteRTCRegister(1, bin2bcd( dt.minute ));
 	WriteRTCRegister(2, bin2bcd( dt.hour )); // (0100 0000) 0x40 = 12 Hr clock
@@ -150,37 +121,15 @@ int RTC_adjust(dateTimeStruct dt)
 	WriteRTCRegister(4, bin2bcd( dt.day ));
 	WriteRTCRegister(5, bin2bcd( dt.month ));
 	WriteRTCRegister(6, bin2bcd( dt.year - 2000 ));
-
-	return 0;
 }
 
 //---------------------------------------------------------------------------------------------
-// DESCRIPTION:
+// DESCRIPTION:		Pull the saved time for the RTC IC, return it in a Struct
 //
-// RETURN/UPDATES:
-//
+// RETURN/UPDATES:	dateTimeStruct
 //---------------------------------------------------------------------------------------------
 dateTimeStruct RTC_now()
-{ /*
-  Wire.beginTransmission(RTC_ADDRESS);
-  Wire.write(i);
-  Wire.endTransmission();
-
-  Wire.requestFrom(RTC_ADDRESS, 7);
-
-  int ss = bcd2bin(Wire.read() & 0x7f);
-  int mm = bcd2bin(Wire.read());
-  int hh = bcd2bin(Wire.read() & 0x3f);
-  Wire.read();
-  int d = bcd2bin(Wire.read());
-
-  int comp = B00100000;
-  int m = bcd2bin(Wire.read() ^ comp);
-
-  int y = bcd2bin(Wire.read()) + 2000;
-
-  return datetime(ss, mm, hh, d, m, y);*/
-
+{
     ReadRTCRegisters(0, 10);
     int ss = bcd2bin(RtcRxBuffer[0] & 0x7f);
     int mm = bcd2bin(RtcRxBuffer[1]);

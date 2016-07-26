@@ -12,8 +12,11 @@
 #include "Common.h"
 //#include "Flash.h"
 
-//--------------------------------------------------------------------
-
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:		Initialize engine object. Start with empty data
+//
+// RETURN/UPDATES:	void
+//---------------------------------------------------------------------------------------------
 void InitializeEngine()
 {
 	// pull stored oil change due hours
@@ -28,8 +31,12 @@ void InitializeEngine()
 	engine.lastRunEnd = datetime( 0, 0, 0, 0, 0, 0 );
 }
 
-//--------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:		checks the engine temperature sensor input
 //
+// RETURN/UPDATES:	1 - Good
+//					0 -	Bad
+//---------------------------------------------------------------------------------------------
 int checkEngineTemp()
 {
 	if ((P7IN & IN_ENGINE_TEMP_FAIL) != 0)
@@ -37,8 +44,12 @@ int checkEngineTemp()
 	return 0;
 }
 
-//--------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:		checks the engine oil pressure sensor input
 //
+// RETURN/UPDATES:	1 - Good
+//					0 -	Bad
+//---------------------------------------------------------------------------------------------
 int checkOilPressure()
 {
 	if ((P6IN & IN_OIL_PRESSURE_OK) != 0)
@@ -46,8 +57,13 @@ int checkOilPressure()
 	return 0;
 }
 
-//--------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:		checks the engine RPM values, compares against set points
 //
+// RETURN/UPDATES:	2 - too fast
+//					1 - Good
+//					0 -	too slow
+//---------------------------------------------------------------------------------------------
 int checkEngineRPMs()
 {
 	if ((P1IN & BIT7) != 0)
@@ -55,8 +71,13 @@ int checkEngineRPMs()
 	return 0;
 }
 
-//--------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:		checks the values for the engine. determines fail conditions or wether to
+//					increment the engine state machine
 //
+// RETURN/UPDATES:	returns desired state
+//
+//---------------------------------------------------------------------------------------------
 int check_Engine_Status()
 {
 	int mode = engine.mode;
@@ -160,8 +181,11 @@ int check_Engine_Status()
 	return mode;
 }
 
-//--------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:		engine state machine
 //
+// RETURN/UPDATES:	void
+//---------------------------------------------------------------------------------------------
 void set_Engine_State(int mode)
 {
 	if (_SYS_FAILURE_ == 1)
@@ -317,8 +341,11 @@ void set_Engine_State(int mode)
 	}
 }
 
-//--------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:		increments the runTime, calculates minutes and hours for accumulated data saving
 //
+// RETURN/UPDATES:	void
+//---------------------------------------------------------------------------------------------
 void runTime()
 {
 	// increment seconds of running
@@ -334,8 +361,11 @@ void runTime()
 	}
 }
 
-//--------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:		calculates the idle time for tracking from engine start and end run times
 //
+// RETURN/UPDATES:	void
+//---------------------------------------------------------------------------------------------
 int store_idleTime()
 {
 	if (engine.lastRunEnd.year == 0)
@@ -390,10 +420,13 @@ int store_idleTime()
 }
 
 //--------------------------------------------------------------------
-// Handle oil change indication and reset
-// Oil Change alert functionality
-// 25 hours before an oil change is due, report to the asset tracker
-// hold OCC button for 5 seconds to reset the oil change to 500 hours in the future
+// DESCRIPTION:		Handle oil change indication and reset
+//					Oil Change alert functionality
+// 					25 hours before an oil change is due, report to the asset tracker
+// 					hold OCC button for 5 seconds to reset the oil change to 500 hours in the future
+//
+// RETURN/UPDATES:	void
+//---------------------------------------------------------------------------------------------
 void handle_oilchangeClear()
 {
 	if (_OILCHANGE_DUE - engine.engineHours <= 25)

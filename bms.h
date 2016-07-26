@@ -15,9 +15,9 @@
 
 extern void check_BatteryBox_Status(void);
 
-int setContactor(int s);
-int setBatteryHeater(int s);
-int setEngineRun(int s);
+void setContactor(int s);
+void setBatteryHeater(int s);
+void setEngineRun(int s);
 
 //--------------------------------------------------------------------
 

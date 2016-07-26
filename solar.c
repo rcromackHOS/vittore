@@ -14,24 +14,34 @@
 //--------------------------------------------------------------------
 
 #define	M_PI		3.14159265358979323846	/* pi */
-//#define	M_PI_2		1.57079632679489661923	/* pi/2 */
+//	Flag for a valid calculated of lat and long
 int SOLAR_validCalc = 0;
 
-//--------------------------------------------------------------------
-
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:		calculates a radian from a degree
+//
+// RETURN/UPDATES:	double - radian
+//---------------------------------------------------------------------------------------------
 double radians(double d)
 {
 	return (double)d * (M_PI / 180);
 }
 
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:		calculates a degree from a radians
+//
+// RETURN/UPDATES:	double - degree
+//---------------------------------------------------------------------------------------------
 double degrees(double r)
 {
 	return (double)r * (180 / M_PI);
 }
 
-//------------------------------------------------------------------
-// initialize scope, Latitude and Longitude
-
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:		initialize scope, Latitude and Longitude
+//
+// RETURN/UPDATES:	void
+//---------------------------------------------------------------------------------------------
 void solar_setCoords(double lat, double lng)
 {
    _lat = lat;
@@ -41,9 +51,11 @@ void solar_setCoords(double lat, double lng)
    SOLAR_validCalc = 0;
 }
 
-//------------------------------------------------------------------
-// Convert date to a Julian ordinal integer
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:		Convert date to a Julian ordinal integer
 //
+// RETURN/UPDATES:	float - Julian conversion
+//---------------------------------------------------------------------------------------------
 float solar_toJulian(float y, float m, float d)
 {
   if (m < 3)
@@ -55,8 +67,11 @@ float solar_toJulian(float y, float m, float d)
   return d + (153 * m - 457) / 5 + 365 * y + (y / 4) - (y / 100) + (y / 400) + 1721119;
 }
 
-//------------------------------------------------------------------
-// Returns Sunrise in a dateTimeStruct class
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:		Returns Sunrise in a dateTimeStruct class
+//
+// RETURN/UPDATES:	timeStruct - sunRise calculated from Latitude and Longitude
+//---------------------------------------------------------------------------------------------
 timeStruct solar_getSunrise(dateTimeStruct ds)
 {
 	  timeStruct ts;
@@ -81,9 +96,11 @@ timeStruct solar_getSunrise(dateTimeStruct ds)
 	  return time(0, 0, 0);
 }
 
-
-//------------------------------------------------------------------
-// Returns Sunset in a timeStruct
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:		Returns Sunset in a timeStruct
+//
+// RETURN/UPDATES:	timeStruct - sunSet calculated from Latitude and Longitude
+//---------------------------------------------------------------------------------------------
 timeStruct solar_getSunset(dateTimeStruct ds)
 {
 	  timeStruct ts;
@@ -108,11 +125,13 @@ timeStruct solar_getSunset(dateTimeStruct ds)
 	  return time(0, 0, 0);
 }
 
-//------------------------------------------------------------------
-// Calculates the Sunrise/Sunset by the Date, Latitude and Longitude - http://www.esrl.noaa.gov/gmd/grad/solcalc/
-//	populates _sunset_d & _sunrise_d doubles
-//	added a 15m offset to these day decimals, for the Light Tower
-
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:		Calculates the Sunrise/Sunset by the Date, Latitude and Longitude - http://www.esrl.noaa.gov/gmd/grad/solcalc/
+//					populates _sunset_d & _sunrise_d doubles
+//					added a 15m offset to these day decimals, for the Light Tower
+//
+// RETURN/UPDATES:	timeStruct - sunSet calculated from Latitude and Longitude
+//---------------------------------------------------------------------------------------------
 int solar_calculate(float y, float m, float d)
 {
 	  double dwdw = degrees(0.5);
@@ -186,9 +205,11 @@ int solar_calculate(float y, float m, float d)
 	  return 1;
 }
 
-//------------------------------------------------------------------
-// Calculate HH/MM by daytime decimal, returns dateTimeStruct class with hour and minute loaded
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:		Calculate HH/MM by daytime decimal, returns dateTimeStruct class with hour and minute loaded
 //
+// RETURN/UPDATES:	timeStruct - day dec converted to a time of day
+//---------------------------------------------------------------------------------------------
 timeStruct solar_timeFromDayDec(float dec)//, timeStruct dt)
 {
 	float hours = 24.0*dec;
