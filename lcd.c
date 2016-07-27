@@ -54,7 +54,7 @@ const char tcOPEN_string[] =  {" OPEN"};
 const char bt_tmp_string[] =  {"Battery Temp:  "};
 const char int_tmp_string[] = {"Internal Temp: "};
 
-const char enghrs_string[] = {"Engine Hours: "};
+const char enghrs_string[] = {"Engine Hours:"};
 const char oilchange_string[] = {"Oil Change Due:  "};
 const char RPM_string[] =     {"Engine RPMs:    "};
 const char runtime_string[] = {"Engine Runtime: "};
@@ -472,7 +472,7 @@ void DIAG_showEngineHours()
 
 	strcpy(__screenbuffer, oilchange_string);
 
-	itoa(_OILCHANGE_DUE, __screenbuffer2, 10);
+	itoa((_OILCHANGE_DUE - engine.engineHours), __screenbuffer2, 10);
 	strcat(__screenbuffer, __screenbuffer2);
 
 	OLED_writeLine(__screenbuffer, 1);

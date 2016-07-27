@@ -12,6 +12,8 @@
 #include "config.h"
 #include "mast.h"
 #include "button.h"
+#include "Common.h"
+#include "WatchdogTimerControl.h"
 
 //---------------------------------------------------------------------------------------------
 // DESCRIPTION:		Checks the buttons and mast status for sleep mode
@@ -74,7 +76,7 @@ void mast_stateMachine(mast_States_t deltastate)
 {
 	int upExtentTriggered = (P8IN & IN_MAST_UP_EXTENT) != 0 ? 1 : 0; // 0 = untriggered
 	int downExtentTriggered = (P8IN & IN_MAST_DOWN_EXTENT) != 0 ? 1 : 0; // 1 = untriggered
-	int latchCutout = (P2IN & IN_MAST_CUT_OUT) != 0 ? 1 : 0; // 1 = untriggered
+	int latchCutout = (P2IN & IN_MAST_CUT_OUT) != 0 ? 0 : 1; // 1 = untriggered
 
 	switch (deltastate)
 	{
@@ -91,6 +93,8 @@ void mast_stateMachine(mast_States_t deltastate)
 
 			if (downExtentTriggered == 0 && upExtentTriggered == 0)
 				_MAST_STATUS = MAST_NOMINAL;
+
+			break;
 
 		case MAST_RISING:
 
@@ -129,7 +133,8 @@ void mast_stateMachine(mast_States_t deltastate)
 					P7OUT &= ~OUT_UP_MAST;
 					break;
 			}
-		}
+
+			break;
 
 		case MAST_LOWERING:
 
@@ -139,8 +144,6 @@ void mast_stateMachine(mast_States_t deltastate)
 
 					P7OUT &= ~OUT_DOWN_MAST;
 
-					enterLowPowerMode();
-
 					break;
 
 				case MAST_NOMINAL: 	// lower mast as normal, watch for lower threshold
@@ -149,6 +152,8 @@ void mast_stateMachine(mast_States_t deltastate)
 					{
 						_MAST_STATUS = MAST_MAXDOWN;
 						P7OUT &= ~OUT_DOWN_MAST;
+
+						enterLowPowerMode();
 					}
 
 					else if (downExtentTriggered == 0)
@@ -162,12 +167,41 @@ void mast_stateMachine(mast_States_t deltastate)
 
 					if (upExtentTriggered == 0)
 						_MAST_STATUS = MAST_NOMINAL;
+
 					break;
 
 			}
+
+			break;
 	}
 }
 
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:		Handling function that preps the unit for low power mode
+//						- turn off peripherals
+//						- raise the flag
+//
+// RETURN/UPDATES:	void
+//---------------------------------------------------------------------------------------------
+void enterLowPowerMode()
+{
+	//OLED_clearDisplay();
 
+	//WdtDisable();
+	//_BIS_SR(LPM3_bits + GIE); // LPM3_bits (SCG1+SCG0+CPUOFF) disabled & interrupts enabled
+
+	WdtDisable();
+	_LPMODE = 1;
+
+	P2OUT = ~OUT_ENGINE_ACC;
+	P3OUT = ~OUT_LIGHTS_ON;
+	P4OUT = ~(OUT_RESET_LED + OUT_LIGHT_1H_LED + OUT_AUTO_LED + OUT_STANDBY_LED + OUT_DOWN_LED + OUT_UP_LED);
+	P5OUT = ~BIT4;
+	P7OUT = ~(OUT_DOWN_MAST + OUT_UP_MAST);
+	P8OUT = ~(OUT_HEARTBEAT_LED + OUT_ASSET_IGNITION);
+	P9OUT = ~(OUT_ENGINE_FAIL + OUT_ENGINE_GLOW + OUT_ENGINE_CRANK);
+	P10OUT = 0x0;
+	P11OUT = ~(OUT_nSPARE3_ON + OUT_nSPARE2_ON + OUT_nSPARE4_ON);
+}
 
 

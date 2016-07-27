@@ -71,6 +71,7 @@ extern int OILCHANGE_PRESS_TMR;
 
 extern int _FORCE_LIGHTS_ON;
 extern int _FORCE_ENGINE_RUN;
+extern int _FORCE_SAVEMEMORY;
 
 extern int _DIAGNOSTIC_MODE;
 extern int _DIAGNOSTIC_MODE_TMR;
@@ -82,6 +83,7 @@ extern int _OILCHANGE_DUE;
 extern int _ADCs_UPDATED;
 
 extern int _POINTER_TO_ENGINE_MINS;
+extern int _LPMODE;
 
 //--------------------------------------------------------------------
 

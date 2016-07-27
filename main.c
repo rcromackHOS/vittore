@@ -25,12 +25,11 @@
 #include "engineController.h"
 #include "lcd.h"
 #include "button.h"
-#include "MCP7940N.h"
 #include "bms.h"
 #include "solar.h"
 #include "mast.h"
 #include "MAX31855.h"
-//#include "Flash.h"
+#include "Flash.h"
 #include "RTC.h"
 
 //--------------------------------------------------------------------
@@ -62,33 +61,6 @@ timeStruct defaultSunrise;
 static unsigned int tmrCnt = 0;
 static int secondCount = 0;
 static int preLoadADCs = 5;
-
-//---------------------------------------------------------------------------------------------
-// DESCRIPTION:		Handling function that preps the unit for low power mode
-//						- turn off peripherals
-//						- raise the flag
-//
-// RETURN/UPDATES:	void
-//---------------------------------------------------------------------------------------------
-void enterLowPowerMode()
-{
-	//OLED_clearDisplay();
-
-	//WdtDisable();
-	//_BIS_SR(LPM3_bits + GIE); // LPM3_bits (SCG1+SCG0+CPUOFF) disabled & interrupts enabled
-
-	_LPMODE = 1;
-
-	P2OUT = ~OUT_ENGINE_ACC;
-	P3OUT = ~OUT_LIGHTS_ON;
-	P4OUT = ~(OUT_RESET_LED + OUT_LIGHT_1H_LED + OUT_AUTO_LED + OUT_STANDBY_LED + OUT_DOWN_LED + OUT_UP_LED);
-	P5OUT = ~BIT4;
-	P7OUT = ~(OUT_DOWN_MAST + OUT_UP_MAST);
-	P8OUT = ~(OUT_HEARTBEAT_LED + OUT_ASSET_IGNITION);
-	P9OUT = ~(OUT_ENGINE_FAIL + OUT_ENGINE_GLOW + OUT_ENGINE_CRANK);
-	P10OUT = ~(OUT_ASSET_I1 + OUT_ASSET_I2 + OUT_ASSET_I3 + OUT_ASSET_I4 + OUT_nBATTERY_HEATER_ON + OUT_nCONTACTOR_ON + OUT_nCABINET_HEATER_ON);
-	P11OUT = ~(OUT_nSPARE3_ON + OUT_nSPARE2_ON + OUT_nSPARE4_ON);
-}
 
 //---------------------------------------------------------------------------------------------
 // DESCRIPTION:	Main
@@ -124,7 +96,7 @@ int main()
 	sunRise = time(0, 0, 7);
 
     // --------------------------
-    /*
+
     switch (GetConfiguration())
     {
    	  	  case SEG_VIRGIN:
@@ -136,7 +108,7 @@ int main()
     	  	  	  	  _nop();
    	  		  	  	  break;
    	 }
-	*/
+
 	solar_setCoords(lat, lng);
 
 	sunSet = solar_getSunset(now);
@@ -144,7 +116,7 @@ int main()
 
 	// --------------------------
 
-	//UpdateFlashMemory();
+	UpdateFlashMemory();
     static int newMode;
 
 	// --------------------------
@@ -192,9 +164,28 @@ int main()
 
 			updateDisplay();
 
-			//checkTimeToSaveMemory();
+			checkTimeToSaveMemory();
 
     	}
+		else
+		{
+
+			if (_MAST_STATUS != MAST_MAXDOWN)
+			{
+				InitializeDisplay();
+
+				WdtEnable();  // enable Watch dog
+
+				_LPMODE = 0;
+
+				_SYS_FAILURE_ = 0;
+				BMS_EVENT = 0;
+
+				P5OUT |= BIT4;
+
+				_UPDATE_SCREEN_ = 1;
+			}
+		}
 
 		WdtKeepAlive();  // reset Watch dog
     }
@@ -214,43 +205,45 @@ int main()
 __interrupt void TIMER1_A0_ISR(void)
 {
    tmrCnt++;
-   // ten millis events
+	   // ten millis events
    if (tmrCnt % 2 == 0)
    {
-   	   button_stateMachine();
-   	   mastUpDown();
+		button_stateMachine();
+		mastUpDown();
    }
 
-   // second based events
-   if (tmrCnt % 100 == 0)
+   if (_LPMODE == 0)
    {
-	   P8OUT ^= OUT_HEARTBEAT_LED;
+	   // second based events
+	   if (tmrCnt % 100 == 0)
+	   {
+		   P8OUT ^= OUT_HEARTBEAT_LED;
 
-	   incrementSecondCounts();
+		   incrementSecondCounts();
+	   }
+
+	   // count GPS state
+	   if (GpsStateCountdown != 0)
+		   GpsStateCountdown--;
+
+	   // temp countdown
+	   if (TempCountdown != 0)
+		   TempCountdown--;
+
+	   // count presses of the diagnostic button
+	   if ((P9IN & BUTTON_nDIAGNOSTIC) == 0)
+		   diagBackButton++;
+	   else
+		   diagBackButton = 0;
+
+		// countdown before starting
+		if (RtcCountdown != 0)
+			RtcCountdown--;
+
+		// the timeout for i2C comms.
+		if (RtcTimeout != 0)
+			RtcTimeout--;
    }
-
-   // count GPS state
-   if (GpsStateCountdown != 0)
-	   GpsStateCountdown--;
-
-   // temp countdown
-   if (TempCountdown != 0)
-	   TempCountdown--;
-
-   // count presses of the diagnostic button
-   if ((P9IN & BUTTON_nDIAGNOSTIC) == 0)
-	   diagBackButton++;
-   else
-	   diagBackButton = 0;
-
-	// countdown before starting
-    if (RtcCountdown != 0)
-		RtcCountdown--;
-
-	// the timeout for i2C comms.
-    if (RtcTimeout != 0)
-		RtcTimeout--;
-
 }
 
 //---------------------------------------------------------------------------------------------
@@ -262,25 +255,28 @@ __interrupt void TIMER1_A0_ISR(void)
 #pragma vector = PORT2_VECTOR
 __interrupt void Port_2(void)
 {
-	sleepModeProcess();
-
-	if (_MAST_STATUS != MAST_MAXDOWN)
+	if (_LPMODE == 1)
 	{
-		//__disable_interrupt();
+		sleepModeProcess();
 
-		//_BIS_SR(GIE);
-		//_BIC_SR(LPM3_EXIT); // wake up from low power mode
+		if (_MAST_STATUS != MAST_MAXDOWN)
+		{
+			//__disable_interrupt();
 
-		//WdtEnable();  // enable Watch dog
+			//_BIS_SR(GIE);
+			//_BIC_SR(LPM3_EXIT); // wake up from low power mode
 
-		_LPMODE = 0;
+			//WdtEnable();  // enable Watch dog
 
-		_SYS_FAILURE_ = 0;
-		BMS_EVENT = 0;
+			_LPMODE = 0;
 
-		P5OUT |= BIT4;
+			_SYS_FAILURE_ = 0;
+			BMS_EVENT = 0;
 
-		P2IFG &= ~IN_MAST_CUT_OUT;
+			P5OUT |= BIT4;
+
+			P2IFG &= ~IN_MAST_CUT_OUT;
+		}
 	}
 }
 
@@ -314,7 +310,7 @@ void handleButtonLight()
 		if (_UNIT_MODE == buttonList[i].mode)
 			P4OUT |= buttonList[i].LEDpin;
 
-		else
+		else if (_UNIT_MODE != buttonList[i].mode || _LPMODE == 1)
 			P4OUT &= ~buttonList[i].LEDpin;
 	}
 	P4OUT &= ~BIT0;
@@ -332,6 +328,9 @@ void setLightsState(int s)
 
     else
     	P3OUT &= ~OUT_LIGHTS_ON;
+
+	if (_LPMODE == 1)
+		P3OUT &= ~OUT_LIGHTS_ON;
 }
 
 //---------------------------------------------------------------------------------------------
@@ -398,6 +397,12 @@ void handleSystemFailEvent()
 		P11OUT &= ~OUT_nSPARE2_ON;
 	else
 		P11OUT |= OUT_nSPARE2_ON;
+
+	if (_LPMODE == 1)
+	{
+		P9OUT &= ~OUT_ENGINE_FAIL;
+		P10OUT &= ~OUT_ASSET_I4;
+	}
 }
 
 //---------------------------------------------------------------------------------------------
@@ -412,6 +417,10 @@ void handleLowFuelEvent()
 		P10OUT |= OUT_ASSET_I3;
 	else
 		P10OUT &= ~OUT_ASSET_I3;
+
+	if (_LPMODE == 1)
+		P10OUT &= ~OUT_ASSET_I3;
+
 }
 
 //---------------------------------------------------------------------------------------------
@@ -461,6 +470,9 @@ void handleCabinetHeating()
 
 	if (VALUE_INTERNAL_TEMP >= _HIGH_SP_INTERNAL_TEMP)
 		P10OUT &= ~OUT_nCABINET_HEATER_ON;
+
+	if (_LPMODE == 1)
+		P10OUT &= ~OUT_nCABINET_HEATER_ON;
 }
 
 //---------------------------------------------------------------------------------------------
@@ -473,15 +485,15 @@ void checkTimeToSaveMemory()
 {
 	static int memSaved;
 
-	if (now.hour == sunRise.hour && now.minute == sunRise.minute && memSaved == 0)
+	if ((now.hour == sunRise.hour && now.minute == sunRise.minute && memSaved == 0) || _FORCE_SAVEMEMORY == 1)
 	{
     	UpdateFlashMemory();
     	memSaved = 1;
+    	_FORCE_SAVEMEMORY = 0;
 	}
 	else if (now.hour != sunRise.hour && now.minute != sunRise.minute)
 		memSaved = 0;
 }
-
 
 
 //---------------------------------------------------------------------------------------------

@@ -15,9 +15,10 @@
 
 //--------------------------------------------------------------------
 
-extern void sleepModeProcess();
 extern void mastUpDown();
 extern void mast_stateMachine(mast_States_t deltastate);
+extern void enterLowPowerMode();
+extern void sleepModeProcess();
 
 //--------------------------------------------------------------------
 

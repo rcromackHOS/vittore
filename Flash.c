@@ -301,6 +301,7 @@ void UpdateFlashMemory(void)
 
 	//------------------------------------------ save idle times
 
+	/*
 	int i = 0;
 	//int j = 0;
 	int pointer = 0;
@@ -320,7 +321,7 @@ void UpdateFlashMemory(void)
 
 		_nop();
 	}
-
+	*/
 	//------------------------------------------
 
 	// TODO: Save the time of last engine run

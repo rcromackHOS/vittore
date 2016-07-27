@@ -73,8 +73,8 @@ static void ConfigurePins(void)
 	P2SEL = 0;
 	P2DS = 0;
 	P2IES = IN_MAST_CUT_OUT;
-	P2IE = IN_MAST_CUT_OUT;						// falling edge
-	P2IFG &= ~IN_MAST_CUT_OUT;
+	//P2IE = IN_MAST_CUT_OUT;						// falling edge
+	//P2IFG &= ~IN_MAST_CUT_OUT;
 
 	P3DIR = BIT0 + BIT3 + OUT_LIGHTS_ON + LCD_SPI_SIMO;
 	P3OUT = BIT0 + BIT3;

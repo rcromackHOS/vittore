@@ -37,7 +37,7 @@ void buildButtonStateMachine()
     button c = {BUTTON_nUP, OUT_UP_LED, MODE_DOWN, STATE_NOMINAL, 0, 0};
     buttonList[5] = c;
 
-
+    P4OUT = 0x3F;
     /*
 	 buttonList[5] =
 	{

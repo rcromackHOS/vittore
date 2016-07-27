@@ -22,7 +22,7 @@
 
 extern void InitializeRTC();
 extern void pollTime();
-extern int RTC_adjust(dateTimeStruct dt);
+extern void RTC_adjust(dateTimeStruct dt);
 int RTC_isRunning(void);
 int RTC_timeIsSet(void);
 extern dateTimeStruct RTC_now();

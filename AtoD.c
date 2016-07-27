@@ -23,7 +23,7 @@
 
 unsigned int ADC_SAMPLES_24V[10];
 unsigned long ADC_TOTAL_24V;
-unsigned int adc_counts = 10;
+unsigned int adc_counts = 5;
 unsigned int adc_count_index = 0;
 
 #define CALADC12_15V_30C  *((unsigned int *)0x1A22)   // Temperature Sensor Calibration-30 C

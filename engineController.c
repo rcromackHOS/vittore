@@ -10,7 +10,7 @@
 #include "Hardware.h"
 #include "timeDate.h"
 #include "Common.h"
-//#include "Flash.h"
+#include "Flash.h"
 
 //---------------------------------------------------------------------------------------------
 // DESCRIPTION:		Initialize engine object. Start with empty data
@@ -320,9 +320,8 @@ void set_Engine_State(int mode)
 			{
 				engine.lastRunEnd = now;
 
-
 				// TODO: Save the time of last engine run
-				//UpdateFlashMemory();
+				UpdateFlashMemory();
 			}
 
 			engine.runTime = 0;
@@ -442,11 +441,11 @@ void handle_oilchangeClear()
 			if (OILCHANGE_PRESS_TMR >= 5)
 			{
 				OILCHANGE_PRESS_TMR = 0;
-				_OILCHANGE_DUE += engine.engineHours;
+				_OILCHANGE_DUE = engine.engineHours + 500;
 
 				clearStateCode( 4 );
 
-				// write oil change hours to EEPROM
+				UpdateFlashMemory();
 			}
 		}
 	}

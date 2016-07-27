@@ -14,7 +14,7 @@ int _ADCs_UPDATED_	=			0;
 //--------------------------------------------------------------------
 
 float _HIGH_SP_24V = 			28.1;//27.5 for 15 min
-float _LOW_SP_24V = 	    	25.50;//26.5 for 15 min
+float _LOW_SP_24V = 	    	25.5;//26.5 for 15 min
 float VALUE_24V = 	    		0.0;
 
 float VALUE_PCB_24V = 	    	0.0;
@@ -42,6 +42,7 @@ int _UNIT_MODE =				0;
 int LIGHTS1HOUR_TMR =			0;
 
 int _STATE_CODE =				0;
+int _LPMODE = 					0;
 
 //--------------------------------------------------------------------
 
@@ -50,7 +51,7 @@ int BMS_EVENT =					0;
 float _HIGH_SP_BMS = 			28.60;
 float _LOW_SP_BMS = 			22.50;
 
-int _BANK_BMS_TMR_SP = 			5;
+int _BANK_BMS_TMR_SP = 			30;
 int _BANK_BMS_TMR_D = 			0;
 
 int _CELLMONITOR_TMR_SP = 		30;
@@ -64,8 +65,9 @@ int _RESETTING_ =      			0;
 int RESET_TMR =      			0;
 int OILCHANGE_PRESS_TMR =      	0;
 
-int _FORCE_LIGHTS_ON =   		0;
+int _FORCE_LIGHTS_ON =   		1;
 int _FORCE_ENGINE_RUN =   		0;
+int _FORCE_SAVEMEMORY =   		0;
 
 int _ADCs_UPDATED =				0;
 
@@ -74,7 +76,7 @@ int _DIAGNOSTIC_MODE_TMR =   	0;
 int _DIAGNOSTIC_PAGE = 			0;
 int _DIAGNOSTIC_PAGES = 		2;
 
-int _OILCHANGE_DUE =     		0;
+int _OILCHANGE_DUE =     		500;
 
 int _SYS_FAILURE_ = 			0;
 
