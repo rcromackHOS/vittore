@@ -146,22 +146,21 @@ void loadAnalogData()
 		 //-------------------------
 
 		 ADC_TOTAL_24V -= ADC_SAMPLES_24V[adc_count_index];
-		 ADC_SAMPLES_24V[adc_count_index] = ADC[AD_24V_POWER_VLT];
+		 ADC_SAMPLES_24V[adc_count_index] = ADC[AD_P_BATTERY_VLT];
 		 ADC_TOTAL_24V += ADC_SAMPLES_24V[adc_count_index];
 
 		 adc_count_index++;
 		 if (adc_count_index == adc_counts)
 			 adc_count_index = 0;
 
-		 VALUE_PCB_24V = ((float)(ADC_TOTAL_24V / adc_counts) / 4095) * 30;
+		 VALUE_24V = ((float)(ADC_TOTAL_24V / adc_counts) / 4095) * 30;
+		 VALUE_24V -= 0.1;
 
 		 //-------------------------
 
 		 VALUE_12V = ((float)ADC[AD_12V_BATTERY_VLT] / 4095) * 15.5;
 
-		 VALUE_24V = (((float)ADC[AD_P_BATTERY_VLT] / 4095) * 30);
-
-		 VALUE_24V = VALUE_PCB_24V;
+		 VALUE_PCB_24V = (((float)ADC[AD_24V_POWER_VLT] / 4095) * 30);
 
 		 VALUE_CURRENT_OUT = ((float)ADC[AD_P_ENGINE_CUR] / 4095) * 500;
 		 //VALUE_12V = ((float)ADC[AD_N_ENGINE_CUR] / 4095) * 500;

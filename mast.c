@@ -14,6 +14,7 @@
 #include "button.h"
 #include "Common.h"
 #include "WatchdogTimerControl.h"
+#include "lcd.h"
 
 //---------------------------------------------------------------------------------------------
 // DESCRIPTION:		Checks the buttons and mast status for sleep mode
@@ -204,4 +205,30 @@ void enterLowPowerMode()
 	P11OUT = ~(OUT_nSPARE3_ON + OUT_nSPARE2_ON + OUT_nSPARE4_ON);
 }
 
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:		Handling function that returns from low power mode
+//						- enablePeripherals
+//						- clear flag
+//
+// RETURN/UPDATES:	void
+//---------------------------------------------------------------------------------------------
+void HandleLowPowerMode()
+{
+	P4OUT = ~(OUT_RESET_LED + OUT_LIGHT_1H_LED + OUT_AUTO_LED + OUT_STANDBY_LED + OUT_DOWN_LED + OUT_UP_LED);
 
+	if (_MAST_STATUS != MAST_MAXDOWN)
+	{
+		InitializeDisplay();
+
+		WdtEnable();  // enable Watch dog
+
+		_LPMODE = 0;
+
+		_SYS_FAILURE_ = 0;
+		BMS_EVENT = 0;
+
+		P5OUT |= BIT4;
+
+		_UPDATE_SCREEN_ = 1;
+	}
+}

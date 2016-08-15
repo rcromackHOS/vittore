@@ -22,6 +22,7 @@
 #include "AtoD.h"
 #include "GPS.h"
 #include "RTC.h"
+#include "mast.h"
 
 static void ConfigurePins(void);
 static void ConfigureCrystals(void);
@@ -33,7 +34,6 @@ static void SetVcoreUp (unsigned int level);
 
 
 void InitializeHardware(void)
-
 {
 	ConfigurePins();
 	ConfigureCrystals();
@@ -46,6 +46,15 @@ void InitializeHardware(void)
 
 	//Add I2C, UARTS, SPI, General Timer,
 
+	// --------------------------
+	// poke the state machine with a default value, and enter our real status
+	mast_stateMachine( MAST_NOMINAL );
+
+    // if we start with the mast down, hit low-power mode
+	if (_MAST_STATUS == MAST_MAXDOWN)
+		enterLowPowerMode();
+	else // if not, do a pretty power up.
+	    P4OUT = 0x3F;
 }
 
 

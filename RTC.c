@@ -59,11 +59,11 @@ void InitializeRTC()
 	if (RTC_timeIsSet() == 0)
 	{
 		RTC_adjust(now);
-		setStateCode(10);
+		//setStateCode(10);
 	}
 
     RtcCountdown = 200;			// 2 seconds delay to make sure seconds are incrementing
-    while (RtcCountdown)
+    while (RtcCountdown > 0)
     {
     	WdtKeepAlive();
     }

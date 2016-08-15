@@ -312,11 +312,16 @@ void set_Engine_State(int mode)
 
 			//if (engine.mode != ENGINE_STOP)
 		   	//{
-				clearStateCode(28);
-				clearStateCode(29);
+			clearStateCode(28);
+			clearStateCode(29);
 		    //}
 
-			if (engine.mode == ENGINE_RUNNING)
+			P2OUT &= ~OUT_ENGINE_ACC;
+			P9OUT &= ~OUT_ENGINE_CRANK;
+			P9OUT &= ~OUT_ENGINE_GLOW;
+			P8OUT &= ~OUT_ASSET_IGNITION;
+
+			if (engine.runTime >= 5)
 			{
 				engine.lastRunEnd = now;
 
@@ -325,14 +330,7 @@ void set_Engine_State(int mode)
 			}
 
 			engine.runTime = 0;
-
-		    P2OUT &= ~OUT_ENGINE_ACC;
-			P9OUT &= ~OUT_ENGINE_CRANK;
-			P9OUT &= ~OUT_ENGINE_GLOW;
-			P8OUT &= ~OUT_ASSET_IGNITION;
-		   //}
-
-		   engine.mode = ENGINE_STOP;
+		    engine.mode = ENGINE_STOP;
 
 		   break;
 

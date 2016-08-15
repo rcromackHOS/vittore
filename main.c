@@ -13,10 +13,9 @@
 /******************************************************************************/
 
 //#include <msp430.h>
-#include "config.h"
-
-#include "Hardware.h"
 #include "msp430f5419A.h"
+#include "config.h"
+#include "Hardware.h"
 #include "Common.h"
 #include "WatchdogTimerControl.h"
 #include "AtoD.h"
@@ -34,8 +33,7 @@
 
 //--------------------------------------------------------------------
 
-void enterLowPowerMode();
-void exitLowPowerMode();
+void InitializeTimeDate();
 
 void setLightsState(int s);
 int isQuietTime(dateTimeStruct now);
@@ -69,7 +67,7 @@ static int preLoadADCs = 5;
 //---------------------------------------------------------------------------------------------
 int main()
 {
-    WdtDisable();
+	WdtDisable();
     __disable_interrupt();
 
     // -------------------------- initization
@@ -82,49 +80,14 @@ int main()
 
     InitializeEngine();
 
-	InitializeRTC();
+    InitializeTimeDate();
 
     // --------------------------
 
-	mast_stateMachine( MAST_NOMINAL );
-
-    // -------------------------- default values
-
-	defaultSunset = time(0, 0, 19);
-	defaultSunrise = time(0, 0, 7);
-	sunSet = time(0, 0, 19);
-	sunRise = time(0, 0, 7);
-
-    // --------------------------
-
-    switch (GetConfiguration())
-    {
-   	  	  case SEG_VIRGIN:
-   	  	  case 0:
-    	  	  	  	  break;
-   	  	  default: 	  // Flash is bad!
-    	  	  	  	  // Run on defaults
-
-    	  	  	  	  _nop();
-   	  		  	  	  break;
-   	 }
-
-	solar_setCoords(lat, lng);
-
-	sunSet = solar_getSunset(now);
-	sunRise = solar_getSunrise(now);
-
-	// --------------------------
-
-	UpdateFlashMemory();
     static int newMode;
 
-	// --------------------------
-
-	if (_MAST_STATUS == MAST_MAXDOWN)
-		enterLowPowerMode();
-
 	_BIS_SR(GIE); // interrupts enabled
+
 	WdtEnable();  // enable Watch dog
 
 	// --------------------------
@@ -168,24 +131,9 @@ int main()
 
     	}
 		else
-		{
+			HandleLowPowerMode();
 
-			if (_MAST_STATUS != MAST_MAXDOWN)
-			{
-				InitializeDisplay();
 
-				WdtEnable();  // enable Watch dog
-
-				_LPMODE = 0;
-
-				_SYS_FAILURE_ = 0;
-				BMS_EVENT = 0;
-
-				P5OUT |= BIT4;
-
-				_UPDATE_SCREEN_ = 1;
-			}
-		}
 
 		WdtKeepAlive();  // reset Watch dog
     }
@@ -235,15 +183,15 @@ __interrupt void TIMER1_A0_ISR(void)
 		   diagBackButton++;
 	   else
 		   diagBackButton = 0;
-
-		// countdown before starting
-		if (RtcCountdown != 0)
-			RtcCountdown--;
-
-		// the timeout for i2C comms.
-		if (RtcTimeout != 0)
-			RtcTimeout--;
    }
+
+	// the timeout for i2C comms.
+	if (RtcTimeout != 0)
+		RtcTimeout--;
+
+	// countdown before starting
+	if (RtcCountdown != 0)
+		RtcCountdown--;
 }
 
 //---------------------------------------------------------------------------------------------
@@ -314,10 +262,54 @@ void handleButtonLight()
 			P4OUT &= ~buttonList[i].LEDpin;
 	}
 	P4OUT &= ~BIT0;
+	P4OUT &= ~buttonList[4].LEDpin;
+	P4OUT &= ~buttonList[5].LEDpin;
+}
+
+
+//---------------------------------------------------------------------------------------------
+// DESCRIPTION:		Initialize all date and Time relative functionality.
+//
+// RETURN/UPDATES:	void
+//---------------------------------------------------------------------------------------------
+void InitializeTimeDate()
+{
+	// Set up the RTC SPI periheral
+	InitializeRTC();
+
+	// Set up defaults for the sunrise sunset
+	defaultSunset = time(0, 0, 19);
+	defaultSunrise = time(0, 0, 7);
+	sunSet = defaultSunset;
+	sunRise = defaultSunrise;
+
+    // --------------------------
+	// check memory mapping
+    switch (GetConfiguration())
+    {
+   	  	  case SEG_VIRGIN: // new board, fresh memor. Load in defaults and restart
+   	  		  	  //WdtEnable();  // enable Watch dog
+   	  		  	 // while (1) {};
+   	  		  	  break;
+
+   	  	  case 0:
+    	  	  	  break;
+
+   	  	  default:
+   	  		  	  setStateCode(98);
+   	  		  	  break;
+   	 }
+
+	// pull data from memory, start the calculations for our location
+    solar_setCoords(lat, lng);
+    // override our defaults with real data
+	sunSet = solar_getSunset(now);
+	sunRise = solar_getSunrise(now);
 }
 
 //---------------------------------------------------------------------------------------------
-// DESCRIPTION:
+// DESCRIPTION:		controls the actual lighting output. Some events override other
+//					lighting conditions
 //
 // RETURN/UPDATES:	void
 //---------------------------------------------------------------------------------------------
@@ -394,9 +386,15 @@ void handleSystemFailEvent()
 
 	// if theres a BMS problem, turn off the inverter
 	if (BMS_EVENT == 1)
+	{
+		//P11OUT &= ~OUT_nSPARE3_ON;
 		P11OUT &= ~OUT_nSPARE2_ON;
+	}
 	else
+	{
 		P11OUT |= OUT_nSPARE2_ON;
+		//P11OUT |= OUT_nSPARE3_ON;
+	}
 
 	if (_LPMODE == 1)
 	{
@@ -549,6 +547,11 @@ void incrementSecondCounts()
 	if (ATTEMPT_D != 0)
 		ATTEMPT_D--;
 
+	if (L_SETPOINT_HIT > 0)
+		L_SETPOINT_HIT++;
+
+	if (H_SETPOINT_HIT > 0)
+		H_SETPOINT_HIT++;
 
 	//---------------------------------------------
 	// Lights centric timers

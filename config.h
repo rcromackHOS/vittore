@@ -26,6 +26,9 @@ extern float VALUE_PCB_24V;
 
 extern int BMS_EVENT;
 
+extern int H_SETPOINT_HIT;
+extern int L_SETPOINT_HIT;
+
 extern float _HIGH_SP_BMS;
 extern float _LOW_SP_BMS;
 
@@ -72,6 +75,7 @@ extern int OILCHANGE_PRESS_TMR;
 extern int _FORCE_LIGHTS_ON;
 extern int _FORCE_ENGINE_RUN;
 extern int _FORCE_SAVEMEMORY;
+extern int _FORCE_GPS_OUTPUTS;
 
 extern int _DIAGNOSTIC_MODE;
 extern int _DIAGNOSTIC_MODE_TMR;

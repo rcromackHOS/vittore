@@ -19,7 +19,7 @@
 
 unsigned char FlashRegisters[MAX_INFO_SIZE];
 
-unsigned int DEFAULT_CONFIG[] = { 0, 0, 0, 0, 0, 20, 70, 0, 51, 65, 1 };
+unsigned int DEFAULT_CONFIG[] = { 0, 0, 0, 1, 244, 20, 70, 0, 51, 65, 1 };
 int mem_pointer;
 
 /*
@@ -228,6 +228,7 @@ static void LoadRamRegistersFromFlash(flashseg_t seg)
 //---------------------------------------------------------------------------------------------
 void UpdateFlashMemory(void)
 {
+
 	//unsigned char idx;
 	unsigned char data[128];
 	unsigned int checksum;
@@ -236,34 +237,10 @@ void UpdateFlashMemory(void)
 	//for(idx = 0; idx < MAX_INFO_SIZE; idx++)
 	//	data[idx] = 0xff;
 
-	/*
-	 * 0-1  	Engine Hours
-	 * 2		Engine Mins
-	 * 3-4		Oil Change
-	 * 5-6		latitude
-	 * 7 		sign for lat
-	 * 8-9		longitude
-	 * 10 		sign for lng
-	 */
-	/*
-	// point = base offset (10) + size of saved data (11) * point of scrolling memory (0-9)
-	POINTER = MEM_POINTER_EXTENT + (MEM_SEG_SIZE + mem_pointer);
-
-	// if you go over the possible number of memory blocks
-	if (POINTER > 8)
-		POINTER = MEM_POINTER_EXTENT;	// reset to the first block spot
-	*/
 
 	data[0] = (engine.engineHours >> 8) & 0xFF;
   	data[1] = engine.engineHours & 0xFF;
 
-	/*
-  	_POINTER_TO_ENGINE_MINS++;
-
-	_POINTER_TO_ENGINE_MINS = FlashRegisters[2];
-
-	engine.engineMins = FlashRegisters[_POINTER_TO_ENGINE_MINS];
-	*/
   	data[2] = engine.engineMins & 0xFF;
 
 	data[3] = (_OILCHANGE_DUE >> 8) & 0xFF;
@@ -334,6 +311,7 @@ void UpdateFlashMemory(void)
 
 	overwriteInfoSeg(segB,&data[0]);
 	overwriteInfoSeg(segC,&data[0]);
+
 }
 
 //---------------------------------------------------------------------------------------------
@@ -416,7 +394,7 @@ static void overwriteInfoSeg(flashseg_t seg, unsigned char *data)
 	while(FCTL3 & BUSY);
 	FCTL3 = FWKEY+LOCK;                       // Set LOCK bit
 
-//	__enable_interrupt();
+	__enable_interrupt();
 	WdtEnable();
 }
 
@@ -446,7 +424,7 @@ static void copy_segCtoB(void)
 	while(FCTL3 & BUSY);
 	FCTL3 = FWKEY+LOCK;                       // Set LOCK bit
 
-//	__enable_interrupt();
+	__enable_interrupt();
 	WdtEnable();
 }
 

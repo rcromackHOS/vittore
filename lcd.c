@@ -34,7 +34,7 @@ const char msg12[] = {"Engine Failed Start "};
 const char msg13[] = {"  Engine Overspeed  "};
 const char msg14[] = {"  Engine Underspeed "};
 const char msg15[] = {"Engine Overheat Fail"};
-const char msg16[] = {"Engine Low oil pres."};
+const char msg16[] = {"  Engine Underspeed "};//{"Engine Low oil pres."};
 const char msg17[] = {" Hardware Exception "};
 const char msg18[] = {"BMS FAIL, CALL TECH."};
 const char msg19[] = {"   Engine Starting  "};
@@ -43,6 +43,7 @@ const char msg21[] = {"Sunrise:    "};
 const char msg22[] = {"Sunset:     "};
 const char msg23[] = {"Lat:         "};
 const char msg24[] = {"Lng:         "};
+//const char msg25[] = {"    MEMORY ERROR    "};
 const char emptyLine_char[] = {"                    "};
 const char empty_char[] = {""};
 const char slash_char[] = {"/"};
@@ -50,6 +51,7 @@ const char space_char[] = {" "};
 const char zero_char[] = {"0"};
 const char colon_char[] = {":"};
 const char VOLT_char[] = {" V"};
+
 const char tcOPEN_string[] =  {" OPEN"};
 const char bt_tmp_string[] =  {"Battery Temp:  "};
 const char int_tmp_string[] = {"Internal Temp: "};
@@ -59,8 +61,8 @@ const char oilchange_string[] = {"Oil Change Due:  "};
 const char RPM_string[] =     {"Engine RPMs:    "};
 const char runtime_string[] = {"Engine Runtime: "};
 
-const char li0[] = "CLEANETEK INDUSTRIES";
-const char li1[] = "        INC         ";
+const char li0[] = "CLEANTEK Industries ";
+const char li1[] = "        Inc         ";
 //const char* const cmpyName[] = {li0, li1};
 
 //--------------------------------------------------------------------
@@ -305,9 +307,9 @@ void DIAG_showDate()
 		strcat(__screenbuffer, space_char);
 
 	// time
-	if (now.second < 10)
+	if (now.hour < 10)
 		strcat(__screenbuffer, zero_char);
-	itoa(now.second, __screenbuffer2, 10);
+	itoa(now.hour, __screenbuffer2, 10);
 	strcat(__screenbuffer, __screenbuffer2);
 
 	strcat(__screenbuffer, colon_char); 	//-
@@ -319,9 +321,9 @@ void DIAG_showDate()
 
 	strcat(__screenbuffer, colon_char); 	//-
 
-	if (now.hour < 10)
+	if (now.second < 10)
 		strcat(__screenbuffer, zero_char);
-	itoa(now.hour, __screenbuffer2, 10);
+	itoa(now.second, __screenbuffer2, 10);
 	strcat(__screenbuffer, __screenbuffer2);
 
 	OLED_writeLine(__screenbuffer, 0);
@@ -453,8 +455,8 @@ void DIAG_showEngineHours()
 		strcat(__screenbuffer, space_char);
 	if (engine.engineHours < 100)
 		strcat(__screenbuffer, space_char);
-//	if (engine.engineHours < 10)
-//		strcat(__screenbuffer, space_char);
+	if (engine.engineHours < 10)
+		strcat(__screenbuffer, zero_char);
 
 	itoa(engine.engineHours, __screenbuffer2, 10);
 	strcat(__screenbuffer, __screenbuffer2);

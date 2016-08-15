@@ -31,20 +31,49 @@ void check_BatteryBox_Status()
 	static int _engineOn;
 
 	//---------------------------------------------- VOLTAGE
-
+	// Latch the run state. It also allows us to force the engine to charge at any point
 	if (_FORCE_ENGINE_RUN == 1)
 		_engineOn = 1;
 
+	// if we've hit the low set point
 	if (VALUE_24V < _LOW_SP_24V)
 	{
-		setStateCode(2);
-		_engineOn = 1;
+		// the initial condition gets the counter going
+		if (L_SETPOINT_HIT == 0)
+			L_SETPOINT_HIT++;
+		// count for 3 seconds of consistent low voltage
+		else if (L_SETPOINT_HIT == 3)
+		{
+			// set the engine run and state condititon
+			setStateCode(2);
+			_engineOn = 1;
+			L_SETPOINT_HIT = 0;
+		}
 	}
 	else
+	{
+		// if we dip back about the low set point, clear the counter
 		clearStateCode(2);
+		L_SETPOINT_HIT = 0;
+	}
 
+	// if we're hit our charging set point
 	if (VALUE_24V >= _HIGH_SP_24V)
-		_engineOn = 0;
+	{
+		// the initial condition gets the counter going
+		if (H_SETPOINT_HIT == 0)
+			H_SETPOINT_HIT++;
+		// count for 3 seconds of consistent high voltage
+		else if (H_SETPOINT_HIT == 3)
+		{
+			// stop the engine, and stop the counter
+			_engineOn = 0;
+			H_SETPOINT_HIT = 0;
+		}
+	}
+	// if we dip back under the high set point, clear the counter
+	else
+		H_SETPOINT_HIT = 0;
 
 	//---------------------------------------------- TEMPERATURE
 

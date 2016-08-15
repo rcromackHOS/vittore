@@ -13,8 +13,8 @@ int _ADCs_UPDATED_	=			0;
 
 //--------------------------------------------------------------------
 
-float _HIGH_SP_24V = 			28.1;//27.5 for 15 min
-float _LOW_SP_24V = 	    	25.5;//26.5 for 15 min
+float _HIGH_SP_24V = 			28.3;//27.5 for 15 min
+float _LOW_SP_24V   = 	    	25.4;//26.5 for 15 min
 float VALUE_24V = 	    		0.0;
 
 float VALUE_PCB_24V = 	    	0.0;
@@ -29,8 +29,8 @@ float VALUE_BAT_TEMP = 			6.00;
 
 float _HIGH_SP_INTERNAL_TEMP = 	10.00;
 float _LOW_SP_INTERNAL_TEMP = 	1.00;
-float VALUE_INTERNAL_TEMP = 	6.00;
-float VALUE_INTERNAL2_TEMP =	6.00;
+float VALUE_INTERNAL_TEMP = 	0.00;
+float VALUE_INTERNAL2_TEMP =	0.00;
 
 //--------------------------------------------------------------------
 
@@ -39,7 +39,7 @@ int _LOW_SP_RPM = 	 			1000;
 int VALUE_RPM = 	   		    0;
 
 int _UNIT_MODE =				0;
-int LIGHTS1HOUR_TMR =			0;
+int LIGHTS1HOUR_TMR =			1;
 
 int _STATE_CODE =				0;
 int _LPMODE = 					0;
@@ -48,7 +48,10 @@ int _LPMODE = 					0;
 
 int BMS_EVENT =					0;
 
-float _HIGH_SP_BMS = 			28.60;
+int H_SETPOINT_HIT =			0;
+int L_SETPOINT_HIT =			0;
+
+float _HIGH_SP_BMS = 			28.5;
 float _LOW_SP_BMS = 			22.50;
 
 int _BANK_BMS_TMR_SP = 			30;
@@ -68,6 +71,8 @@ int OILCHANGE_PRESS_TMR =      	0;
 int _FORCE_LIGHTS_ON =   		1;
 int _FORCE_ENGINE_RUN =   		0;
 int _FORCE_SAVEMEMORY =   		0;
+
+int _FORCE_GPS_OUTPUTS = 		0;
 
 int _ADCs_UPDATED =				0;
 
@@ -118,8 +123,8 @@ int diagBackButton =			0;
 
 //--------------------------------------------------------------------
 
-double lat =					0.0;
-double lng = 					0.0;
+double lat =					52.1;
+double lng = 					-113.0;
 
 dateTimeStruct now;
 timeStruct sunSet;

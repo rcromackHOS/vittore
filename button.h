@@ -23,10 +23,9 @@
 #define MODE_UP       	  0x4
 #define MODE_DOWN     	  0x5
 
-
 //--------------------------------------------------------------------
 
-void buildButtonStateMachine();
+extern void buildButtonStateMachine();
 void button_stateMachine();
 
 void mastUpDown();
